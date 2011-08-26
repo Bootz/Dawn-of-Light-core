@@ -1,5 +1,6 @@
 *.suo
 /release
+/debug
 /obj/Release
 /DOLBase/obj
 /DOLConfig/obj
