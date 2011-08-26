@@ -1,0 +1,10 @@
+*.suo
+/release
+/obj/Release
+/DOLBase/obj
+/DOLConfig/obj
+/DOLDatabase/obj
+/DOLServer/obj
+/GameServer/obj
+/GameServerScripts/obj
+/UnitTests/obj
