@@ -1352,7 +1352,10 @@ namespace DOL.GS
                 }
                 else
                 {
-                    tmp = new ObjectEnumerator(res);
+                    if (res.Count > 0)
+                        tmp = new ObjectEnumerator(res);
+                    else
+                        tmp = new EmptyEnumerator();
                 }
                 return tmp;
             }
