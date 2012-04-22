@@ -1,16 +1,16 @@
 /*
  * DAWN OF LIGHT - The first free open source DAoC server emulator
- * 
+ *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
  * as published by the Free Software Foundation; either version 2
  * of the License, or (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
@@ -18,19 +18,16 @@
  */
 
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using DOL.Database;
 using DOL.Events;
-using DOL.GS.PacketHandler;
-using DOL.GS.RealmAbilities;
 using DOL.GS.Spells;
 
 namespace DOL.GS.Effects
 {
     /// <summary>
     /// Minion Rescue
-    /// </summary> 
+    /// </summary>
     public class SearingPetEffect : TimedEffect
     {
         // Parameters
@@ -86,6 +83,7 @@ namespace DOL.GS.Effects
                 GameEventMgr.AddHandler(EffectOwner, GamePlayerEvent.Quit, new DOLEventHandler(PlayerLeftWorld));
             }
         }
+
         public override void Stop()
         {
             if (pulseTimer != null) { pulseTimer.Stop(); pulseTimer = null; }
@@ -94,6 +92,7 @@ namespace DOL.GS.Effects
 
             base.Stop();
         }
+
         protected virtual int PulseTimer(RegionTimer timer)
         {
             if (EffectOwner == null || pet == null || pbaoe == null)
@@ -129,13 +128,14 @@ namespace DOL.GS.Effects
             if (player != null && player.ControlledBrain != null && player.ControlledBrain.Body != null)
             {
                 GameNPC pet = player.ControlledBrain.Body as GameNPC;
-				SearingPetEffect SearingPet = pet.EffectList.GetOfType<SearingPetEffect>();
+                SearingPetEffect SearingPet = pet.EffectList.GetOfType<SearingPetEffect>();
                 if (SearingPet != null)
                     SearingPet.Cancel(false);
             }
         }
 
         public override string Name { get { return "Searing pet"; } }
+
         public override ushort Icon { get { return 7064; } }
 
         public override IList<string> DelveInfo

@@ -1,21 +1,23 @@
 /*
  * DAWN OF LIGHT - The first free open source DAoC server emulator
- * 
+ *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
  * as published by the Free Software Foundation; either version 2
  * of the License, or (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
  */
+
+using DOL.Events;
 
 /*
  * Suncheck: [19.06.2007]
@@ -23,9 +25,8 @@
  *   - Sorted
  *   - Added missing (+language support)
  */
-using System;
+
 using DOL.Language;
-using DOL.Events;
 
 namespace DOL.GS.PlayerTitles
 {
@@ -39,21 +40,20 @@ namespace DOL.GS.PlayerTitles
         /// </summary>
         /// <param name="player">The title owner.</param>
         /// <returns>The title description.</returns>
-		public override string GetDescription(GamePlayer player)
-		{
-			return LanguageMgr.GetTranslation(player.Client, "Titles.Kills.All.MasterAssassine");
-		}
+        public override string GetDescription(GamePlayer player)
+        {
+            return LanguageMgr.GetTranslation(player.Client, "Titles.Kills.All.MasterAssassine");
+        }
 
-		/// <summary>
-		/// The title value, shown over player's head.
-		/// </summary>
-		/// <param>The title owner.</param>
-		/// <returns>The title value.</returns>
-		public override string GetValue(GamePlayer player)
-		{
-			return LanguageMgr.GetTranslation(player.Client, "Titles.Kills.All.MasterAssassine");
-		} 
-
+        /// <summary>
+        /// The title value, shown over player's head.
+        /// </summary>
+        /// <param>The title owner.</param>
+        /// <returns>The title value.</returns>
+        public override string GetValue(GamePlayer player)
+        {
+            return LanguageMgr.GetTranslation(player.Client, "Titles.Kills.All.MasterAssassine");
+        }
 
         /// <summary>
         /// The event to hook.
@@ -70,7 +70,7 @@ namespace DOL.GS.PlayerTitles
         /// <returns>true if the player is suitable for this title.</returns>
         public override bool IsSuitable(GamePlayer player)
         {
-	    //100000+
+            //100000+
             return (player.KillsHiberniaPlayers + player.KillsMidgardPlayers + player.KillsAlbionPlayers) >= 100000;
         }
     }

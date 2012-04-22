@@ -1,21 +1,22 @@
 ﻿/*
  * DAWN OF LIGHT - The first free open source DAoC server emulator
- * 
+ *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
  * as published by the Free Software Foundation; either version 2
  * of the License, or (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
  */
+
 using System;
 using System.Collections.Generic;
 using System.Reflection;
@@ -114,6 +115,7 @@ namespace DOL.GS.Commands
         }
 
         #region Helpers
+
         private string GetRealmBySlotIndex(int slot)
         {
             string realm = "";
@@ -149,9 +151,11 @@ namespace DOL.GS.Commands
 
             return false;
         }
+
         #endregion Helpers
 
         #region Messages
+
         private void EmptySlot(GameClient client, int slot)
         {
             client.Out.SendMessage("The given source slot (" + slot + ") is empty.", eChatType.CT_System, eChatLoc.CL_SystemWindow);
@@ -169,7 +173,7 @@ namespace DOL.GS.Commands
                     str += ", " + slot.ToString();
             }
 
-            client.Out.SendMessage("Invalid character slot" + (slots.Length > 1 ? "s" : "") + ": " + str, eChatType.CT_System, eChatLoc.CL_SystemWindow); 
+            client.Out.SendMessage("Invalid character slot" + (slots.Length > 1 ? "s" : "") + ": " + str, eChatType.CT_System, eChatLoc.CL_SystemWindow);
         }
 
         private void NotSameRealm(GameClient client, int sourceSlot, int targetSlot)
@@ -183,9 +187,11 @@ namespace DOL.GS.Commands
             client.Out.SendMessage("The character slot for " + name + " has been successfully changed. (old slot = " + oldSlot +
                                    ", new slot = " + newSlot + ")", eChatType.CT_System, eChatLoc.CL_SystemWindow);
         }
+
         #endregion Messages
 
         #region SendCharacterListWindow
+
         private static readonly int[] m_firstCharacterSlotByRealm = new int[3] { 100, 200, 300 };
 
         private void SendCharacterListWindow(GameClient client)
@@ -247,9 +253,11 @@ namespace DOL.GS.Commands
 
             client.Out.SendCustomTextWindow("Character slots", data);
         }
+
         #endregion SendCharacterListWindow
 
         #region SetSlot
+
         private void SetSlot(GameClient client, int sourceSlot, int targetSlot)
         {
             DOLCharacters source = null;
@@ -315,6 +323,7 @@ namespace DOL.GS.Commands
 
             SlotChanged(client, source.Name, sourceSlot, source.AccountSlot);
         }
+
         #endregion SetSlot
     }
 }

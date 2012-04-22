@@ -1,16 +1,16 @@
 /*
  * DAWN OF LIGHT - The first free open source DAoC server emulator
- * 
+ *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
  * as published by the Free Software Foundation; either version 2
  * of the License, or (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
@@ -18,17 +18,18 @@
  */
 
 using System;
-using DOL.GS;
-using DOL.GS.PacketHandler;
-using DOL.GS.Effects;
 using DOL.Database;
 using DOL.Events;
+using DOL.GS.Effects;
+using DOL.GS.PacketHandler;
 
 namespace DOL.GS.Spells
 {
     //http://www.camelotherald.com/masterlevels/ma.php?ml=Stormlord
     //shared timer 1
+
     #region Stormlord-1
+
     [SpellHandlerAttribute("DazzlingArray")]
     public class DazzlingArraySpellHandler : StormSpellHandler
     {
@@ -71,10 +72,13 @@ namespace DOL.GS.Spells
             tempest = ScriptMgr.CreateSpellHandler(m_caster, s, sl);
         }
     }
-    #endregion
+
+    #endregion Stormlord-1
 
     //no shared timer
+
     #region Stormlord-2
+
     [SpellHandlerAttribute("VacuumVortex")]
     public class VacuumVortexSpellHandler : SpellHandler
     {
@@ -112,11 +116,14 @@ namespace DOL.GS.Spells
         }
 
         public VacuumVortexSpellHandler(GameLiving caster, Spell spell, SpellLine line) : base(caster, spell, line) { }
-    }	
-    #endregion
+    }
+
+    #endregion Stormlord-2
 
     //shared timer 2
+
     #region Stormlord-3
+
     [SpellHandlerAttribute("EnervatingGas")]
     public class EnervatingGasSpellHandler : StormSpellHandler
     {
@@ -158,11 +165,14 @@ namespace DOL.GS.Spells
             sl = SkillBase.GetSpellLine(GlobalSpellsLines.Reserved_Spells);
             tempest = ScriptMgr.CreateSpellHandler(m_caster, s, sl);
         }
-    }	
-    #endregion
+    }
+
+    #endregion Stormlord-3
 
     //shared timer 1
+
     #region Stormlord-4
+
     [SpellHandlerAttribute("InebriatingFumes")]
     public class InebriatingFumesSpellHandler : StormSpellHandler
     {
@@ -204,11 +214,14 @@ namespace DOL.GS.Spells
             sl = SkillBase.GetSpellLine(GlobalSpellsLines.Reserved_Spells);
             tempest = ScriptMgr.CreateSpellHandler(m_caster, s, sl);
         }
-    }	
-    #endregion
+    }
+
+    #endregion Stormlord-4
 
     //shared timer 2
+
     #region Stormlord-5
+
     [SpellHandlerAttribute("MentalSiphon")]
     public class MentalSiphonSpellHandler : StormSpellHandler
     {
@@ -250,15 +263,19 @@ namespace DOL.GS.Spells
             sl = SkillBase.GetSpellLine(GlobalSpellsLines.Reserved_Spells);
             tempest = ScriptMgr.CreateSpellHandler(m_caster, s, sl);
         }
-    }	
-    #endregion
+    }
+
+    #endregion Stormlord-5
 
     //no shared timer
+
     #region Stormlord-6
+
     [SpellHandlerAttribute("FocusingWinds")]
     public class FocusingWindsSpellHandler : SpellHandler
     {
         private GameSpellEffect m_effect;
+
         public override void OnEffectStart(GameSpellEffect effect)
         {
             base.OnEffectStart(effect);
@@ -293,12 +310,16 @@ namespace DOL.GS.Spells
                 return;
             }
         }
+
         public FocusingWindsSpellHandler(GameLiving caster, Spell spell, SpellLine line) : base(caster, spell, line) { }
-    }	
-    #endregion
+    }
+
+    #endregion Stormlord-6
 
     //shared timer 1
+
     #region Stormlord-7
+
     [SpellHandlerAttribute("ChokingVapors")]
     public class ChokingVaporsSpellHandler : StormSpellHandler
     {
@@ -341,10 +362,13 @@ namespace DOL.GS.Spells
             tempest = ScriptMgr.CreateSpellHandler(m_caster, s, sl);
         }
     }
-    #endregion
+
+    #endregion Stormlord-7
 
     //shared timer 1
+
     #region Stormlord-8
+
     [SpellHandlerAttribute("SenseDullingCloud")]
     public class SenseDullingCloudSpellHandler : StormSpellHandler
     {
@@ -386,11 +410,14 @@ namespace DOL.GS.Spells
             sl = SkillBase.GetSpellLine(GlobalSpellsLines.Reserved_Spells);
             tempest = ScriptMgr.CreateSpellHandler(m_caster, s, sl);
         }
-    }	
-    #endregion
+    }
+
+    #endregion Stormlord-8
 
     //no shared timer
+
     #region Stormlord-9
+
     [SpellHandlerAttribute("EnergyTempest")]
     public class EnergyTempestSpellHandler : StormSpellHandler
     {
@@ -432,8 +459,9 @@ namespace DOL.GS.Spells
             sl = SkillBase.GetSpellLine(GlobalSpellsLines.Reserved_Spells);
             tempest = ScriptMgr.CreateSpellHandler(m_caster, s, sl);
         }
-    }	
-    #endregion
+    }
+
+    #endregion Stormlord-9
 
     //ML 10 Arcing Power - already handled in another area
 }

@@ -1,21 +1,12 @@
-using System.Collections;
-using System;
 using System.Collections.Generic;
-using DOL;
-using DOL.GS;
-using DOL.Events;
-using DOL.Database;
-using DOL.GS.PacketHandler;
 
 namespace DOL.GS.Effects
 {
-
     public class FungalUnionEffect : TimedEffect
     {
         private GameLiving owner;
 
         public FungalUnionEffect() : base(60000) { }
-
 
         public override void Start(GameLiving target)
         {
@@ -38,12 +29,9 @@ namespace DOL.GS.Effects
             }
         }
 
-
         public override string Name { get { return "Fungal Union"; } }
 
-
         public override ushort Icon { get { return 3061; } }
-
 
         public override IList<string> DelveInfo
         {

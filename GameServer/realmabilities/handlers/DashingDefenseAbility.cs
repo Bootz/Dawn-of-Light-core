@@ -1,11 +1,9 @@
-using System.Reflection;
 using System.Collections;
-using DOL.Database;
-using DOL.GS;
-using DOL.GS.PacketHandler;
-using DOL.GS.Effects;
-using DOL.Language;
 using System.Collections.Generic;
+using DOL.Database;
+using DOL.GS.Effects;
+using DOL.GS.PacketHandler;
+using DOL.Language;
 
 namespace DOL.GS.RealmAbilities
 {
@@ -26,8 +24,8 @@ namespace DOL.GS.RealmAbilities
             if (CheckPreconditions(living, DEAD | SITTING | MEZZED | STUNNED)) return;
             if (player.TempProperties.getProperty(Dashing, false))
             {
-				player.Out.SendMessage(LanguageMgr.GetTranslation(player.Client, "DashingDefenseAbility.Execute.AlreadyEffect"), eChatType.CT_SpellResisted, eChatLoc.CL_SystemWindow);
-				return;
+                player.Out.SendMessage(LanguageMgr.GetTranslation(player.Client, "DashingDefenseAbility.Execute.AlreadyEffect"), eChatType.CT_SpellResisted, eChatLoc.CL_SystemWindow);
+                return;
             }
 
             switch (Level)
@@ -42,10 +40,10 @@ namespace DOL.GS.RealmAbilities
 
             ArrayList targets = new ArrayList();
             if (player.Group == null)
-                {
-					player.Out.SendMessage(LanguageMgr.GetTranslation(player.Client, "DashingDefenseAbility.Execute.MustInGroup"), eChatType.CT_SpellResisted, eChatLoc.CL_SystemWindow);
-					return;
-                }
+            {
+                player.Out.SendMessage(LanguageMgr.GetTranslation(player.Client, "DashingDefenseAbility.Execute.MustInGroup"), eChatType.CT_SpellResisted, eChatLoc.CL_SystemWindow);
+                return;
+            }
             else foreach (GamePlayer grpMate in player.Group.GetPlayersInTheGroup())
                     if (player.IsWithinRadius(grpMate, m_range) && grpMate.IsAlive)
                         targets.Add(grpMate);
@@ -62,7 +60,6 @@ namespace DOL.GS.RealmAbilities
                         new DashingDefenseEffect().Start(player, target, m_duration);
                     }
             }
-
         }
 
         public override int GetReUseDelay(int level)
@@ -70,12 +67,12 @@ namespace DOL.GS.RealmAbilities
             return 420;
         }
 
-		public override void AddEffectsInfo(IList<string> list)
-		{
-			list.Add(LanguageMgr.GetTranslation(ServerProperties.Properties.SERV_LANGUAGE, "DashingDefenseAbility.AddEffectsInfo.Info1"));
-			list.Add("");
-			list.Add(LanguageMgr.GetTranslation(ServerProperties.Properties.SERV_LANGUAGE, "DashingDefenseAbility.AddEffectsInfo.Info2"));
-			list.Add(LanguageMgr.GetTranslation(ServerProperties.Properties.SERV_LANGUAGE, "DashingDefenseAbility.AddEffectsInfo.Info3"));
-		}
+        public override void AddEffectsInfo(IList<string> list)
+        {
+            list.Add(LanguageMgr.GetTranslation(ServerProperties.Properties.SERV_LANGUAGE, "DashingDefenseAbility.AddEffectsInfo.Info1"));
+            list.Add("");
+            list.Add(LanguageMgr.GetTranslation(ServerProperties.Properties.SERV_LANGUAGE, "DashingDefenseAbility.AddEffectsInfo.Info2"));
+            list.Add(LanguageMgr.GetTranslation(ServerProperties.Properties.SERV_LANGUAGE, "DashingDefenseAbility.AddEffectsInfo.Info3"));
+        }
     }
 }

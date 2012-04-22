@@ -26,7 +26,7 @@
 * UPDATE:  You must edit the Database if you want this quest to work correctly.
 * remove any reference in the DB to "Statue Demons Breach", there will be 200+ if using rev 818DB
 * also run this script: update mob set aggrolevel = 0 where flags = 12 and region = 489;
-* the ambient corpses are all agro, and will attack if you get to close. 
+* the ambient corpses are all agro, and will attack if you get to close.
 */
 
 using System;
@@ -34,10 +34,7 @@ using System.Reflection;
 using DOL.AI.Brain;
 using DOL.Database;
 using DOL.Events;
-using DOL.GS.Behaviour;
-using DOL.GS.Behaviour.Attributes;
 using DOL.GS.PacketHandler;
-using DOL.GS.Quests;
 using DOL.Language;
 using log4net;
 
@@ -109,6 +106,7 @@ namespace DOL.GS.Quests.Midgard
                 log.Info("Quest \"" + questTitle + "\" (Mid) initializing ...");
 
             #region defineNPCs
+
             GameNPC[] npcs;
 
             npcs = WorldMgr.GetNPCsByName("Charles", (eRealm)2);
@@ -133,7 +131,6 @@ namespace DOL.GS.Quests.Midgard
                 Charles.RespawnInterval = -1;
                 Charles.BodyType = 0;
 
-
                 StandardMobBrain brain = new StandardMobBrain();
                 brain.AggroLevel = 0;
                 brain.AggroRange = 500;
@@ -143,15 +140,13 @@ namespace DOL.GS.Quests.Midgard
                     Charles.SaveIntoDatabase();
 
                 Charles.AddToWorld();
-
             }
             else
             {
                 Charles = npcs[0];
             }
 
-
-            #endregion
+            #endregion defineNPCs
 
             #region defineItems
 
@@ -175,7 +170,7 @@ namespace DOL.GS.Quests.Midgard
                 daringpaddedboots.IsTradable = true;
                 daringpaddedboots.CanDropAsLoot = false;
                 daringpaddedboots.Color = 0;
-                daringpaddedboots.Bonus = 0; // default bonus				
+                daringpaddedboots.Bonus = 0; // default bonus
                 daringpaddedboots.Bonus1 = 4;
                 daringpaddedboots.Bonus1Type = (int)3;
                 daringpaddedboots.Bonus2 = 0;
@@ -248,7 +243,7 @@ namespace DOL.GS.Quests.Midgard
                 daringpaddedcap.IsTradable = true;
                 daringpaddedcap.CanDropAsLoot = false;
                 daringpaddedcap.Color = 0;
-                daringpaddedcap.Bonus = 0; // default bonus				
+                daringpaddedcap.Bonus = 0; // default bonus
                 daringpaddedcap.Bonus1 = 4;
                 daringpaddedcap.Bonus1Type = (int)2;
                 daringpaddedcap.Bonus2 = 0;
@@ -321,7 +316,7 @@ namespace DOL.GS.Quests.Midgard
                 daringpaddedgloves.IsTradable = true;
                 daringpaddedgloves.CanDropAsLoot = false;
                 daringpaddedgloves.Color = 0;
-                daringpaddedgloves.Bonus = 0; // default bonus				
+                daringpaddedgloves.Bonus = 0; // default bonus
                 daringpaddedgloves.Bonus1 = 4;
                 daringpaddedgloves.Bonus1Type = (int)3;
                 daringpaddedgloves.Bonus2 = 0;
@@ -394,7 +389,7 @@ namespace DOL.GS.Quests.Midgard
                 daringpaddedpants.IsTradable = true;
                 daringpaddedpants.CanDropAsLoot = false;
                 daringpaddedpants.Color = 0;
-                daringpaddedpants.Bonus = 0; // default bonus				
+                daringpaddedpants.Bonus = 0; // default bonus
                 daringpaddedpants.Bonus1 = 4;
                 daringpaddedpants.Bonus1Type = (int)2;
                 daringpaddedpants.Bonus2 = 0;
@@ -461,13 +456,13 @@ namespace DOL.GS.Quests.Midgard
                 daringpaddedsleeves.Item_Type = 28;
                 daringpaddedsleeves.Id_nb = "daringpaddedsleeves";
                 daringpaddedsleeves.Hand = 0;
-                daringpaddedsleeves.Price= 0;
+                daringpaddedsleeves.Price = 0;
                 daringpaddedsleeves.IsPickable = true;
                 daringpaddedsleeves.IsDropable = true;
                 daringpaddedsleeves.IsTradable = true;
                 daringpaddedsleeves.CanDropAsLoot = false;
                 daringpaddedsleeves.Color = 0;
-                daringpaddedsleeves.Bonus = 0; // default bonus				
+                daringpaddedsleeves.Bonus = 0; // default bonus
                 daringpaddedsleeves.Bonus1 = 4;
                 daringpaddedsleeves.Bonus1Type = (int)6;
                 daringpaddedsleeves.Bonus2 = 0;
@@ -540,7 +535,7 @@ namespace DOL.GS.Quests.Midgard
                 daringpaddedvest.IsTradable = true;
                 daringpaddedvest.CanDropAsLoot = false;
                 daringpaddedvest.Color = 0;
-                daringpaddedvest.Bonus = 0; // default bonus				
+                daringpaddedvest.Bonus = 0; // default bonus
                 daringpaddedvest.Bonus1 = 12;
                 daringpaddedvest.Bonus1Type = (int)10;
                 daringpaddedvest.Bonus2 = 0;
@@ -613,7 +608,7 @@ namespace DOL.GS.Quests.Midgard
                 daringleatherboots.IsTradable = true;
                 daringleatherboots.CanDropAsLoot = false;
                 daringleatherboots.Color = 0;
-                daringleatherboots.Bonus = 0; // default bonus				
+                daringleatherboots.Bonus = 0; // default bonus
                 daringleatherboots.Bonus1 = 4;
                 daringleatherboots.Bonus1Type = (int)3;
                 daringleatherboots.Bonus2 = 0;
@@ -686,7 +681,7 @@ namespace DOL.GS.Quests.Midgard
                 daringleathercap.IsTradable = true;
                 daringleathercap.CanDropAsLoot = false;
                 daringleathercap.Color = 0;
-                daringleathercap.Bonus = 0; // default bonus				
+                daringleathercap.Bonus = 0; // default bonus
                 daringleathercap.Bonus1 = 4;
                 daringleathercap.Bonus1Type = (int)3;
                 daringleathercap.Bonus2 = 0;
@@ -759,7 +754,7 @@ namespace DOL.GS.Quests.Midgard
                 daringleathergloves.IsTradable = true;
                 daringleathergloves.CanDropAsLoot = false;
                 daringleathergloves.Color = 0;
-                daringleathergloves.Bonus = 0; // default bonus				
+                daringleathergloves.Bonus = 0; // default bonus
                 daringleathergloves.Bonus1 = 4;
                 daringleathergloves.Bonus1Type = (int)2;
                 daringleathergloves.Bonus2 = 0;
@@ -832,7 +827,7 @@ namespace DOL.GS.Quests.Midgard
                 daringleatherjerkin.IsTradable = true;
                 daringleatherjerkin.CanDropAsLoot = false;
                 daringleatherjerkin.Color = 0;
-                daringleatherjerkin.Bonus = 0; // default bonus				
+                daringleatherjerkin.Bonus = 0; // default bonus
                 daringleatherjerkin.Bonus1 = 12;
                 daringleatherjerkin.Bonus1Type = (int)10;
                 daringleatherjerkin.Bonus2 = 0;
@@ -905,7 +900,7 @@ namespace DOL.GS.Quests.Midgard
                 daringleatherleggings.IsTradable = true;
                 daringleatherleggings.CanDropAsLoot = false;
                 daringleatherleggings.Color = 0;
-                daringleatherleggings.Bonus = 0; // default bonus				
+                daringleatherleggings.Bonus = 0; // default bonus
                 daringleatherleggings.Bonus1 = 4;
                 daringleatherleggings.Bonus1Type = (int)2;
                 daringleatherleggings.Bonus2 = 0;
@@ -978,7 +973,7 @@ namespace DOL.GS.Quests.Midgard
                 daringleathersleeves.IsTradable = true;
                 daringleathersleeves.CanDropAsLoot = false;
                 daringleathersleeves.Color = 0;
-                daringleathersleeves.Bonus = 0; // default bonus				
+                daringleathersleeves.Bonus = 0; // default bonus
                 daringleathersleeves.Bonus1 = 4;
                 daringleathersleeves.Bonus1Type = (int)1;
                 daringleathersleeves.Bonus2 = 0;
@@ -1051,7 +1046,7 @@ namespace DOL.GS.Quests.Midgard
                 daringstuddedboots.IsTradable = true;
                 daringstuddedboots.CanDropAsLoot = false;
                 daringstuddedboots.Color = 0;
-                daringstuddedboots.Bonus = 0; // default bonus				
+                daringstuddedboots.Bonus = 0; // default bonus
                 daringstuddedboots.Bonus1 = 4;
                 daringstuddedboots.Bonus1Type = (int)3;
                 daringstuddedboots.Bonus2 = 0;
@@ -1124,7 +1119,7 @@ namespace DOL.GS.Quests.Midgard
                 daringstuddedcap.IsTradable = true;
                 daringstuddedcap.CanDropAsLoot = false;
                 daringstuddedcap.Color = 0;
-                daringstuddedcap.Bonus = 0; // default bonus				
+                daringstuddedcap.Bonus = 0; // default bonus
                 daringstuddedcap.Bonus1 = 4;
                 daringstuddedcap.Bonus1Type = (int)3;
                 daringstuddedcap.Bonus2 = 0;
@@ -1197,7 +1192,7 @@ namespace DOL.GS.Quests.Midgard
                 daringstuddedgloves.IsTradable = true;
                 daringstuddedgloves.CanDropAsLoot = false;
                 daringstuddedgloves.Color = 0;
-                daringstuddedgloves.Bonus = 0; // default bonus				
+                daringstuddedgloves.Bonus = 0; // default bonus
                 daringstuddedgloves.Bonus1 = 4;
                 daringstuddedgloves.Bonus1Type = (int)4;
                 daringstuddedgloves.Bonus2 = 0;
@@ -1270,7 +1265,7 @@ namespace DOL.GS.Quests.Midgard
                 daringstuddedjerkin.IsTradable = true;
                 daringstuddedjerkin.CanDropAsLoot = false;
                 daringstuddedjerkin.Color = 0;
-                daringstuddedjerkin.Bonus = 0; // default bonus				
+                daringstuddedjerkin.Bonus = 0; // default bonus
                 daringstuddedjerkin.Bonus1 = 12;
                 daringstuddedjerkin.Bonus1Type = (int)10;
                 daringstuddedjerkin.Bonus2 = 0;
@@ -1343,7 +1338,7 @@ namespace DOL.GS.Quests.Midgard
                 daringstuddedleggings.IsTradable = true;
                 daringstuddedleggings.CanDropAsLoot = false;
                 daringstuddedleggings.Color = 0;
-                daringstuddedleggings.Bonus = 0; // default bonus				
+                daringstuddedleggings.Bonus = 0; // default bonus
                 daringstuddedleggings.Bonus1 = 4;
                 daringstuddedleggings.Bonus1Type = (int)4;
                 daringstuddedleggings.Bonus2 = 0;
@@ -1416,7 +1411,7 @@ namespace DOL.GS.Quests.Midgard
                 daringstuddedsleeves.IsTradable = true;
                 daringstuddedsleeves.CanDropAsLoot = false;
                 daringstuddedsleeves.Color = 0;
-                daringstuddedsleeves.Bonus = 0; // default bonus				
+                daringstuddedsleeves.Bonus = 0; // default bonus
                 daringstuddedsleeves.Bonus1 = 4;
                 daringstuddedsleeves.Bonus1Type = (int)1;
                 daringstuddedsleeves.Bonus2 = 0;
@@ -1470,14 +1465,14 @@ namespace DOL.GS.Quests.Midgard
                     GameServer.Database.AddObject(daringstuddedsleeves);
             }
 
-
-            #endregion
+            #endregion defineItems
 
             #region defineAreas
+
             Mid_Statue_Area = WorldMgr.GetRegion(Mid_Statue.RegionID).AddArea(new Area.Circle("", Mid_Statue.X, Mid_Statue.Y, Mid_Statue.Z, 500));
             Mid_Statue_Area.RegisterPlayerEnter(new DOLEventHandler(PlayerEnterStatueArea));
 
-            #endregion
+            #endregion defineAreas
 
             GameEventMgr.AddHandler(GamePlayerEvent.AcceptQuest, new DOLEventHandler(SubscribeQuest));
             GameEventMgr.AddHandler(GamePlayerEvent.DeclineQuest, new DOLEventHandler(SubscribeQuest));
@@ -1602,6 +1597,7 @@ namespace DOL.GS.Quests.Midgard
                 }
             }
         }
+
         /// <summary>
         /// This method checks if a player qualifies for this quest
         /// </summary>
@@ -1649,6 +1645,7 @@ namespace DOL.GS.Quests.Midgard
             else if (e == GamePlayerEvent.DeclineQuest)
                 CheckPlayerAcceptQuest(qargs.Player, 0x00);
         }
+
         protected static void PlayerEnterStatueArea(DOLEvent e, object sender, EventArgs args)
         {
             AreaEventArgs aargs = args as AreaEventArgs;
@@ -1661,6 +1658,7 @@ namespace DOL.GS.Quests.Midgard
                 quest.Step = 2;
             }
         }
+
         private static void CheckPlayerAcceptQuest(GamePlayer player, byte response)
         {
             if (Charles.CanGiveQuest(typeof(childsplay), player) <= 0)
@@ -1714,7 +1712,7 @@ namespace DOL.GS.Quests.Midgard
             base.FinishQuest(); //Defined in Quest, changes the state, stores in DB etc ...
 
             //k109: xp and money Rewards...
-			m_questPlayer.GainExperience(GameLiving.eXPSource.Quest, 2, true);
+            m_questPlayer.GainExperience(GameLiving.eXPSource.Quest, 2, true);
             m_questPlayer.AddMoney(Money.GetMoney(0, 0, 0, 0, 67), LanguageMgr.GetTranslation(m_questPlayer.Client, "ChildsPlay.FinishQuest.Text1"));
             InventoryLogging.LogInventoryAction("(QUEST;" + Name + ")", m_questPlayer, eInventoryActionType.Quest, 67);
         }

@@ -1,10 +1,9 @@
-using System;
 using System.Collections;
+using System.Collections.Generic;
 using DOL.Database;
 using DOL.GS.Effects;
 using DOL.GS.PacketHandler;
 using DOL.Language;
-using System.Collections.Generic;
 
 namespace DOL.GS.RealmAbilities
 {
@@ -44,7 +43,6 @@ namespace DOL.GS.RealmAbilities
         {
             bool removed = false;
             ArrayList effects = new ArrayList();
-
 
             GamePlayer player = (GamePlayer)living;
 
@@ -137,6 +135,7 @@ namespace DOL.GS.RealmAbilities
                 m_purge = purge;
                 counter = 5;
             }
+
             protected override void OnTick()
             {
                 if (!m_caster.IsAlive)

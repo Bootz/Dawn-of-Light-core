@@ -1,16 +1,16 @@
 ﻿/*
  * DAWN OF LIGHT - The first free open source DAoC server emulator
- * 
+ *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
  * as published by the Free Software Foundation; either version 2
  * of the License, or (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
@@ -18,7 +18,7 @@
  */
 /*
  * Author:		Cletus
- * Date:		23. 10. 2006	
+ * Date:		23. 10. 2006
  * Directory: /scripts/quests/albion/
  *
  * Description:
@@ -30,6 +30,7 @@ using DOL.Database;
 using DOL.Events;
 using DOL.GS.PacketHandler;
 using log4net;
+
 /* I suggest you declare yourself some namespaces for your quests
  * Like: DOL.GS.Quests.Albion
  *       DOL.GS.Quests.Midgard
@@ -44,7 +45,7 @@ namespace DOL.GS.Quests.Albion
     /* The first thing we do, is to declare the class we create
      * as Quest. To do this, we derive from the abstract class
      * AbstractQuest
-     * 
+     *
      * This quest for example will be stored in the database with
      * the name: DOL.GS.Quests.Albion.AMessageToTheManes
      */
@@ -57,13 +58,13 @@ namespace DOL.GS.Quests.Albion
         private static readonly ILog log = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
 
         /* Declare the variables we need inside our quest.
-         * You can declare static variables here, which will be available in 
+         * You can declare static variables here, which will be available in
          * ALL instance of your quest and should be initialized ONLY ONCE inside
          * the OnScriptLoaded method.
-         * 
+         *
          * Or declare nonstatic variables here which can be unique for each Player
          * and change through the quest journey...
-         * 
+         *
          * We store our two mobs as static variables, since we need them
          */
 
@@ -71,7 +72,7 @@ namespace DOL.GS.Quests.Albion
         protected const int minimumLevel = 9;
         protected const int maximumLevel = 12;
 
-        /* 
+        /*
          * Start NPC
          */
         private static GameNPC sirJerem = null;
@@ -81,6 +82,7 @@ namespace DOL.GS.Quests.Albion
         /* We need to define the constructors from the base class here, else there might be problems
          * when loading this quest...
          */
+
         public AMessageToTheManes()
             : base()
         {
@@ -101,34 +103,33 @@ namespace DOL.GS.Quests.Albion
         {
         }
 
-
         /* The following method is called automatically when this quest class
          * is loaded. You might notice that this method is the same as in standard
          * game events. And yes, quests basically are game events for single players
-         * 
-         * To make this method automatically load, we have to declare it static
-         * and give it the [ScriptLoadedEvent] attribute. 
          *
-         * Inside this method we initialize the quest. This is neccessary if we 
+         * To make this method automatically load, we have to declare it static
+         * and give it the [ScriptLoadedEvent] attribute.
+         *
+         * Inside this method we initialize the quest. This is neccessary if we
          * want to set the quest hooks to the NPCs.
-         * 
+         *
          * If you want, you can however add a quest to the player from ANY place
          * inside your code, from events, from custom items, from anywhere you
          * want. We will do it the standard way here ... and make Sir Quait wail
-         * a bit about the loss of his sword! 
+         * a bit about the loss of his sword!
          */
 
         [ScriptLoadedEvent]
         public static void ScriptLoaded(DOLEvent e, object sender, EventArgs args)
-		{
-			if (!ServerProperties.Properties.LOAD_QUESTS)
-				return;
+        {
+            if (!ServerProperties.Properties.LOAD_QUESTS)
+                return;
             if (log.IsInfoEnabled)
                 log.Info("Quest \"" + questTitle + "\" initializing ...");
             /* First thing we do in here is to search for the NPCs inside
             * the world who comes from the certain Realm. If we find a the players,
             * this means we don't have to create a new one.
-            * 
+            *
             * NOTE: You can do anything you want in this method, you don't have
             * to search for NPC's ... you could create a custom item, place it
             * on the ground and if a player picks it up, he will get the quest!
@@ -166,16 +167,12 @@ namespace DOL.GS.Quests.Albion
                 if (SAVE_INTO_DATABASE)
                     sirJerem.SaveIntoDatabase();
 
-
                 sirJerem.AddToWorld();
-
             }
             else
                 sirJerem = npcs[0];
 
-
-            #endregion
-
+            #endregion defineNPCs
 
             /* Now we add some hooks to the Sir Quait we found.
 				* Actually, we want to know when a player interacts with him.
@@ -184,8 +181,8 @@ namespace DOL.GS.Quests.Albion
 				* method. This means, the "TalkToXXX" method is called whenever
 				* a player right clicks on him or when he whispers to him.
 				*/
-			GameEventMgr.AddHandler(GamePlayerEvent.AcceptQuest, new DOLEventHandler(SubscribeQuest));
-			GameEventMgr.AddHandler(GamePlayerEvent.DeclineQuest, new DOLEventHandler(SubscribeQuest));
+            GameEventMgr.AddHandler(GamePlayerEvent.AcceptQuest, new DOLEventHandler(SubscribeQuest));
+            GameEventMgr.AddHandler(GamePlayerEvent.DeclineQuest, new DOLEventHandler(SubscribeQuest));
 
             GameEventMgr.AddHandler(sirJerem, GameLivingEvent.Interact, new DOLEventHandler(TalkToSirJerem));
             GameEventMgr.AddHandler(sirJerem, GameLivingEvent.WhisperReceive, new DOLEventHandler(TalkToSirJerem));
@@ -198,8 +195,8 @@ namespace DOL.GS.Quests.Albion
         }
 
         /* The following method is called automatically when this quest class
-         * is unloaded. 
-         * 
+         * is unloaded.
+         *
          * Since we set hooks in the load method, it is good practice to remove
          * those hooks again!
          */
@@ -213,11 +210,11 @@ namespace DOL.GS.Quests.Albion
             if (sirJerem == null)
                 return;
 
-            /* Removing hooks works just as adding them but instead of 
+            /* Removing hooks works just as adding them but instead of
              * AddHandler, we call RemoveHandler, the parameters stay the same
              */
-			GameEventMgr.RemoveHandler(GamePlayerEvent.AcceptQuest, new DOLEventHandler(SubscribeQuest));
-			GameEventMgr.RemoveHandler(GamePlayerEvent.DeclineQuest, new DOLEventHandler(SubscribeQuest));
+            GameEventMgr.RemoveHandler(GamePlayerEvent.AcceptQuest, new DOLEventHandler(SubscribeQuest));
+            GameEventMgr.RemoveHandler(GamePlayerEvent.DeclineQuest, new DOLEventHandler(SubscribeQuest));
 
             GameEventMgr.RemoveHandler(sirJerem, GameObjectEvent.Interact, new DOLEventHandler(TalkToSirJerem));
             GameEventMgr.RemoveHandler(sirJerem, GameLivingEvent.WhisperReceive, new DOLEventHandler(TalkToSirJerem));
@@ -233,7 +230,7 @@ namespace DOL.GS.Quests.Albion
 
         protected static void TalkToSirJerem(DOLEvent e, object sender, EventArgs args)
         {
-            //We get the player from the event arguments and check if he qualifies		
+            //We get the player from the event arguments and check if he qualifies
             GamePlayer player = ((SourceEventArgs)args).Source as GamePlayer;
             if (player == null)
                 return;
@@ -254,7 +251,7 @@ namespace DOL.GS.Quests.Albion
                     if (quest.Step == 1)
                         sirJerem.SayTo(player, "It heartens me to know that I can count on your help. Because we cannot devote many resources to dealing with the demons, the first part of my plan calls for us to deliver a warning message to these [demons].");
                     else if (quest.Step == 3)
-                        sirJerem.SayTo(player, "You've returned! I must admit, "+player.Name+". I was beginning to get a little worried. Were you able to kill the two Manes [demons]?");
+                        sirJerem.SayTo(player, "You've returned! I must admit, " + player.Name + ". I was beginning to get a little worried. Were you able to kill the two Manes [demons]?");
                     return;
                 }
                 else
@@ -281,7 +278,7 @@ namespace DOL.GS.Quests.Albion
                             sirJerem.SayTo(player, "We have skilled soldirs and commanders, but if our enemies should decide to unite, I fear they would overrun us. The denizens of Darkness Falls have begun to venture beyond the confines of their dungeon. We must act to [contain] them.");
                             break;
                         case "contain":
-							player.Out.SendQuestSubscribeCommand(sirJerem, QuestMgr.GetIDForQuestType(typeof(AMessageToTheManes)), "Will you help Sir Jerem dissuade the Manes demons from leaving Darkness Falls? [Levels 9-12]");
+                            player.Out.SendQuestSubscribeCommand(sirJerem, QuestMgr.GetIDForQuestType(typeof(AMessageToTheManes)), "Will you help Sir Jerem dissuade the Manes demons from leaving Darkness Falls? [Levels 9-12]");
                             break;
                     }
                 }
@@ -317,24 +314,23 @@ namespace DOL.GS.Quests.Albion
                             break;
                     }
                 }
-
             }
         }
 
-		protected static void SubscribeQuest(DOLEvent e, object sender, EventArgs args)
-		{
-			QuestEventArgs qargs = args as QuestEventArgs;
-			if (qargs == null)
-				return;
+        protected static void SubscribeQuest(DOLEvent e, object sender, EventArgs args)
+        {
+            QuestEventArgs qargs = args as QuestEventArgs;
+            if (qargs == null)
+                return;
 
-			if (qargs.QuestID != QuestMgr.GetIDForQuestType(typeof(AMessageToTheManes)))
-				return;
+            if (qargs.QuestID != QuestMgr.GetIDForQuestType(typeof(AMessageToTheManes)))
+                return;
 
-			if (e == GamePlayerEvent.AcceptQuest)
-				CheckPlayerAcceptQuest(qargs.Player, 0x01);
-			else if (e == GamePlayerEvent.DeclineQuest)
-				CheckPlayerAcceptQuest(qargs.Player, 0x00);
-		}
+            if (e == GamePlayerEvent.AcceptQuest)
+                CheckPlayerAcceptQuest(qargs.Player, 0x01);
+            else if (e == GamePlayerEvent.DeclineQuest)
+                CheckPlayerAcceptQuest(qargs.Player, 0x00);
+        }
 
         /// <summary>
         /// This method checks if a player qualifies for this quest
@@ -353,7 +349,6 @@ namespace DOL.GS.Quests.Albion
 
             return true;
         }
-
 
         /* This is our callback hook that will be called when the player clicks
          * on any button in the quest offer dialog. We check if he accepts or
@@ -436,7 +431,6 @@ namespace DOL.GS.Quests.Albion
                         return "[Step #2] Travel east from Prydwen Keep, past the bridge, to the Darkness Falls portal and kill two Manes demons. If you have trouble locating the portal, you can access your map by typing /map.";
                     case 3:
                         return "[Step #3] You've killed two Manes demons. Return to Sir Jerem at Prydwen Keep to the west and speak with him.";
-                    
                 }
                 return base.Description;
             }
@@ -450,7 +444,6 @@ namespace DOL.GS.Quests.Albion
                 return;
             if (player.IsDoingQuest(typeof(AMessageToTheManes)) == null)
                 return;
-
 
             if (Step == 2 && e == GameLivingEvent.EnemyKilled)
             {
@@ -472,13 +465,11 @@ namespace DOL.GS.Quests.Albion
                     }
                 }
             }
-            
         }
 
         public override void AbortQuest()
         {
             base.AbortQuest(); //Defined in Quest, changes the state, stores in DB etc ...
-
         }
 
         public override void FinishQuest()
@@ -487,12 +478,10 @@ namespace DOL.GS.Quests.Albion
 
             //Give reward to player here ...
 
-			m_questPlayer.GainExperience(GameLiving.eXPSource.Quest, (long)((m_questPlayer.ExperienceForNextLevel - m_questPlayer.ExperienceForCurrentLevel) / 8.98), true);
+            m_questPlayer.GainExperience(GameLiving.eXPSource.Quest, (long)((m_questPlayer.ExperienceForNextLevel - m_questPlayer.ExperienceForCurrentLevel) / 8.98), true);
             long money = Money.GetMoney(0, 0, 0, 1, 49 + Util.Random(50));
             m_questPlayer.AddMoney(money, "You are awarded 1 silver and some copper!");
             InventoryLogging.LogInventoryAction("(QUEST;" + Name + ")", m_questPlayer, eInventoryActionType.Quest, money);
-
         }
-
     }
 }

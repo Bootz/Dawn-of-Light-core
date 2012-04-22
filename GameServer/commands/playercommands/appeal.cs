@@ -1,25 +1,24 @@
-﻿/* 
+﻿/*
  * DAWN OF LIGHT - The first free open source DAoC server emulator
- * 
+ *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
  * as published by the Free Software Foundation; either version 2
  * of the License, or (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
  */
 
-using DOL.Language;
 using DOL.GS.Appeal;
-using DOL.GS.ServerProperties;
+using DOL.Language;
 
 namespace DOL.GS.Commands
 {
@@ -38,19 +37,19 @@ namespace DOL.GS.Commands
     {
         public void OnCommand(GameClient client, string[] args)
         {
-			if (IsSpammingCommand(client.Player, "appeal"))
-				return;
+            if (IsSpammingCommand(client.Player, "appeal"))
+                return;
 
-			if (ServerProperties.Properties.DISABLE_APPEALSYSTEM)
+            if (ServerProperties.Properties.DISABLE_APPEALSYSTEM)
             {
                 AppealMgr.MessageToClient(client, LanguageMgr.GetTranslation(client, "Scripts.Players.Appeal.SystemDisabled"));
                 return;
             }
 
-			if (client.Player.IsMuted)
-			{
-				return;
-			}
+            if (client.Player.IsMuted)
+            {
+                return;
+            }
 
             //Help display
             if (args.Length == 1)
@@ -118,7 +117,6 @@ namespace DOL.GS.Commands
                             severity = (int)AppealMgr.eSeverity.Medium;
                             break;
                         }
-
                 }
                 string message = string.Join(" ", args, 1, args.Length - 1);
                 GamePlayer p = client.Player as GamePlayer;
@@ -130,6 +128,7 @@ namespace DOL.GS.Commands
     }
 
     #region reportbug
+
     //handles /reportbug command that is issued from the client /appeal function.
     [CmdAttribute(
     "&reportbug",
@@ -172,8 +171,11 @@ namespace DOL.GS.Commands
             return;
         }
     }
+
     #endregion reportbug
+
     #region reportharass
+
     //handles /reportharass command that is issued from the client /appeal function.
     [CmdAttribute(
     "&reportharass",
@@ -218,8 +220,11 @@ namespace DOL.GS.Commands
             return;
         }
     }
+
     #endregion reportharass
+
     #region reporttos
+
     //handles /reporttos command that is issued from the client /appeal function.
     [CmdAttribute(
     "&reporttos",
@@ -292,8 +297,11 @@ namespace DOL.GS.Commands
             return;
         }
     }
+
     #endregion reporttos
+
     #region reportstuck
+
     //handles /reportharass command that is issued from the client /appeal function.
     [CmdAttribute(
     "&reportstuck",
@@ -338,8 +346,11 @@ namespace DOL.GS.Commands
             return;
         }
     }
+
     #endregion reportstuck
+
     #region emergency
+
     //handles /appea command that is issued from the client /appeal function (emergency appeal).
     [CmdAttribute(
     "&appea",
@@ -384,5 +395,6 @@ namespace DOL.GS.Commands
             return;
         }
     }
+
     #endregion emergency
 }

@@ -1,21 +1,16 @@
-using System;
-using System.Collections;
-using DOL.GS;
-using DOL.Events;
+using DOL.AI.Brain;
 using DOL.GS.Effects;
 using DOL.GS.PacketHandler;
-using DOL.AI.Brain;
 
 namespace DOL.GS.Spells
 {
-
-	[SpellHandlerAttribute("HereticDoTLostOnPulse")]
+    [SpellHandlerAttribute("HereticDoTLostOnPulse")]
     public class HereticDoTLostOnPulse : HereticPiercingMagic
-	{
+    {
         protected int m_lastdamage = 0;
         protected int m_pulsedamage = 0;
-    //    protected int m_pulsecount = -1;
-        
+        //    protected int m_pulsecount = -1;
+
         public override void FinishSpellCast(GameLiving target)
         {
             BeginEffect();
@@ -41,7 +36,6 @@ namespace DOL.GS.Spells
             ad.AttackType = AttackData.eAttackType.Unknown;
             return ad;
         }
-
 
         public override void CalculateDamageVariance(GameLiving target, out double min, out double max)
         {
@@ -69,7 +63,6 @@ namespace DOL.GS.Spells
             if (min < 0) min = 0;
         }
 
-
         protected override GameSpellEffect CreateSpellEffect(GameLiving target, double effectiveness)
         {
             base.CreateSpellEffect(target, effectiveness);
@@ -77,31 +70,30 @@ namespace DOL.GS.Spells
             return new GameSpellEffect(this, m_spell.Duration, m_spellLine.IsBaseLine ? 3000 : 2000, 1);
         }
 
-    /*    public override void OnSpellPulse(PulsingSpellEffect effect)
-        {
-            if (m_pulsecount == -1)
-                m_pulsecount = m_spell.Pulse;
-
-            if (m_pulsecount > 0)
+        /*    public override void OnSpellPulse(PulsingSpellEffect effect)
             {
-                if (m_pulsecount == m_spell.Pulse)
+                if (m_pulsecount == -1)
+                    m_pulsecount = m_spell.Pulse;
+
+                if (m_pulsecount > 0)
+                {
+                    if (m_pulsecount == m_spell.Pulse)
+                        m_pulsecount -= 1;
+
                     m_pulsecount -= 1;
-
-                m_pulsecount -= 1;
-                base.OnSpellPulse(effect);
-            }
-            else
-            {
-                RemoveEffect();
-            }
-        }*/
+                    base.OnSpellPulse(effect);
+                }
+                else
+                {
+                    RemoveEffect();
+                }
+            }*/
 
         public override void OnEffectStart(GameSpellEffect effect)
         {
             base.OnEffectStart(effect);
             SendEffectAnimation(effect.Owner, 0, false, 1);
         }
-
 
         public override void OnEffectPulse(GameSpellEffect effect)
         {
@@ -110,14 +102,14 @@ namespace DOL.GS.Spells
             if (m_caster.Mana < Spell.PulsePower)
             {
                 RemoveEffect();
-				return;
+                return;
             }
 
-            if ( !m_caster.IsAlive || !effect.Owner.IsAlive || m_caster.Mana < Spell.PulsePower || !m_caster.IsWithinRadius( effect.Owner, Spell.Range ) || m_caster.IsMezzed || m_caster.IsStunned || ( m_caster.TargetObject is GameLiving ? effect.Owner != m_caster.TargetObject as GameLiving : true ) )
-			{
-				RemoveEffect();
-				return;
-			}
+            if (!m_caster.IsAlive || !effect.Owner.IsAlive || m_caster.Mana < Spell.PulsePower || !m_caster.IsWithinRadius(effect.Owner, Spell.Range) || m_caster.IsMezzed || m_caster.IsStunned || (m_caster.TargetObject is GameLiving ? effect.Owner != m_caster.TargetObject as GameLiving : true))
+            {
+                RemoveEffect();
+                return;
+            }
             if (!m_caster.TargetInView)
             {
                 RemoveEffect();
@@ -130,12 +122,11 @@ namespace DOL.GS.Spells
             MessageToLiving(effect.Owner, Spell.Message1, eChatType.CT_Spell);
 
             Message.SystemToArea(effect.Owner, Util.MakeSentence(Spell.Message2, effect.Owner.GetName(0, false)), eChatType.CT_YouHit, effect.Owner);
-           
+
             OnDirectEffect(effect.Owner, effect.Effectiveness);
 
             m_caster.Mana -= effect.Spell.PulsePower;
         }
-
 
         public override int OnEffectExpires(GameSpellEffect effect, bool noMessages)
         {
@@ -168,8 +159,8 @@ namespace DOL.GS.Spells
             else
             {
                 m_pulsedamage = m_lastdamage / 4;
-                if (target == focustarget) 
-                m_lastdamage += m_pulsedamage;
+                if (target == focustarget)
+                    m_lastdamage += m_pulsedamage;
             }
 
             ad.Damage = m_lastdamage;
@@ -181,7 +172,7 @@ namespace DOL.GS.Spells
 
         protected virtual void OnSpellResist(GameLiving target)
         {
-			m_lastdamage -= m_lastdamage / 4;
+            m_lastdamage -= m_lastdamage / 4;
             SendEffectAnimation(target, 0, false, 0);
             if (target is GameNPC)
             {
@@ -189,7 +180,7 @@ namespace DOL.GS.Spells
                 if (brain != null)
                 {
                     GamePlayer owner = brain.GetPlayerOwner();
-					//Worthless checks
+                    //Worthless checks
                     if (owner != null/* && owner.ControlledNpc != null && target == owner.ControlledNpc.Body*/)
                     {
                         MessageToLiving(owner, "Your " + target.Name + " resists the effect!", eChatType.CT_SpellResisted);
@@ -210,7 +201,7 @@ namespace DOL.GS.Spells
                 ad.Target = target;
                 ad.AttackType = AttackData.eAttackType.Spell;
                 ad.AttackResult = GameLiving.eAttackResult.Missed;
-				ad.SpellHandler = this;
+                ad.SpellHandler = this;
                 target.OnAttackedByEnemy(ad);
                 target.StartInterruptTimer(target.SpellInterruptDuration, ad.AttackType, Caster);
             }
@@ -225,16 +216,16 @@ namespace DOL.GS.Spells
                 if (aggroBrain != null)
                     aggroBrain.AddToAggroList(Caster, 1);
             }
-			if (target.Realm == 0 || Caster.Realm == 0)
-			{
-				target.LastAttackedByEnemyTickPvE = target.CurrentRegion.Time;
-				Caster.LastAttackTickPvE = Caster.CurrentRegion.Time;
-			}
-			else
-			{
-				target.LastAttackedByEnemyTickPvP = target.CurrentRegion.Time;
-				Caster.LastAttackTickPvP = Caster.CurrentRegion.Time;
-			}
+            if (target.Realm == 0 || Caster.Realm == 0)
+            {
+                target.LastAttackedByEnemyTickPvE = target.CurrentRegion.Time;
+                Caster.LastAttackTickPvE = Caster.CurrentRegion.Time;
+            }
+            else
+            {
+                target.LastAttackedByEnemyTickPvP = target.CurrentRegion.Time;
+                Caster.LastAttackTickPvP = Caster.CurrentRegion.Time;
+            }
         }
 
         public virtual void DamageTarget(AttackData ad)
@@ -248,6 +239,6 @@ namespace DOL.GS.Spells
             }
         }
 
-		public HereticDoTLostOnPulse(GameLiving caster, Spell spell, SpellLine line) : base(caster, spell, line) {}
-	}
+        public HereticDoTLostOnPulse(GameLiving caster, Spell spell, SpellLine line) : base(caster, spell, line) { }
+    }
 }

@@ -1,40 +1,39 @@
 /*
  * DAWN OF LIGHT - The first free open source DAoC server emulator
- * 
+ *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
  * as published by the Free Software Foundation; either version 2
  * of the License, or (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  */
 
-using System;
-using DOL.GS;
 using System.Collections.Generic;
-using DOL.GS.PacketHandler;
-using DOL.GS.Effects;
 using DOL.Database;
+using DOL.GS.Effects;
+using DOL.GS.PacketHandler;
 
 namespace DOL.GS.Spells
 {
     //http://www.camelotherald.com/masterlevels/ma.php?ml=Perfector
     //the link isnt corrently working so correct me if you see any timers wrong.
 
-
     //ML1 Cure NS - already handled in another area
 
     //ML2 GRP Cure Disease - already handled in another area
 
     //shared timer 1
+
     #region Perfecter-3
+
     [SpellHandlerAttribute("FOH")]
     public class FOHSpellHandler : FontSpellHandler
     {
@@ -75,22 +74,25 @@ namespace DOL.GS.Spells
             dbs.Power = 0;
             dbs.CastTime = 0;
             dbs.Range = WorldMgr.VISIBILITY_DISTANCE;
-			dbs.Message1 = spell.Message1;
-			dbs.Message2 = spell.Message2;
-			dbs.Message3 = spell.Message3;
-			dbs.Message4 = spell.Message4;
+            dbs.Message1 = spell.Message1;
+            dbs.Message2 = spell.Message2;
+            dbs.Message3 = spell.Message3;
+            dbs.Message4 = spell.Message4;
             sRadius = 350;
             s = new Spell(dbs, 1);
             sl = SkillBase.GetSpellLine(GlobalSpellsLines.Reserved_Spells);
             heal = ScriptMgr.CreateSpellHandler(m_caster, s, sl);
         }
     }
-    #endregion
+
+    #endregion Perfecter-3
 
     //ML4 Greatness - passive increases 20% concentration
 
     //shared timer 1
+
     #region Perfecter-5
+
     [SpellHandlerAttribute("FOP")]
     public class FOPSpellHandler : FontSpellHandler
     {
@@ -131,20 +133,23 @@ namespace DOL.GS.Spells
             dbs.Power = 0;
             dbs.CastTime = 0;
             dbs.Range = WorldMgr.VISIBILITY_DISTANCE;
-			dbs.Message1 = spell.Message1;
-			dbs.Message2 = spell.Message2;
-			dbs.Message3 = spell.Message3;
-			dbs.Message4 = spell.Message4;
+            dbs.Message1 = spell.Message1;
+            dbs.Message2 = spell.Message2;
+            dbs.Message3 = spell.Message3;
+            dbs.Message4 = spell.Message4;
             sRadius = 350;
             s = new Spell(dbs, 1);
             sl = SkillBase.GetSpellLine(GlobalSpellsLines.Reserved_Spells);
             heal = ScriptMgr.CreateSpellHandler(m_caster, s, sl);
         }
     }
-    #endregion
+
+    #endregion Perfecter-5
 
     //shared timer 1
+
     #region Perfecter-6
+
     [SpellHandlerAttribute("FOR")]
     public class FORSpellHandler : FontSpellHandler
     {
@@ -192,13 +197,16 @@ namespace DOL.GS.Spells
             heal = ScriptMgr.CreateSpellHandler(m_caster, s, sl);
         }
     }
-    #endregion
+
+    #endregion Perfecter-6
 
     //shared timer 2
     //ML7 Leaping Health - already handled in another area
 
     //no shared timer
+
     #region Perfecter-8
+
     [SpellHandlerAttribute("SickHeal")]
     public class SickHealSpellHandler : RemoveSpellEffectHandler
     {
@@ -211,10 +219,13 @@ namespace DOL.GS.Spells
             m_spellTypesToRemove.Add("RvrResurrectionIllness");
         }
     }
-    #endregion
+
+    #endregion Perfecter-8
 
     //shared timer 1
+
     #region Perfecter-9
+
     [SpellHandlerAttribute("FOD")]
     public class FODSpellHandler : FontSpellHandler
     {
@@ -260,13 +271,15 @@ namespace DOL.GS.Spells
             sl = SkillBase.GetSpellLine(GlobalSpellsLines.Reserved_Spells);
             heal = ScriptMgr.CreateSpellHandler(m_caster, s, sl);
         }
-    }	
-    #endregion
+    }
+
+    #endregion Perfecter-9
 
     //shared timer 2
     //ML10 Rampant Healing - already handled in another area
 
     #region PoT
+
     [SpellHandlerAttribute("PowerOverTime")]
     public class PoTSpellHandler : SpellHandler
     {
@@ -326,7 +339,7 @@ namespace DOL.GS.Spells
             if (target is GamePlayer)
             {
                 GamePlayer player = target as GamePlayer;
-                if (player.CharacterClass.ID == (int)eCharacterClass.Vampiir 
+                if (player.CharacterClass.ID == (int)eCharacterClass.Vampiir
                     || player.CharacterClass.ID == (int)eCharacterClass.MaulerHib
                     || player.CharacterClass.ID == (int)eCharacterClass.MaulerMid
                     || player.CharacterClass.ID == (int)eCharacterClass.MaulerAlb)
@@ -361,28 +374,29 @@ namespace DOL.GS.Spells
             return 0;
         }
 
-
         // constructor
         public PoTSpellHandler(GameLiving caster, Spell spell, SpellLine line) : base(caster, spell, line) { }
     }
-    #endregion
+
+    #endregion PoT
 
     #region CCResist
+
     [SpellHandler("CCResist")]
     public class CCResistSpellHandler : MasterlevelHandling
     {
         public override void OnEffectStart(GameSpellEffect effect)
         {
-        	base.OnEffectStart(effect);
+            base.OnEffectStart(effect);
             effect.Owner.BaseBuffBonusCategory[(int)eProperty.MesmerizeDurationReduction] += (int)m_spell.Value;
             effect.Owner.BaseBuffBonusCategory[(int)eProperty.StunDurationReduction] += (int)m_spell.Value;
             effect.Owner.BaseBuffBonusCategory[(int)eProperty.SpeedDecreaseDurationReduction] += (int)m_spell.Value;
-             
+
             if (effect.Owner is GamePlayer)
             {
-            	GamePlayer player = effect.Owner as GamePlayer;
+                GamePlayer player = effect.Owner as GamePlayer;
                 player.UpdatePlayerStatus();
-            	player.Out.SendUpdatePlayer();       
+                player.Out.SendUpdatePlayer();
             }
         }
 
@@ -391,18 +405,19 @@ namespace DOL.GS.Spells
             effect.Owner.BaseBuffBonusCategory[(int)eProperty.MesmerizeDurationReduction] -= (int)m_spell.Value;
             effect.Owner.BaseBuffBonusCategory[(int)eProperty.StunDurationReduction] -= (int)m_spell.Value;
             effect.Owner.BaseBuffBonusCategory[(int)eProperty.SpeedDecreaseDurationReduction] -= (int)m_spell.Value;
-            
+
             if (effect.Owner is GamePlayer)
             {
-            	GamePlayer player = effect.Owner as GamePlayer;
+                GamePlayer player = effect.Owner as GamePlayer;
                 player.UpdatePlayerStatus();
-            	player.Out.SendUpdatePlayer();  
+                player.Out.SendUpdatePlayer();
             }
-            return base.OnEffectExpires(effect,noMessages);
+            return base.OnEffectExpires(effect, noMessages);
         }
 
         // constructor
         public CCResistSpellHandler(GameLiving caster, Spell spell, SpellLine line) : base(caster, spell, line) { }
     }
-    #endregion
+
+    #endregion CCResist
 }

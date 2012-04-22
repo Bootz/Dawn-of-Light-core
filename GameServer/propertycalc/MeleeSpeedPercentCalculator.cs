@@ -16,28 +16,29 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
  */
+
 using System;
 
 namespace DOL.GS.PropertyCalc
 {
-	/// <summary>
-	/// The Melee Speed bonus percent calculator
-	///
-	/// BuffBonusCategory1 is used for buffs
-	/// BuffBonusCategory2 unused
-	/// BuffBonusCategory3 is used for debuff
-	/// BuffBonusCategory4 unused
-	/// BuffBonusMultCategory1 unused
-	/// </summary>
-	[PropertyCalculator(eProperty.MeleeSpeed)]
-	public class MeleeSpeedPercentCalculator : PropertyCalculator
-	{
-		public override int CalcValue(GameLiving living, eProperty property)
-		{
-			return Math.Max(1, 100
-				-living.BaseBuffBonusCategory[(int)property] // less is faster = buff
-				+living.DebuffCategory[(int)property] // more is slower = debuff
-				-Math.Min(10, living.ItemBonus[(int)property])); // http://www.camelotherald.com/more/1325.shtml
-		}
-	}
+    /// <summary>
+    /// The Melee Speed bonus percent calculator
+    ///
+    /// BuffBonusCategory1 is used for buffs
+    /// BuffBonusCategory2 unused
+    /// BuffBonusCategory3 is used for debuff
+    /// BuffBonusCategory4 unused
+    /// BuffBonusMultCategory1 unused
+    /// </summary>
+    [PropertyCalculator(eProperty.MeleeSpeed)]
+    public class MeleeSpeedPercentCalculator : PropertyCalculator
+    {
+        public override int CalcValue(GameLiving living, eProperty property)
+        {
+            return Math.Max(1, 100
+                - living.BaseBuffBonusCategory[(int)property] // less is faster = buff
+                + living.DebuffCategory[(int)property] // more is slower = debuff
+                - Math.Min(10, living.ItemBonus[(int)property])); // http://www.camelotherald.com/more/1325.shtml
+        }
+    }
 }

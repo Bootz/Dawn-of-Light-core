@@ -1,16 +1,16 @@
 /*
  * DAWN OF LIGHT - The first free open source DAoC server emulator
- * 
+ *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
  * as published by the Free Software Foundation; either version 2
  * of the License, or (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
@@ -20,6 +20,7 @@
  * [Ganrod] Nidel 2008-07-08
  * - Corrections for Bomber actions.
  */
+
 using System;
 using DOL.AI.Brain;
 using DOL.Events;
@@ -30,11 +31,11 @@ namespace DOL.GS.Spells
     [SpellHandlerAttribute("Bomber")]
     public class BomberSpellHandler : SummonSpellHandler
     {
-		private static readonly log4net.ILog log = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
+        private static readonly log4net.ILog log = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
 
-		const string BOMBERTARGET = "bombertarget";
+        const string BOMBERTARGET = "bombertarget";
 
-		public BomberSpellHandler(GameLiving caster, Spell spell, SpellLine line) : base(caster, spell, line) { m_isSilent = true; }
+        public BomberSpellHandler(GameLiving caster, Spell spell, SpellLine line) : base(caster, spell, line) { m_isSilent = true; }
 
         public override bool CheckBeginCast(GameLiving selectedTarget)
         {
@@ -57,8 +58,8 @@ namespace DOL.GS.Spells
             base.ApplyEffectOnTarget(target, effectiveness);
             pet.TempProperties.setProperty(BOMBERTARGET, target);
             pet.Name = Spell.Name;
-			pet.Flags ^= GameNPC.eFlags.DONTSHOWNAME;
-			pet.FixedSpeed = true;
+            pet.Flags ^= GameNPC.eFlags.DONTSHOWNAME;
+            pet.FixedSpeed = true;
             pet.Follow(target, 5, Spell.Range * 5); // with Toa bonus, if the bomber was fired > Spell.Range base, it didnt move..
         }
 
@@ -81,9 +82,11 @@ namespace DOL.GS.Spells
         {
             return new BomberBrain(owner);
         }
+
         protected override void SetBrainToOwner(IControlledBrain brain)
         {
         }
+
         protected override void OnNpcReleaseCommand(DOLEvent e, object sender, EventArgs arguments)
         {
         }
@@ -116,7 +119,7 @@ namespace DOL.GS.Spells
             subspell.Level = m_spell.Level;
             if (living.IsWithinRadius(bomber, 350))
             {
-				ISpellHandler spellhandler = ScriptMgr.CreateSpellHandler(Caster, subspell, SkillBase.GetSpellLine(SpellLine.KeyName));
+                ISpellHandler spellhandler = ScriptMgr.CreateSpellHandler(Caster, subspell, SkillBase.GetSpellLine(SpellLine.KeyName));
                 spellhandler.StartSpell(living);
             }
 

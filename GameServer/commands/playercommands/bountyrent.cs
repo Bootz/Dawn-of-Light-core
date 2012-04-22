@@ -1,45 +1,46 @@
 /*
  * DAWN OF LIGHT - The first free open source DAoC server emulator
- * 
+ *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
  * as published by the Free Software Foundation; either version 2
  * of the License, or (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
  */
+
 using System;
-using DOL.GS.PacketHandler;
 using DOL.GS.Housing;
+using DOL.GS.PacketHandler;
 using DOL.Language;
 
 namespace DOL.GS.Commands
 {
-	[CmdAttribute("&bountyrent", //command to handle
-		ePrivLevel.Player, //minimum privelege level
-		"Pay house rent with bountypoints", //command description
+    [CmdAttribute("&bountyrent", //command to handle
+        ePrivLevel.Player, //minimum privelege level
+        "Pay house rent with bountypoints", //command description
         "Use /bountyrent personal/guild <amount> to pay.")]
-	public class BountyRentCommandHandler : AbstractCommandHandler, ICommandHandler
-	{
-		public void OnCommand(GameClient client, string[] args)
-		{
+    public class BountyRentCommandHandler : AbstractCommandHandler, ICommandHandler
+    {
+        public void OnCommand(GameClient client, string[] args)
+        {
             long bpWorth = ServerProperties.Properties.RENT_BOUNTY_POINT_TO_GOLD;
 
-			if (args.Length < 2)
-			{
+            if (args.Length < 2)
+            {
                 client.Out.SendMessage(LanguageMgr.GetTranslation(client, "Scripts.Players.Bountyrent.CmdUsage", bpWorth),
                     eChatType.CT_System, eChatLoc.CL_SystemWindow);
 
-				return;
-			}
+                return;
+            }
 
             if (args.Length < 3)
             {
@@ -50,13 +51,13 @@ namespace DOL.GS.Commands
             }
 
             House house = client.Player.CurrentHouse;
-			if (house == null)
-			{
+            if (house == null)
+            {
                 client.Out.SendMessage(LanguageMgr.GetTranslation(client, "Scripts.Players.Bountyrent.RangeOfAHouse"),
                     eChatType.CT_System, eChatLoc.CL_SystemWindow);
 
-				return;
-			}
+                return;
+            }
 
             long BPsToAdd = 0;
             try
@@ -71,10 +72,10 @@ namespace DOL.GS.Commands
                 return;
             }
 
-			switch (args[1].ToLower())
-			{
-				case "personal":
-					{
+            switch (args[1].ToLower())
+            {
+                case "personal":
+                    {
                         if (!house.CanPayRent(client.Player))
                         {
                             client.Out.SendMessage(LanguageMgr.GetTranslation(client, "Scripts.Players.Bountyrent.NoPayRentPerm"),
@@ -83,13 +84,13 @@ namespace DOL.GS.Commands
                             return;
                         }
 
-						if ((client.Player.BountyPoints -= BPsToAdd) < 0)
-						{
+                        if ((client.Player.BountyPoints -= BPsToAdd) < 0)
+                        {
                             client.Out.SendMessage(LanguageMgr.GetTranslation(client, "Scripts.Players.Bountyrent.NotEnoughBp"),
                                 eChatType.CT_System, eChatLoc.CL_SystemWindow);
 
-							return;
-						}
+                            return;
+                        }
 
                         if (house.KeptMoney >= (HouseMgr.GetRentByModel(house.Model) * ServerProperties.Properties.RENT_LOCKBOX_PAYMENTS))
                         {
@@ -116,9 +117,9 @@ namespace DOL.GS.Commands
                         client.Out.SendUpdatePoints();
                         client.Out.SendMessage(LanguageMgr.GetTranslation(client, "Scripts.Players.Bountyrent.YouSpend", BPsToAdd, ((BPsToAdd * bpWorth) / bpWorth)),
                             eChatType.CT_System, eChatLoc.CL_SystemWindow);
-					} break;
-				case "guild":
-					{
+                    } break;
+                case "guild":
+                    {
                         if (house.DatabaseItem.GuildHouse && client.Player.GuildName == house.DatabaseItem.GuildName)
                         {
                             if (house.CanPayRent(client.Player))
@@ -167,12 +168,12 @@ namespace DOL.GS.Commands
                         }
 
                         DisplayMessage(client, LanguageMgr.GetTranslation(client, "Scripts.Players.Bountyrent.NotAHouseGuildLeader"));
-					} break;
-				default:
-					{
+                    } break;
+                default:
+                    {
                         DisplayMessage(client, LanguageMgr.GetTranslation(client, "Scripts.Players.Bountyrent.CorrectFormat"));
-					} break;
-			}
-		}
-	}
+                    } break;
+            }
+        }
+    }
 }

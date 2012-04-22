@@ -6,6 +6,7 @@ namespace DOL.Database
     public class DBLanguageNPC : DataObject
     {
         #region Variables
+
         private string m_translationId = string.Empty;
         private string m_name = string.Empty;
         private string m_suffix = string.Empty;
@@ -14,11 +15,13 @@ namespace DOL.Database
         private string m_messageArticle = string.Empty;
         private string m_language = string.Empty;
         private string m_tag = string.Empty;
+
         #endregion Variables
 
         public DBLanguageNPC() { }
 
         #region Properties
+
         /// <summary>
         /// Gets or sets the translation id.
         /// </summary>
@@ -49,9 +52,9 @@ namespace DOL.Database
 
         /// <summary>
         /// Gets or sets the name suffix (currently used by necromancer pets).
-        /// 
+        ///
         /// The XYZ spell is no longer in the Death Servant's queue.
-        /// 
+        ///
         /// 's = the suffix.
         /// </summary>
         [DataElement(AllowDbNull = true)]
@@ -81,9 +84,9 @@ namespace DOL.Database
 
         /// <summary>
         /// Gets or sets the translated examine article.
-        /// 
+        ///
         /// You examine the Tree.
-        /// 
+        ///
         /// the = the examine article.
         /// </summary>
         [DataElement(AllowDbNull = true)]
@@ -99,9 +102,9 @@ namespace DOL.Database
 
         /// <summary>
         /// Gets or sets the translated message article.
-        /// 
+        ///
         /// GamePlayer has been killed by a Tree.
-        /// 
+        ///
         /// a = the message article.
         /// </summary>
         [DataElement(AllowDbNull = true)]
@@ -142,6 +145,7 @@ namespace DOL.Database
                 m_tag = value;
             }
         }
+
         #endregion Properties
     }
 }

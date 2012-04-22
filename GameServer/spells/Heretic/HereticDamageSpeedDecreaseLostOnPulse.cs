@@ -1,17 +1,13 @@
 using System;
-using System.Collections;
-using DOL.GS;
-using DOL.Events;
+using DOL.AI.Brain;
 using DOL.GS.Effects;
 using DOL.GS.PacketHandler;
-using DOL.AI.Brain;
 
 namespace DOL.GS.Spells
 {
-
-	[SpellHandlerAttribute("HereticDamageSpeedDecreaseLOP")]
-	public class HereticDamageSpeedDecreaseLostOnPulse : HereticSpeedDecreaseSpellHandler
-	{
+    [SpellHandlerAttribute("HereticDamageSpeedDecreaseLOP")]
+    public class HereticDamageSpeedDecreaseLostOnPulse : HereticSpeedDecreaseSpellHandler
+    {
         protected int m_lastdamage = 0;
         protected int m_pulsedamage = 0;
         //    protected int m_pulsecount = -1;
@@ -42,7 +38,6 @@ namespace DOL.GS.Spells
             return ad;
         }
 
-
         public override void CalculateDamageVariance(GameLiving target, out double min, out double max)
         {
             int speclevel = 1;
@@ -68,7 +63,6 @@ namespace DOL.GS.Spells
             if (min > max) min = max;
             if (min < 0) min = 0;
         }
-
 
         protected override GameSpellEffect CreateSpellEffect(GameLiving target, double effectiveness)
         {
@@ -102,7 +96,6 @@ namespace DOL.GS.Spells
             SendEffectAnimation(effect.Owner, 0, false, 1);
         }
 
-
         public override void OnEffectPulse(GameSpellEffect effect)
         {
             GameLiving t = effect.Owner;
@@ -121,7 +114,7 @@ namespace DOL.GS.Spells
                 RemoveEffect();
             }
 
-            if ( !m_caster.IsWithinRadius( effect.Owner, Spell.Range ) )
+            if (!m_caster.IsWithinRadius(effect.Owner, Spell.Range))
             {
                 RemoveEffect();
             }
@@ -136,24 +129,23 @@ namespace DOL.GS.Spells
 
             OnDirectEffect(effect.Owner, effect.Effectiveness);
 
-			// A really lame way to charge the correct amount of power per pulse since this spell is cast and maintained without pulsing. - Tolakram
-			if (m_focusTargets.Count > 1)
-			{
-				double powerPerTarget = (double)(effect.Spell.PulsePower / m_focusTargets.Count);
+            // A really lame way to charge the correct amount of power per pulse since this spell is cast and maintained without pulsing. - Tolakram
+            if (m_focusTargets.Count > 1)
+            {
+                double powerPerTarget = (double)(effect.Spell.PulsePower / m_focusTargets.Count);
 
-				int powerUsed = (int)powerPerTarget;
-				if (Util.ChanceDouble(((double)powerPerTarget - (double)powerUsed)))
-					powerUsed += 1;
+                int powerUsed = (int)powerPerTarget;
+                if (Util.ChanceDouble(((double)powerPerTarget - (double)powerUsed)))
+                    powerUsed += 1;
 
-				if (powerUsed > 0)
-					m_caster.Mana -= powerUsed;
-			}
-			else
-			{
-				m_caster.Mana -= effect.Spell.PulsePower;
-			}
-		}
-
+                if (powerUsed > 0)
+                    m_caster.Mana -= powerUsed;
+            }
+            else
+            {
+                m_caster.Mana -= effect.Spell.PulsePower;
+            }
+        }
 
         public override int OnEffectExpires(GameSpellEffect effect, bool noMessages)
         {
@@ -207,7 +199,7 @@ namespace DOL.GS.Spells
                 if (brain != null)
                 {
                     GamePlayer owner = brain.GetPlayerOwner();
-					//Worthless checks - if these situations happen, we need to fix that instead of ignoring them
+                    //Worthless checks - if these situations happen, we need to fix that instead of ignoring them
                     if (owner != null /*&& owner.ControlledNpc != null && target == owner.ControlledNpc.Body*/)
                     {
                         MessageToLiving(owner, "Your " + target.Name + " resists the effect!", eChatType.CT_SpellResisted);
@@ -228,7 +220,7 @@ namespace DOL.GS.Spells
                 ad.Target = target;
                 ad.AttackType = AttackData.eAttackType.Spell;
                 ad.AttackResult = GameLiving.eAttackResult.Missed;
-				ad.SpellHandler = this;
+                ad.SpellHandler = this;
                 target.OnAttackedByEnemy(ad);
                 target.StartInterruptTimer(target.SpellInterruptDuration, ad.AttackType, Caster);
             }
@@ -243,16 +235,16 @@ namespace DOL.GS.Spells
                 if (aggroBrain != null)
                     aggroBrain.AddToAggroList(Caster, 1);
             }
-			if (target.Realm == 0 || Caster.Realm == 0)
-			{
-				target.LastAttackedByEnemyTickPvE = target.CurrentRegion.Time;
-				Caster.LastAttackTickPvE = Caster.CurrentRegion.Time;
-			}
-			else
-			{
-				target.LastAttackedByEnemyTickPvP = target.CurrentRegion.Time;
-				Caster.LastAttackTickPvP = Caster.CurrentRegion.Time;
-			}
+            if (target.Realm == 0 || Caster.Realm == 0)
+            {
+                target.LastAttackedByEnemyTickPvE = target.CurrentRegion.Time;
+                Caster.LastAttackTickPvE = Caster.CurrentRegion.Time;
+            }
+            else
+            {
+                target.LastAttackedByEnemyTickPvP = target.CurrentRegion.Time;
+                Caster.LastAttackTickPvP = Caster.CurrentRegion.Time;
+            }
         }
 
         public virtual void DamageTarget(AttackData ad)
@@ -266,7 +258,6 @@ namespace DOL.GS.Spells
             }
         }
 
-
-		public HereticDamageSpeedDecreaseLostOnPulse(GameLiving caster, Spell spell, SpellLine line) : base(caster, spell, line) {}
-	}
+        public HereticDamageSpeedDecreaseLostOnPulse(GameLiving caster, Spell spell, SpellLine line) : base(caster, spell, line) { }
+    }
 }

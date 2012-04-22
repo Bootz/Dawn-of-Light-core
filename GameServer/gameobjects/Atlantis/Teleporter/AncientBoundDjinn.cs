@@ -1,28 +1,25 @@
 ﻿/*
  * DAWN OF LIGHT - The first free open source DAoC server emulator
- * 
+ *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
  * as published by the Free Software Foundation; either version 2
  * of the License, or (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
  */
+
 using System;
-using log4net;
-using System.Reflection;
-using DOL.Events;
 using DOL.Database;
 using DOL.GS.PacketHandler;
-using DOL.GS.Housing;
 
 namespace DOL.GS
 {
@@ -32,13 +29,14 @@ namespace DOL.GS
     /// <author>Aredhel</author>
     public abstract class AncientBoundDjinn : GameTeleporter
     {
-        private const int NpcTemplateId = 3000;      
+        private const int NpcTemplateId = 3000;
         private const int ZOffset = 63;
 
         /// <summary>
         /// Creates a new djinn.
         /// </summary>
-        public AncientBoundDjinn(DjinnStone djinnStone) : base()
+        public AncientBoundDjinn(DjinnStone djinnStone)
+            : base()
         {
             NpcTemplate npcTemplate = NpcTemplateMgr.GetTemplate(NpcTemplateId);
 
@@ -88,7 +86,7 @@ namespace DOL.GS
         {
             get
             {
-				return CurrentZone.GetRealm();
+                return CurrentZone.GetRealm();
             }
         }
 
@@ -128,7 +126,7 @@ namespace DOL.GS
                     case 34:
                     case 134:
                         return 0x4aa;
-                    
+
                     // Temple of Twilight:
                     case 80:
                     case 37:
@@ -226,34 +224,32 @@ namespace DOL.GS
             return base.WhisperReceive(source, text);
         }
 
+        protected override bool GetTeleportLocation(GamePlayer player, string text)
+        {
+            // special cases
+            if (text.ToLower() == "battlegrounds" || text.ToLower() == "personal")
+            {
+                return base.GetTeleportLocation(player, text);
+            }
 
-		protected override bool GetTeleportLocation(GamePlayer player, string text)
-		{
-			// special cases
-			if (text.ToLower() == "battlegrounds" || text.ToLower() == "personal")
-			{
-				return base.GetTeleportLocation(player, text);
-			}
+            // Find the teleport location in the database.  For Djinns use the player realm to match Interact list given.
+            Teleport port = WorldMgr.GetTeleportLocation(player.Realm, String.Format("{0}:{1}", Type, text));
 
-			// Find the teleport location in the database.  For Djinns use the player realm to match Interact list given.
-			Teleport port = WorldMgr.GetTeleportLocation(player.Realm, String.Format("{0}:{1}", Type, text));
+            if (port != null)
+            {
+                if (port.RegionID == 0 && port.X == 0 && port.Y == 0 && port.Z == 0)
+                {
+                    OnSubSelectionPicked(player, port);
+                }
+                else
+                {
+                    OnDestinationPicked(player, port);
+                }
+                return false;
+            }
 
-			if (port != null)
-			{
-				if (port.RegionID == 0 && port.X == 0 && port.Y == 0 && port.Z == 0)
-				{
-					OnSubSelectionPicked(player, port);
-				}
-				else
-				{
-					OnDestinationPicked(player, port);
-				}
-				return false;
-			}
-
-			return true;	// Needs further processing.
-		}
-
+            return true;	// Needs further processing.
+        }
 
         /// <summary>
         /// Player has picked a subselection.
@@ -335,7 +331,6 @@ namespace DOL.GS
                         SayTo(player, reply);
                         return;
                     }
-
             }
 
             base.OnSubSelectionPicked(player, subSelection);
@@ -386,13 +381,13 @@ namespace DOL.GS
         }
 
         /// <summary>
-        /// Teleport the player to the designated coordinates. 
+        /// Teleport the player to the designated coordinates.
         /// </summary>
         /// <param name="player"></param>
         /// <param name="destination"></param>
         protected override void OnTeleport(GamePlayer player, Teleport destination)
         {
-            player.Out.SendMessage("There is an odd distortion in the air around you...", 
+            player.Out.SendMessage("There is an odd distortion in the air around you...",
                 eChatType.CT_System, eChatLoc.CL_SystemWindow);
 
             base.OnTeleport(player, destination);
@@ -405,10 +400,10 @@ namespace DOL.GS
         /// <returns></returns>
         public override bool Say(String message)
         {
-			foreach (GamePlayer player in GetPlayersInRadius(WorldMgr.SAY_DISTANCE))
-			{
-				player.Out.SendMessage(String.Format("The {0} says, \"{1}\"", this.Name, message), eChatType.CT_System, eChatLoc.CL_SystemWindow);
-			}
+            foreach (GamePlayer player in GetPlayersInRadius(WorldMgr.SAY_DISTANCE))
+            {
+                player.Out.SendMessage(String.Format("The {0} says, \"{1}\"", this.Name, message), eChatType.CT_System, eChatLoc.CL_SystemWindow);
+            }
 
             return true;
         }

@@ -1,58 +1,54 @@
 /*
  * DAWN OF LIGHT - The first free open source DAoC server emulator
- * 
+ *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
  * as published by the Free Software Foundation; either version 2
  * of the License, or (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
  */
+
 using System;
 using System.Collections;
 using System.Collections.Specialized;
 using System.Reflection;
-using System.Text;
-using DOL.Database;
-using DOL.Events;
-using DOL.GS.PacketHandler;
-using log4net;
 using DOL.GS.Behaviour.Attributes;
-using DOL.GS.Behaviour;
+using log4net;
 
 namespace DOL.GS.Behaviour
-{				
-	/// <summary>
-	/// Declares the behaviours managed, all behaviourtypes instances
-	/// must be registered here to be usable
-	/// </summary>
+{
+    /// <summary>
+    /// Declares the behaviours managed, all behaviourtypes instances
+    /// must be registered here to be usable
+    /// </summary>
     public sealed class BehaviourMgr
-    {  
-		#region Declaration
+    {
+        #region Declaration
 
-		/// <summary>
-		/// Defines a logger for this class.
-		/// </summary>
-		private static readonly ILog log = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
-		
+        /// <summary>
+        /// Defines a logger for this class.
+        /// </summary>
+        private static readonly ILog log = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
+
         private static readonly IDictionary m_behaviourActionMap = new HybridDictionary();
         private static readonly IDictionary m_behaviourTriggerMap = new HybridDictionary();
         private static readonly IDictionary m_behaviourRequirementMap = new HybridDictionary();
 
-		#endregion
+        #endregion Declaration
 
         public static bool Init()
         {
-            //We will search our assemblies for Quests by reflection so 
-            //it is not neccessary anymore to register new quests with the 
+            //We will search our assemblies for Quests by reflection so
+            //it is not neccessary anymore to register new quests with the
             //server, it is done automatically!
             foreach (Assembly assembly in AppDomain.CurrentDomain.GetAssemblies())
             {
@@ -61,10 +57,10 @@ namespace DOL.GS.Behaviour
                 {
                     // Pick up a class
                     if (type.IsClass != true)
-                        continue;                                        
-                    
+                        continue;
+
                     if (typeof(IBehaviourAction).IsAssignableFrom(type))
-                    {                        
+                    {
                         ActionAttribute attr = GetActionAttribute(type);
                         if (attr != null)
                         {
@@ -76,7 +72,6 @@ namespace DOL.GS.Behaviour
 
                     if (typeof(IBehaviourTrigger).IsAssignableFrom(type))
                     {
-                        
                         TriggerAttribute attr = getTriggerAttribute(type);
                         if (attr != null)
                         {
@@ -88,7 +83,6 @@ namespace DOL.GS.Behaviour
 
                     if (typeof(IBehaviourRequirement).IsAssignableFrom(type))
                     {
-                        
                         RequirementAttribute attr = getRequirementAttribute(type);
                         if (attr != null)
                         {
@@ -114,7 +108,7 @@ namespace DOL.GS.Behaviour
         public static TriggerAttribute getTriggerAttribute(Type type)
         {
             foreach (Attribute attr in type.GetCustomAttributes(typeof(TriggerAttribute), false))
-            {                
+            {
                 return (TriggerAttribute)attr;
             }
             return null;
@@ -122,19 +116,19 @@ namespace DOL.GS.Behaviour
 
         public static RequirementAttribute getRequirementAttribute(Type type)
         {
-            foreach (Attribute attr in type.GetCustomAttributes(typeof(RequirementAttribute),false))
-            {            
+            foreach (Attribute attr in type.GetCustomAttributes(typeof(RequirementAttribute), false))
+            {
                 return (RequirementAttribute)attr;
             }
             return null;
-        }		
-		
-		/// <summary>
+        }
+
+        /// <summary>
         /// Creates a new BehaviourBuilder
-		/// </summary>		
+        /// </summary>
         /// <returns>BehaviourBuilder</returns>
-        public static BehaviourBuilder getBuilder() 
-		{
+        public static BehaviourBuilder getBuilder()
+        {
             return new BehaviourBuilder();
         }
 
@@ -151,7 +145,7 @@ namespace DOL.GS.Behaviour
 
         public static Type GetTypeForActionType(eActionType actionType)
         {
-            return (Type) m_behaviourActionMap[actionType];
+            return (Type)m_behaviourActionMap[actionType];
         }
 
         public static void RegisterBehaviourTrigger(eTriggerType triggerType, Type type)
@@ -185,7 +179,6 @@ namespace DOL.GS.Behaviour
         {
             return (Type)m_behaviourRequirementMap[requirementType];
         }
-		
     }
 
     /// <summary>

@@ -1,16 +1,16 @@
 /*
  * DAWN OF LIGHT - The first free open source DAoC server emulator
- * 
+ *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
  * as published by the Free Software Foundation; either version 2
  * of the License, or (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
@@ -20,7 +20,6 @@
 using System;
 using System.Collections.Generic;
 using DOL.Database;
-using DOL.GS.Effects;
 using DOL.GS.PacketHandler;
 using DOL.GS.ServerRules;
 
@@ -37,6 +36,7 @@ namespace DOL.GS.RealmAbilities
         private int damage;
         private int resist;
         private int basedamage;
+
         /// <summary>
         /// Action
         /// </summary>
@@ -60,7 +60,7 @@ namespace DOL.GS.RealmAbilities
                 return;
             }
 
-            if (!living.IsWithinRadius( target, (int)(1500 * living.GetModified(eProperty.SpellRange) * 0.01)))
+            if (!living.IsWithinRadius(target, (int)(1500 * living.GetModified(eProperty.SpellRange) * 0.01)))
             {
                 Message.ChatToOthers(living, "You are too far away from your target to use this ability!", eChatType.CT_SpellResisted);
                 return;
@@ -79,15 +79,16 @@ namespace DOL.GS.RealmAbilities
                     if (p != m_oldtarget && p != living && GameServer.ServerRules.IsAllowedToAttack(living, p, true))
                     {
                         DamageTarget(p, living, x);
-						p.StartInterruptTimer(3000, AttackData.eAttackType.Spell, living);
+                        p.StartInterruptTimer(3000, AttackData.eAttackType.Spell, living);
                         m_newtarget = p;
                         break;
                     }
                 }
             }
-            if(deactivate)
-            DisableSkill(living);
+            if (deactivate)
+                DisableSkill(living);
         }
+
         private void DamageTarget(GameLiving target, GameLiving caster, double counter)
         {
             int level = caster.GetModifiedSpecLevel("Stormcalling");
@@ -125,10 +126,12 @@ namespace DOL.GS.RealmAbilities
             target.OnAttackedByEnemy(ad);
             caster.DealDamage(ad);
         }
+
         public override int GetReUseDelay(int level)
         {
             return 600;
         }
+
         public override void AddEffectsInfo(IList<string> list)
         {
             list.Add("Casts a lightning bolt at the enemy target and hits up to 5 targets. If there is only one target available, the spell will hit once. If there are multiple targets, the spell has a chance to jump from target to target and back to the prior target. With each jump, the damage of the spell is reduced by 25%.");
@@ -137,6 +140,5 @@ namespace DOL.GS.RealmAbilities
             list.Add("Target: Realm Enemy");
             list.Add("Casting time: instant");
         }
-
     }
 }

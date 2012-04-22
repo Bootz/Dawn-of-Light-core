@@ -1,20 +1,15 @@
 using System;
 using System.Collections.Generic;
-using System.Text;
-using DOL.GS.Behaviour;
+using System.Reflection;
+using DOL.AI.Brain;
+using DOL.Events;
 using DOL.GS.Behaviour.Actions;
 using DOL.GS.Behaviour.Triggers;
 using log4net;
-using System.Reflection;
-using DOL.Events;
-using DOL.GS;
-using DOL.GS.Quests;
-using DOL.GS.PacketHandler;
-using DOL.AI.Brain;
 
 namespace DOL.GS.Behaviour.Examples
 {
-    class TestBehaviour
+    internal class TestBehaviour
     {
         /// <summary>
         /// Defines a logger for this class.
@@ -41,7 +36,7 @@ namespace DOL.GS.Behaviour.Examples
                 SirQuait.Model = 40;
                 SirQuait.Name = "Sir Quait";
                 if (log.IsWarnEnabled)
-                    log.Warn("Could not find " + SirQuait.Name + ", creating ...");                
+                    log.Warn("Could not find " + SirQuait.Name + ", creating ...");
                 SirQuait.Realm = eRealm.Albion;
                 SirQuait.CurrentRegionID = 1;
                 SirQuait.Size = 50;
@@ -55,12 +50,11 @@ namespace DOL.GS.Behaviour.Examples
                 SirQuait.RespawnInterval = 0;
                 SirQuait.BodyType = 0;
 
-
                 StandardMobBrain brain = new StandardMobBrain();
                 brain.AggroLevel = 0;
                 brain.AggroRange = 0;
                 SirQuait.SetOwnBrain(brain);
-                
+
                 SirQuait.AddToWorld();
             }
             else
@@ -68,20 +62,20 @@ namespace DOL.GS.Behaviour.Examples
                 SirQuait = npcs[0];
             }
 
-            #endregion
+            #endregion defineNPCs
 
             #region defineBehaviours
 
             BaseBehaviour b = new BaseBehaviour(SirQuait);
-            MessageAction a = new MessageAction(SirQuait,"This is just a simple test bahaviour.",eTextType.Emote);
+            MessageAction a = new MessageAction(SirQuait, "This is just a simple test bahaviour.", eTextType.Emote);
             b.AddAction(a);
-            InteractTrigger t = new InteractTrigger(SirQuait,b.NotifyHandler,SirQuait);
+            InteractTrigger t = new InteractTrigger(SirQuait, b.NotifyHandler, SirQuait);
             b.AddTrigger(t);
 
             // store the behaviour in a list so it won't be garbage collected
             behaviours.Add(b);
 
-            #endregion
+            #endregion defineBehaviours
 
             log.Info("Simple Test Behaviour added");
         }

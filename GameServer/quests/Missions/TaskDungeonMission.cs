@@ -1,80 +1,86 @@
 using System;
-using System.Collections;
 using System.Reflection;
 
-using DOL.Database;
 using DOL.Events;
 using DOL.GS.PacketHandler;
 using log4net;
 
 namespace DOL.GS.Quests
 {
-	public class TaskDungeonMission : AbstractMission
-	{
+    public class TaskDungeonMission : AbstractMission
+    {
         /// <summary>
         /// Defines a logger for this class.
         /// </summary>
         private static readonly ILog log = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
+
         public enum eTDMissionType : int
-		{
-			Clear = 0,
-			Boss = 1,
-			Specific = 2,
-		}
+        {
+            Clear = 0,
+            Boss = 1,
+            Specific = 2,
+        }
 
-		public enum eDungeonType : int
-		{
-			Melee = 0,
-			Ranged = 1,
-		}
+        public enum eDungeonType : int
+        {
+            Melee = 0,
+            Ranged = 1,
+        }
 
-		private eDungeonType m_dungeonType = eDungeonType.Melee;
-		public eDungeonType DungeonType
-		{
-			get { return m_dungeonType; }
-		}
+        private eDungeonType m_dungeonType = eDungeonType.Melee;
 
-		private eTDMissionType m_missionType;
-		public eTDMissionType TDMissionType
-		{
-			get { return m_missionType; }
-		}
+        public eDungeonType DungeonType
+        {
+            get { return m_dungeonType; }
+        }
 
-		private TaskDungeonInstance m_taskRegion;
+        private eTDMissionType m_missionType;
+
+        public eTDMissionType TDMissionType
+        {
+            get { return m_missionType; }
+        }
+
+        private TaskDungeonInstance m_taskRegion;
+
         public TaskDungeonInstance TaskRegion
-		{
-			get { return m_taskRegion; }
-		}
+        {
+            get { return m_taskRegion; }
+        }
 
-		private int m_current = 0;
-		public int Current
-		{
-			get { return m_current; }
-		}
+        private int m_current = 0;
 
-		private long m_total = 0;
-		public long Total
-		{
-			get { return m_total; }
-		}
+        public int Current
+        {
+            get { return m_current; }
+        }
 
-		private string m_bossName = "";
-		public string BossName
-		{
-			get { return m_bossName; }
-		}
+        private long m_total = 0;
 
-		private string m_targetName = "";
-		public string TargetName
-		{
-			get { return m_targetName; }
-		}
+        public long Total
+        {
+            get { return m_total; }
+        }
 
-		public TaskDungeonMission(object owner)
-			: base(owner)
-		{
+        private string m_bossName = "";
+
+        public string BossName
+        {
+            get { return m_bossName; }
+        }
+
+        private string m_targetName = "";
+
+        public string TargetName
+        {
+            get { return m_targetName; }
+        }
+
+        public TaskDungeonMission(object owner)
+            : base(owner)
+        {
             log.Info("INFO: Successfully entered TaskDungeonMission!");
-			GamePlayer player = owner as GamePlayer;
+            GamePlayer player = owner as GamePlayer;
 
             if (owner is Group)
             {
@@ -83,26 +89,24 @@ namespace DOL.GS.Quests
                 (owner as Group).Mission = this;
             }
 
-			if (player == null)
-				return;
+            if (player == null)
+                return;
 
-			//check level range and get region id from it
-			ushort rid = GetRegionFromLevel(player.Level, player.Realm);
+            //check level range and get region id from it
+            ushort rid = GetRegionFromLevel(player.Level, player.Realm);
 
             TaskDungeonInstance instance = (TaskDungeonInstance)WorldMgr.CreateInstance(rid, typeof(TaskDungeonInstance));
             m_taskRegion = instance;
             instance.Mission = this;
 
-			//Dinberg: I've removed instance level, and have commented this out so it compiles.
-            //I dont have time to implement the rest right now, 
+            //Dinberg: I've removed instance level, and have commented this out so it compiles.
+            //I dont have time to implement the rest right now,
             //m_taskRegion.InstanceLevel = GetLevelFromPlayer(player);
 
             //Infact, this clearly isnt in use. I'll fix it to use the new instance system, and then itll work.
             //Do that later this week ^^.
 
-            
             //Lets load the region from the InstanceXElementDB!
-
 
             //First we get the instance keyname.
             string keyname = "TaskDungeon" + rid + ".1"; //TODO; variations, eg .2, .3 etc.
@@ -126,8 +130,8 @@ namespace DOL.GS.Quests
                         m_targetName = npc.Name;
             }
 
-			int specificCount = 0;
-            
+            int specificCount = 0;
+
             //Draw the mission type before we do anymore counting...
             if (Util.Chance(40) && m_bossName != "")
                 m_missionType = eTDMissionType.Boss;
@@ -135,7 +139,7 @@ namespace DOL.GS.Quests
                 m_missionType = eTDMissionType.Specific;
             else
                 m_missionType = eTDMissionType.Clear;
-                
+
             //Now, count if we need to.
             if (m_missionType != eTDMissionType.Boss)
             {
@@ -147,7 +151,7 @@ namespace DOL.GS.Quests
                     //Now, if we want all mobs, get all mobs...
                     if (m_missionType == eTDMissionType.Clear)
                         specificCount++;
-                    else if (entry.Name == m_targetName) 
+                    else if (entry.Name == m_targetName)
                         //only count target mobs for specific dungeons.
                         specificCount++;
                 }
@@ -155,20 +159,20 @@ namespace DOL.GS.Quests
 
             //append the count to the total!
             m_total = specificCount;
-		}
+        }
 
         //Dinberg: removed this void. Handled in TaskDungeonInstance
-		//private static byte GetLevelFromPlayer(GamePlayer player)
+        //private static byte GetLevelFromPlayer(GamePlayer player)
 
-		//Burial Tomb
-		private static ushort[] burial_tomb = new ushort[] { 293/*, 294, 295, 400, 401, 402, 403, 404*/ };
-		//The Cursed Barrow
-		private static ushort[] the_cursed_barrow = new ushort[] { 450/*, 451, 452, 453, 454*/ };
-		//Damp Cavern
-		private static ushort[] damp_cavern = new ushort[] { 300/*, 301, 302, 303, 304*/ };
+        //Burial Tomb
+        private static ushort[] burial_tomb = new ushort[] { 293/*, 294, 295, 400, 401, 402, 403, 404*/ };
+        //The Cursed Barrow
+        private static ushort[] the_cursed_barrow = new ushort[] { 450/*, 451, 452, 453, 454*/ };
+        //Damp Cavern
+        private static ushort[] damp_cavern = new ushort[] { 300/*, 301, 302, 303, 304*/ };
 
-		private static ushort GetRegionFromLevel(byte level, eRealm realm)
-		{
+        private static ushort GetRegionFromLevel(byte level, eRealm realm)
+        {
             return 286;
             /*
 			//TODO: fill this properly for all levels
@@ -185,38 +189,38 @@ namespace DOL.GS.Quests
 				}
 			}
 			return 0;*/
-		}
+        }
 
-		private static ushort GetRandomRegion(ushort[] regions)
-		{
-			return regions[Util.Random(0, regions.Length - 1)];
-		}
+        private static ushort GetRandomRegion(ushort[] regions)
+        {
+            return regions[Util.Random(0, regions.Length - 1)];
+        }
 
-		public override void Notify(DOLEvent e, object sender, EventArgs args)
-		{
-			if (e != GameLivingEvent.EnemyKilled)
-				return;
+        public override void Notify(DOLEvent e, object sender, EventArgs args)
+        {
+            if (e != GameLivingEvent.EnemyKilled)
+                return;
 
-			EnemyKilledEventArgs eargs = args as EnemyKilledEventArgs;
+            EnemyKilledEventArgs eargs = args as EnemyKilledEventArgs;
 
-			switch (m_missionType)
-			{
-				case eTDMissionType.Boss:
-					{
-						if (eargs.Target.Name == m_bossName)
-							FinishMission();
-						break;
-					}
-				case eTDMissionType.Specific:
-					{
-						if (eargs.Target.Name == m_targetName)
-						{
-							m_current++;
-							UpdateMission();
-							if (m_current == m_total)
-								FinishMission();
-							else
-							{
+            switch (m_missionType)
+            {
+                case eTDMissionType.Boss:
+                    {
+                        if (eargs.Target.Name == m_bossName)
+                            FinishMission();
+                        break;
+                    }
+                case eTDMissionType.Specific:
+                    {
+                        if (eargs.Target.Name == m_targetName)
+                        {
+                            m_current++;
+                            UpdateMission();
+                            if (m_current == m_total)
+                                FinishMission();
+                            else
+                            {
                                 /* - Dinberg, disabled this. Messages extremely annoying.
 								if (m_owner is GamePlayer)
 								{
@@ -230,18 +234,18 @@ namespace DOL.GS.Quests
 									}
 								}
                                  */
-							}
-						}
-						break;
-					}
-				case eTDMissionType.Clear:
-					{
-						m_current++;
-						UpdateMission();
-						if (m_current == m_total)
-							FinishMission();
-						else
-						{
+                            }
+                        }
+                        break;
+                    }
+                case eTDMissionType.Clear:
+                    {
+                        m_current++;
+                        UpdateMission();
+                        if (m_current == m_total)
+                            FinishMission();
+                        else
+                        {
                             /*
 							if (m_owner is GamePlayer)
 							{
@@ -255,29 +259,29 @@ namespace DOL.GS.Quests
 								}
 							}
                              */
-						}
-						break;
-					}
-			}
-		}
+                        }
+                        break;
+                    }
+            }
+        }
 
-		/*
-		 * [Task] You have been asked to kill Dralkden the Thirster in the nearby caves.
-		 * [Task] You have been asked to clear the nearby caves.
-		 * [Task] You have been asked to clear the nearby caves. 19 creatures left!
-		 * [Task] You have been asked to kill 6 acidic clouds in the nearby caves!
-		 */
+        /*
+         * [Task] You have been asked to kill Dralkden the Thirster in the nearby caves.
+         * [Task] You have been asked to clear the nearby caves.
+         * [Task] You have been asked to clear the nearby caves. 19 creatures left!
+         * [Task] You have been asked to kill 6 acidic clouds in the nearby caves!
+         */
 
-		public override string Description
-		{
-			get
-			{
-				switch (m_missionType)
-				{
-					case eTDMissionType.Boss: return "You have been asked to kill " + m_bossName + " in the nearby caves.";
-					case eTDMissionType.Specific: return "You have been asked to kill " + m_total + " " + m_targetName + " in the nearby caves.";
-					case eTDMissionType.Clear:
-						{
+        public override string Description
+        {
+            get
+            {
+                switch (m_missionType)
+                {
+                    case eTDMissionType.Boss: return "You have been asked to kill " + m_bossName + " in the nearby caves.";
+                    case eTDMissionType.Specific: return "You have been asked to kill " + m_total + " " + m_targetName + " in the nearby caves.";
+                    case eTDMissionType.Clear:
+                        {
                             if (m_owner is GamePlayer && (m_owner as GamePlayer).CurrentRegion != m_taskRegion)
                             {
                                 return "You have been asked to clear the nearby caves.";
@@ -288,77 +292,78 @@ namespace DOL.GS.Quests
                                 return "You have been asked to clear the nearby caves. " + (m_total - m_current) + " creature" + (test == true ? "" : "s") + " left!";
                             }
                         }
-					default: return "No description for mission type " + m_missionType.ToString();
-				}
-			}
-		}
+                    default: return "No description for mission type " + m_missionType.ToString();
+                }
+            }
+        }
 
-		public override long RewardRealmPoints
-		{
-			get { return 0; }
-		}
+        public override long RewardRealmPoints
+        {
+            get { return 0; }
+        }
 
-		public override long RewardMoney
-		{
-			get {
-				GamePlayer player = m_owner as GamePlayer;
-				if (m_owner is Group)
-					player = (m_owner as Group).Leader;
-				return player.Level * player.Level * 100;
-			}
-		}
+        public override long RewardMoney
+        {
+            get
+            {
+                GamePlayer player = m_owner as GamePlayer;
+                if (m_owner is Group)
+                    player = (m_owner as Group).Leader;
+                return player.Level * player.Level * 100;
+            }
+        }
 
-		private int XPMagicNumber
-		{
-			get
-			{
-				switch (m_missionType)
-				{
-					case eTDMissionType.Clear: return 75;
-					case eTDMissionType.Boss:
-					case eTDMissionType.Specific: return 50;
-				}
-				return 0;
-			}
-		}
+        private int XPMagicNumber
+        {
+            get
+            {
+                switch (m_missionType)
+                {
+                    case eTDMissionType.Clear: return 75;
+                    case eTDMissionType.Boss:
+                    case eTDMissionType.Specific: return 50;
+                }
+                return 0;
+            }
+        }
 
-		public override long RewardXP
-		{
-			get
-			{
-				GamePlayer player = m_owner as GamePlayer;
-				if (m_owner is Group)
-					player = (m_owner as Group).Leader;
-				long amount = XPMagicNumber * player.Level;
-				if (player.Level > 1)
-					amount += XPMagicNumber * (player.Level - 1);
-				return amount;
-				/*
-				long XPNeeded = (m_owner as GamePlayer).ExperienceForNextLevel - (m_owner as GamePlayer).ExperienceForCurrentLevel;
-				return (long)(XPNeeded * 0.50 / (m_owner as GamePlayer).Level); // 50% of total xp for level
-				 */
-			}
-		}
+        public override long RewardXP
+        {
+            get
+            {
+                GamePlayer player = m_owner as GamePlayer;
+                if (m_owner is Group)
+                    player = (m_owner as Group).Leader;
+                long amount = XPMagicNumber * player.Level;
+                if (player.Level > 1)
+                    amount += XPMagicNumber * (player.Level - 1);
+                return amount;
+                /*
+                long XPNeeded = (m_owner as GamePlayer).ExperienceForNextLevel - (m_owner as GamePlayer).ExperienceForCurrentLevel;
+                return (long)(XPNeeded * 0.50 / (m_owner as GamePlayer).Level); // 50% of total xp for level
+                 */
+            }
+        }
 
-		public override void FinishMission()
-		{
-			if (m_owner is GamePlayer)
-			{
-				(m_owner as GamePlayer).Out.SendMessage("Mission Complete", eChatType.CT_ScreenCenter, eChatLoc.CL_ChatWindow);
-			}
-			else if (m_owner is Group)
-			{
-				foreach (GamePlayer player in (m_owner as Group).GetPlayersInTheGroup())
-				{
-					player.Out.SendMessage("Mission Complete", eChatType.CT_ScreenCenter, eChatLoc.CL_ChatWindow);
-				}
-			}
-			base.FinishMission();
-		}
-	}
+        public override void FinishMission()
+        {
+            if (m_owner is GamePlayer)
+            {
+                (m_owner as GamePlayer).Out.SendMessage("Mission Complete", eChatType.CT_ScreenCenter, eChatLoc.CL_ChatWindow);
+            }
+            else if (m_owner is Group)
+            {
+                foreach (GamePlayer player in (m_owner as Group).GetPlayersInTheGroup())
+                {
+                    player.Out.SendMessage("Mission Complete", eChatType.CT_ScreenCenter, eChatLoc.CL_ChatWindow);
+                }
+            }
+            base.FinishMission();
+        }
+    }
 
     //This part is done by Dinberg, but the original source im not sure of. I'm trying to tweak it the the instance
-    //system I've developed, and this script was partly finished so I adopted it ^^. 
+    //system I've developed, and this script was partly finished so I adopted it ^^.
     public class TaskDungeonInstance : Instance
     {
         public TaskDungeonInstance(ushort ID, GameTimer.TimeManager time, RegionData dat)
@@ -367,6 +372,7 @@ namespace DOL.GS.Quests
         }
 
         private TaskDungeonMission m_mission;
+
         /// <summary>
         /// Gets/Sets the Mission of this instance.
         /// </summary>
@@ -398,7 +404,6 @@ namespace DOL.GS.Quests
             if (player.Mission == m_mission) player.Mission.ExpireMission();
         }
 
-
         //This void is outside of Instance,
         //because i want people to think carefully about how they change levels in their instance.
         public void UpdateInstanceLevel()
@@ -429,7 +434,7 @@ namespace DOL.GS.Quests
         {
             //We expire the mission as players can no longer reach or access the region once collapsed.
             if (Mission != null)
-            Mission.ExpireMission();
+                Mission.ExpireMission();
             base.OnCollapse();
         }
     }

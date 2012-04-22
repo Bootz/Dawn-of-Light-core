@@ -16,51 +16,39 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
  */
-using System;
-using System.Reflection;
-using System.Collections.Generic;
-using System.Text;
-using DOL.GS;
-using DOL.GS.Spells;
+
 using DOL.AI.Brain;
-using DOL.Events;
-using log4net;
-using DOL.GS.PacketHandler;
-using DOL.Database;
-using System.Collections;
-using DOL.GS.Effects;
-using DOL.GS.Styles;
 
 namespace DOL.GS
 {
-	public class BDSubPet : BDPet
-	{
-		/// <summary>
-		/// Holds the different subpet ids
-		/// </summary>
-		public enum SubPetType : byte
-		{
-			Melee = 0,
-			Healer = 1,
-			Caster = 2,
-			Debuffer = 3,
-			Buffer = 4,
-			Archer = 5
-		}
+    public class BDSubPet : BDPet
+    {
+        /// <summary>
+        /// Holds the different subpet ids
+        /// </summary>
+        public enum SubPetType : byte
+        {
+            Melee = 0,
+            Healer = 1,
+            Caster = 2,
+            Debuffer = 3,
+            Buffer = 4,
+            Archer = 5
+        }
 
-		/// <summary>
-		/// Create a commander.
-		/// </summary>
-		/// <param name="npcTemplate"></param>
-		/// <param name="owner"></param>
-		public BDSubPet(INpcTemplate npcTemplate) : base(npcTemplate) { }
+        /// <summary>
+        /// Create a commander.
+        /// </summary>
+        /// <param name="npcTemplate"></param>
+        /// <param name="owner"></param>
+        public BDSubPet(INpcTemplate npcTemplate) : base(npcTemplate) { }
 
-		public override short MaxSpeed
-		{
-			get
-			{
-				return (Brain as IControlledBrain).Owner.MaxSpeed;
-			}
-		}
-	}
+        public override short MaxSpeed
+        {
+            get
+            {
+                return (Brain as IControlledBrain).Owner.MaxSpeed;
+            }
+        }
+    }
 }

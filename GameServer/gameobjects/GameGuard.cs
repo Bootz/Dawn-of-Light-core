@@ -1,7 +1,7 @@
-using DOL.AI.Brain;
-using DOL.Language;
 using System.Collections;
+using DOL.AI.Brain;
 using DOL.GS.PacketHandler;
+using DOL.Language;
 
 namespace DOL.GS
 {

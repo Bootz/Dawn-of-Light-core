@@ -16,13 +16,10 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
  */
+
 using System;
-using System.Collections;
-using DOL.GS.PacketHandler;
-using DOL.Events;
-using DOL.GS.SkillHandler;
-using DOL.GS.RealmAbilities;
 using System.Collections.Generic;
+using DOL.GS.PacketHandler;
 
 namespace DOL.GS.Effects
 {
@@ -31,7 +28,6 @@ namespace DOL.GS.Effects
     // <//summary>
     public class DashingDefenseEffect : StaticEffect, IGameEffect
     {
-
         //private Int64 m_startTick;
         private RegionTimer m_expireTimer;
         //private GamePlayer m_player;
@@ -141,69 +137,68 @@ namespace DOL.GS.Effects
         // Starts the timers for this effect
         // <//summary>
         private void StartTimers()
-		{
-			StopTimers();
-			m_expireTimer = new RegionTimer(GuardSource, new RegionTimerCallback(ExpireCallback), m_effectDuration * 1000);
-		}
+        {
+            StopTimers();
+            m_expireTimer = new RegionTimer(GuardSource, new RegionTimerCallback(ExpireCallback), m_effectDuration * 1000);
+        }
 
-		/// <summary>
-		/// Stops the timers for this effect
-		/// </summary>
-		private void StopTimers()
-		{
-
-			if (m_expireTimer != null)
-			{
-				m_expireTimer.Stop();
-				m_expireTimer = null;
-			}
-		}
+        /// <summary>
+        /// Stops the timers for this effect
+        /// </summary>
+        private void StopTimers()
+        {
+            if (m_expireTimer != null)
+            {
+                m_expireTimer.Stop();
+                m_expireTimer = null;
+            }
+        }
 
         // <summary>
         // Remaining Time of the effect in milliseconds
         // <//summary>
-		private int ExpireCallback(RegionTimer timer)
-		{
-			Cancel(false);
+        private int ExpireCallback(RegionTimer timer)
+        {
+            Cancel(false);
 
-			return 0;
-		}
+            return 0;
+        }
 
         // <summary>
         // Effect Name
         // <//summary>
         public override string Name
-		{
-			get
-			{
-				return "Dashing Defense";
-			}
-		}
+        {
+            get
+            {
+                return "Dashing Defense";
+            }
+        }
 
         /// <summary>
-		/// Remaining time of the effect in milliseconds
-		/// </summary>
-		public override Int32 RemainingTime
-		{
-			get
-			{
-				RegionTimer timer = m_expireTimer;
-				if (timer == null || !timer.IsAlive)
-					return 0;
-				return timer.TimeUntilElapsed;
-			}
-		}
+        /// Remaining time of the effect in milliseconds
+        /// </summary>
+        public override Int32 RemainingTime
+        {
+            get
+            {
+                RegionTimer timer = m_expireTimer;
+                if (timer == null || !timer.IsAlive)
+                    return 0;
+                return timer.TimeUntilElapsed;
+            }
+        }
 
         /// <summary>
-		/// Icon ID
-		/// </summary>
-		public override UInt16 Icon
-		{
-			get
-			{
-				return 3032;
-			}
-		}
+        /// Icon ID
+        /// </summary>
+        public override UInt16 Icon
+        {
+            get
+            {
+                return 3032;
+            }
+        }
 
         // <summary>
         // Delve Info

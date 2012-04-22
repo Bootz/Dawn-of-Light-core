@@ -1,17 +1,13 @@
 using System;
-using System.Collections;
-using DOL.GS.PacketHandler;
-using DOL.GS.SkillHandler;
-using DOL.GS.PropertyCalc;
-using DOL.Events;
 using System.Collections.Generic;
+using DOL.Events;
 
 namespace DOL.GS.Effects
 {
     /// <summary>
     /// Effect handler for Barrier Of Fortitude
     /// </summary>
-	public class StrikePredictionEffect : StaticEffect, IGameEffect
+    public class StrikePredictionEffect : StaticEffect, IGameEffect
     {
         private const String m_delveString = "Grants all group members a chance to evade all melee and arrow attacks for 30 seconds.";
         private GamePlayer m_player;
@@ -49,7 +45,7 @@ namespace DOL.GS.Effects
         {
             GamePlayer player = (GamePlayer)sender;
 
-        	StrikePredictionEffect SPEffect = player.EffectList.GetOfType<StrikePredictionEffect>();
+            StrikePredictionEffect SPEffect = player.EffectList.GetOfType<StrikePredictionEffect>();
             if (SPEffect != null)
             {
                 SPEffect.Cancel(false);
@@ -82,7 +78,6 @@ namespace DOL.GS.Effects
         /// </summary>
         private void StopTimers()
         {
-
             if (m_expireTimer != null)
             {
                 m_expireTimer.Stop();
@@ -100,7 +95,6 @@ namespace DOL.GS.Effects
 
             return 0;
         }
-
 
         /// <summary>
         /// Name of the effect
@@ -145,7 +139,7 @@ namespace DOL.GS.Effects
         {
             get
             {
-				var delveInfoList = new List<string>();
+                var delveInfoList = new List<string>();
                 delveInfoList.Add(m_delveString);
                 delveInfoList.Add(" ");
                 delveInfoList.Add("Value: " + m_value + "%");

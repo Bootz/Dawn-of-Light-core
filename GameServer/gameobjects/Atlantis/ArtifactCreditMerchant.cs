@@ -1,24 +1,23 @@
 ﻿/*
  * DAWN OF LIGHT - The first free open source DAoC server emulator
- * 
+ *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
  * as published by the Free Software Foundation; either version 2
  * of the License, or (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
  */
+
 using System;
-using System.Collections.Generic;
-using System.Text;
 using DOL.Database;
 using DOL.GS.PacketHandler;
 
@@ -45,7 +44,6 @@ namespace DOL.GS
             SayTo(player, intro);
             return true;
         }
-
 
         /// <summary>
         /// Merchant has received a /whisper.
@@ -101,25 +99,25 @@ namespace DOL.GS
 
             if (player != null && item != null && item.Name.EndsWith("Credit"))
             {
-				if (ArtifactMgr.GrantArtifactBountyCredit(player, item.Name))
-				{
+                if (ArtifactMgr.GrantArtifactBountyCredit(player, item.Name))
+                {
                     player.Inventory.RemoveItem(item);
                     InventoryLogging.LogInventoryAction(player, this, eInventoryActionType.Merchant, item.Template, item.Count);
-					return true;
-				}
-				else
-				{
-					// refund bounty points
+                    return true;
+                }
+                else
+                {
+                    // refund bounty points
                     player.Inventory.RemoveItem(item);
                     InventoryLogging.LogInventoryAction(player, this, eInventoryActionType.Merchant, item.Template, item.Count);
 
-					long totalValue = item.Price;
-					player.BountyPoints += totalValue;
-					player.Out.SendUpdatePoints();
-					player.Out.SendMessage(totalValue + " Bounty Points refunded", eChatType.CT_ScreenCenterSmaller, eChatLoc.CL_SystemWindow);
-					player.Out.SendMessage("You already have this credit or your class is not eligible to receive this artifact. " + totalValue + " Bounty Points refunded!", eChatType.CT_Merchant, eChatLoc.CL_SystemWindow);
-					return true;
-				}
+                    long totalValue = item.Price;
+                    player.BountyPoints += totalValue;
+                    player.Out.SendUpdatePoints();
+                    player.Out.SendMessage(totalValue + " Bounty Points refunded", eChatType.CT_ScreenCenterSmaller, eChatLoc.CL_SystemWindow);
+                    player.Out.SendMessage("You already have this credit or your class is not eligible to receive this artifact. " + totalValue + " Bounty Points refunded!", eChatType.CT_Merchant, eChatLoc.CL_SystemWindow);
+                    return true;
+                }
             }
 
             return base.ReceiveItem(source, item);

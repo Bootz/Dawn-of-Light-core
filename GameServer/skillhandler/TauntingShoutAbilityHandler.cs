@@ -16,9 +16,6 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
  */
-using System;
-using DOL.GS.PacketHandler;
-using DOL.GS;
 
 namespace DOL.GS.SkillHandler
 {
@@ -28,19 +25,20 @@ namespace DOL.GS.SkillHandler
     [SkillHandlerAttribute(Abilities.TauntingShout)]
     public class TauntingShoutAbilityHandler : SpellCastingAbilityHandler
     {
-		public override long Preconditions
-		{
-			get
-			{
-				return DEAD | SITTING | MEZZED | STUNNED;
-			}
-		}
-		public override int SpellID
-		{
-			get
-			{
-				return 14377;
-			}
-		}     
+        public override long Preconditions
+        {
+            get
+            {
+                return DEAD | SITTING | MEZZED | STUNNED;
+            }
+        }
+
+        public override int SpellID
+        {
+            get
+            {
+                return 14377;
+            }
+        }
     }
 }

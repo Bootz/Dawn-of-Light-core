@@ -17,10 +17,9 @@
  *
  */
 
+using System;
 using System.Collections.Generic;
 using DOL.Events;
-using DOL.GS.PacketHandler;
-using System;
 
 namespace DOL.GS.Effects
 {
@@ -64,7 +63,7 @@ namespace DOL.GS.Effects
 
         public override void Stop()
         {
-			if (m_player.EffectList.GetOfType<SputinsLegacyEffect>() != null) m_player.EffectList.Remove(this);
+            if (m_player.EffectList.GetOfType<SputinsLegacyEffect>() != null) m_player.EffectList.Remove(this);
             GameEventMgr.RemoveHandler(m_player, GameLivingEvent.AttackedByEnemy, new DOLEventHandler(OnAttacked));
             GameEventMgr.RemoveHandler(m_player, GameLivingEvent.Dying, new DOLEventHandler(OnRemove));
             GameEventMgr.RemoveHandler(m_player, GamePlayerEvent.Quit, new DOLEventHandler(OnRemove));
@@ -72,14 +71,6 @@ namespace DOL.GS.Effects
             GameEventMgr.RemoveHandler(m_player, GamePlayerEvent.RegionChanged, new DOLEventHandler(OnRemove));
             base.Stop();
         }
-
-
-
-
-
-
-
-
 
         public override string Name { get { return "Resurrection Damage Immunity"; } }
 

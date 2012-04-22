@@ -1,33 +1,32 @@
 /*
  * DAWN OF LIGHT - The first free open source DAoC server emulator
- * 
+ *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
  * as published by the Free Software Foundation; either version 2
  * of the License, or (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
  * [StephenxPimentel
  * 1.108 - Valhallas Blessing now has a 75% chance to not use power or endurance.
- * 
+ *
  * -Code shown in SpellHandler - Line 1510
  * -And StyleProcessor - Line 577
- * 
+ *
  */
 
-using System;
 using System.Collections;
+using System.Collections.Generic;
 using DOL.Database;
 using DOL.GS.Effects;
-using System.Collections.Generic;
 
 namespace DOL.GS.RealmAbilities
 {
@@ -59,7 +58,7 @@ namespace DOL.GS.RealmAbilities
                 {
                     foreach (GamePlayer grpplayer in player.Group.GetPlayersInTheGroup())
                     {
-                        if (player.IsWithinRadius( grpplayer, SpellRadius ) && grpplayer.IsAlive)
+                        if (player.IsWithinRadius(grpplayer, SpellRadius) && grpplayer.IsAlive)
                             targets.Add(grpplayer);
                     }
                 }
@@ -67,7 +66,7 @@ namespace DOL.GS.RealmAbilities
                 {
                     //send spelleffect
                     if (!target.IsAlive) continue;
-					ValhallasBlessingEffect ValhallasBlessing = target.EffectList.GetOfType<ValhallasBlessingEffect>();
+                    ValhallasBlessingEffect ValhallasBlessing = target.EffectList.GetOfType<ValhallasBlessingEffect>();
                     if (ValhallasBlessing != null)
                         ValhallasBlessing.Cancel(false);
                     new ValhallasBlessingEffect().Start(target);
@@ -89,8 +88,6 @@ namespace DOL.GS.RealmAbilities
             list.Add("Duration: 30s");
             list.Add("Casting time: Instant");
         }
-
     }
 }
-
 

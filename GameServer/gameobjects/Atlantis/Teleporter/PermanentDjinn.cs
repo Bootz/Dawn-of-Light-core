@@ -1,24 +1,23 @@
 ﻿/*
  * DAWN OF LIGHT - The first free open source DAoC server emulator
- * 
+ *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
  * as published by the Free Software Foundation; either version 2
  * of the License, or (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
  */
+
 using System;
-using System.Collections.Generic;
-using System.Text;
 using DOL.Events;
 using DOL.GS.PacketHandler;
 
@@ -33,7 +32,8 @@ namespace DOL.GS
     {
         private object m_syncObject = new object();
 
-        public PermanentDjinn(DjinnStone djinnStone) : base(djinnStone)
+        public PermanentDjinn(DjinnStone djinnStone)
+            : base(djinnStone)
         {
             this.Model = VisibleModel;
             this.AddToWorld();
@@ -64,8 +64,8 @@ namespace DOL.GS
         /// </summary>
         private void DoRandomEmote()
         {
-            String[] emotes = 
-            { 
+            String[] emotes =
+            {
                 "The {0} seems to be making an extremely concerted effort not to start laughing hysterically.",
                 "The {0} chuckles a bit to itself and mutters, 'Masters... hah...'",
                 "The {0} giggles quietly and whispers to itself, 'That's right, go on, just a little further...'",

@@ -1,11 +1,7 @@
-using System.Reflection;
-using System.Collections;
+using System.Collections.Generic;
 using DOL.Database;
-using DOL.GS;
-using DOL.GS.Effects;
 using DOL.GS.PacketHandler;
 using DOL.Language;
-using System.Collections.Generic;
 
 namespace DOL.GS.RealmAbilities
 {
@@ -20,7 +16,7 @@ namespace DOL.GS.RealmAbilities
         {
             GamePlayer player = living as GamePlayer;
             if (CheckPreconditions(living, DEAD | SITTING | STEALTHED)) return;
-			if (player.EffectList.CountOfType<AdrenalineRushEffect>() > 0)
+            if (player.EffectList.CountOfType<AdrenalineRushEffect>() > 0)
             {
                 player.Out.SendMessage("You already an effect of that type!", eChatType.CT_SpellResisted, eChatLoc.CL_SystemWindow);
             }
@@ -31,6 +27,7 @@ namespace DOL.GS.RealmAbilities
             }
             DisableSkill(living);
         }
+
         public override int GetReUseDelay(int level)
         {
             switch (level)
@@ -51,6 +48,5 @@ namespace DOL.GS.RealmAbilities
             list.Add(LanguageMgr.GetTranslation(ServerProperties.Properties.SERV_LANGUAGE, "AdrenalineRushAbility.AddEffectsInfo.Info4"));
             list.Add(LanguageMgr.GetTranslation(ServerProperties.Properties.SERV_LANGUAGE, "AdrenalineRushAbility.AddEffectsInfo.Info5"));
         }
-
     }
 }

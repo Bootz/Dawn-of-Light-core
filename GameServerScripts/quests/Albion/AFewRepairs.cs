@@ -1,16 +1,16 @@
 ﻿/*
  * DAWN OF LIGHT - The first free open source DAoC server emulator
- * 
+ *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
  * as published by the Free Software Foundation; either version 2
  * of the License, or (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
@@ -18,14 +18,14 @@
  */
 /*
  * Author:		Cletus
- * Date:		20. 10. 2006	
+ * Date:		20. 10. 2006
  * Directory: /scripts/quests/albion/
  *
  * Description:
  * Visit Brice Yarley at their farm in Western Cornwall (loc=18.0K/49.0K)
  * Go kill 2 Elder Beech. The journal describes their position fairly accurately.
  * Return to Patrick Yarley with the 2 pieces of Elder Wood.
- * Go kill a Moor Boogey and then return with the Teeth. 
+ * Go kill a Moor Boogey and then return with the Teeth.
  */
 
 using System;
@@ -34,6 +34,7 @@ using DOL.Database;
 using DOL.Events;
 using DOL.GS.PacketHandler;
 using log4net;
+
 /* I suggest you declare yourself some namespaces for your quests
  * Like: DOL.GS.Quests.Albion
  *       DOL.GS.Quests.Midgard
@@ -48,7 +49,7 @@ namespace DOL.GS.Quests.Albion
     /* The first thing we do, is to declare the class we create
      * as Quest. To do this, we derive from the abstract class
      * AbstractQuest
-     * 
+     *
      * This quest for example will be stored in the database with
      * the name: DOL.GS.Quests.Albion.AFewRepairs
      */
@@ -61,13 +62,13 @@ namespace DOL.GS.Quests.Albion
         private static readonly ILog log = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
 
         /* Declare the variables we need inside our quest.
-         * You can declare static variables here, which will be available in 
+         * You can declare static variables here, which will be available in
          * ALL instance of your quest and should be initialized ONLY ONCE inside
          * the OnScriptLoaded method.
-         * 
+         *
          * Or declare nonstatic variables here which can be unique for each Player
          * and change through the quest journey...
-         * 
+         *
          * We store our two mobs as static variables, since we need them
          */
 
@@ -75,7 +76,7 @@ namespace DOL.GS.Quests.Albion
         protected const int minimumLevel = 35;
         protected const int maximumLevel = 37;
 
-        /* 
+        /*
          * Start NPC
          */
         private static GameNPC briceYarley = null;
@@ -94,6 +95,7 @@ namespace DOL.GS.Quests.Albion
         /* We need to define the constructors from the base class here, else there might be problems
          * when loading this quest...
          */
+
         public AFewRepairs()
             : base()
         {
@@ -114,34 +116,33 @@ namespace DOL.GS.Quests.Albion
         {
         }
 
-
         /* The following method is called automatically when this quest class
          * is loaded. You might notice that this method is the same as in standard
          * game events. And yes, quests basically are game events for single players
-         * 
-         * To make this method automatically load, we have to declare it static
-         * and give it the [ScriptLoadedEvent] attribute. 
          *
-         * Inside this method we initialize the quest. This is neccessary if we 
+         * To make this method automatically load, we have to declare it static
+         * and give it the [ScriptLoadedEvent] attribute.
+         *
+         * Inside this method we initialize the quest. This is neccessary if we
          * want to set the quest hooks to the NPCs.
-         * 
+         *
          * If you want, you can however add a quest to the player from ANY place
          * inside your code, from events, from custom items, from anywhere you
          * want. We will do it the standard way here ... and make Sir Quait wail
-         * a bit about the loss of his sword! 
+         * a bit about the loss of his sword!
          */
 
         [ScriptLoadedEvent]
         public static void ScriptLoaded(DOLEvent e, object sender, EventArgs args)
         {
-			if (!ServerProperties.Properties.LOAD_QUESTS)
-				return;
+            if (!ServerProperties.Properties.LOAD_QUESTS)
+                return;
             if (log.IsInfoEnabled)
                 log.Info("Quest \"" + questTitle + "\" initializing ...");
             /* First thing we do in here is to search for the NPCs inside
             * the world who comes from the certain Realm. If we find a the players,
             * this means we don't have to create a new one.
-            * 
+            *
             * NOTE: You can do anything you want in this method, you don't have
             * to search for NPC's ... you could create a custom item, place it
             * on the ground and if a player picks it up, he will get the quest!
@@ -174,7 +175,6 @@ namespace DOL.GS.Quests.Albion
                 if (SAVE_INTO_DATABASE)
                     briceYarley.SaveIntoDatabase();
 
-
                 briceYarley.AddToWorld();
             }
             else
@@ -204,19 +204,14 @@ namespace DOL.GS.Quests.Albion
                 if (SAVE_INTO_DATABASE)
                     patrickYarley.SaveIntoDatabase();
 
-
                 patrickYarley.AddToWorld();
             }
             else
                 patrickYarley = npcs[0];
 
-
-
-            #endregion
+            #endregion defineNPCs
 
             #region defineItems
-
-
 
             elderWood = GameServer.Database.FindObjectByKey<ItemTemplate>("elder_wood");
             if (elderWood == null)
@@ -228,7 +223,7 @@ namespace DOL.GS.Quests.Albion
                 elderWood.Id_nb = "elder_wood";
                 elderWood.Name = "Elder Wood";
                 elderWood.Level = 1;
-                elderWood.Model = 520; 
+                elderWood.Model = 520;
                 elderWood.IsDropable = false;
                 elderWood.IsPickable = false;
                 elderWood.Weight = 5;
@@ -245,14 +240,14 @@ namespace DOL.GS.Quests.Albion
                 boogeyTeeth.Id_nb = "boogey_teeth";
                 boogeyTeeth.Name = "Boogey Teeth";
                 boogeyTeeth.Level = 1;
-                boogeyTeeth.Model = 106; 
+                boogeyTeeth.Model = 106;
                 boogeyTeeth.IsDropable = false;
                 boogeyTeeth.IsPickable = false;
                 boogeyTeeth.Weight = 4;
                 GameServer.Database.AddObject(boogeyTeeth);
             }
 
-            #endregion
+            #endregion defineItems
 
             /* Now we add some hooks to the Sir Quait we found.
 				* Actually, we want to know when a player interacts with him.
@@ -261,8 +256,8 @@ namespace DOL.GS.Quests.Albion
 				* method. This means, the "TalkToXXX" method is called whenever
 				* a player right clicks on him or when he whispers to him.
 				*/
-			GameEventMgr.AddHandler(GamePlayerEvent.AcceptQuest, new DOLEventHandler(SubscribeQuest));
-			GameEventMgr.AddHandler(GamePlayerEvent.DeclineQuest, new DOLEventHandler(SubscribeQuest));
+            GameEventMgr.AddHandler(GamePlayerEvent.AcceptQuest, new DOLEventHandler(SubscribeQuest));
+            GameEventMgr.AddHandler(GamePlayerEvent.DeclineQuest, new DOLEventHandler(SubscribeQuest));
 
             GameEventMgr.AddHandler(briceYarley, GameLivingEvent.Interact, new DOLEventHandler(TalkToBriceYarley));
             GameEventMgr.AddHandler(briceYarley, GameLivingEvent.WhisperReceive, new DOLEventHandler(TalkToBriceYarley));
@@ -270,8 +265,6 @@ namespace DOL.GS.Quests.Albion
             GameEventMgr.AddHandler(patrickYarley, GameLivingEvent.Interact, new DOLEventHandler(TalkToPatrickYarley));
             GameEventMgr.AddHandler(patrickYarley, GameLivingEvent.WhisperReceive, new DOLEventHandler(TalkToPatrickYarley));
 
-
-            
             /* Now we bring to briceYarley the possibility to give this quest to players */
             briceYarley.AddQuestToGive(typeof(AFewRepairs));
 
@@ -280,8 +273,8 @@ namespace DOL.GS.Quests.Albion
         }
 
         /* The following method is called automatically when this quest class
-         * is unloaded. 
-         * 
+         * is unloaded.
+         *
          * Since we set hooks in the load method, it is good practice to remove
          * those hooks again!
          */
@@ -294,18 +287,17 @@ namespace DOL.GS.Quests.Albion
              */
             if (briceYarley != null)
             {
-
-                /* Removing hooks works just as adding them but instead of 
+                /* Removing hooks works just as adding them but instead of
                  * AddHandler, we call RemoveHandler, the parameters stay the same
                  */
-				GameEventMgr.RemoveHandler(GamePlayerEvent.AcceptQuest, new DOLEventHandler(SubscribeQuest));
-				GameEventMgr.RemoveHandler(GamePlayerEvent.DeclineQuest, new DOLEventHandler(SubscribeQuest));
+                GameEventMgr.RemoveHandler(GamePlayerEvent.AcceptQuest, new DOLEventHandler(SubscribeQuest));
+                GameEventMgr.RemoveHandler(GamePlayerEvent.DeclineQuest, new DOLEventHandler(SubscribeQuest));
 
                 GameEventMgr.RemoveHandler(briceYarley, GameObjectEvent.Interact, new DOLEventHandler(TalkToBriceYarley));
                 GameEventMgr.RemoveHandler(briceYarley, GameLivingEvent.WhisperReceive, new DOLEventHandler(TalkToBriceYarley));
 
-				/* Now we remove to arleighPenn the possibility to give this quest to players */
-				briceYarley.RemoveQuestToGive(typeof(AFewRepairs));
+                /* Now we remove to arleighPenn the possibility to give this quest to players */
+                briceYarley.RemoveQuestToGive(typeof(AFewRepairs));
             }
             if (patrickYarley != null)
             {
@@ -321,7 +313,7 @@ namespace DOL.GS.Quests.Albion
 
         protected static void TalkToBriceYarley(DOLEvent e, object sender, EventArgs args)
         {
-            //We get the player from the event arguments and check if he qualifies		
+            //We get the player from the event arguments and check if he qualifies
             GamePlayer player = ((SourceEventArgs)args).Source as GamePlayer;
             if (player == null)
                 return;
@@ -342,13 +334,13 @@ namespace DOL.GS.Quests.Albion
                     //If the player is already doing the quest, we look if he has the items:
                     if (quest.Step == 1)
                         briceYarley.SayTo(player, "There are some [elder beech] creatures to the north just inside the tree line beyond the fallen tower. If you cut down a few of them they should yield enough wood for the project.");
-                    
+
                     return;
                 }
                 else
                 {
                     //Player hasn't the quest:
-                    briceYarley.SayTo(player, "Welcome to Cornwall, "+player.CharacterClass.Name+". My family has a bit of a [problem] and we would be grateful if you could lend a hand.");
+                    briceYarley.SayTo(player, "Welcome to Cornwall, " + player.CharacterClass.Name + ". My family has a bit of a [problem] and we would be grateful if you could lend a hand.");
                     return;
                 }
             }
@@ -376,7 +368,7 @@ namespace DOL.GS.Quests.Albion
                             break;
                         //If the player offered his "help", we send the quest dialog now!
                         case "gathering":
-							player.Out.SendQuestSubscribeCommand(briceYarley, QuestMgr.GetIDForQuestType(typeof(AFewRepairs)), "Will you help the Yarleys with a few repairs? [Levels 35-37]");
+                            player.Out.SendQuestSubscribeCommand(briceYarley, QuestMgr.GetIDForQuestType(typeof(AFewRepairs)), "Will you help the Yarleys with a few repairs? [Levels 35-37]");
                             break;
                     }
                 }
@@ -396,7 +388,6 @@ namespace DOL.GS.Quests.Albion
                             break;
                     }
                 }
-
             }
         }
 
@@ -407,7 +398,7 @@ namespace DOL.GS.Quests.Albion
 
         protected static void TalkToPatrickYarley(DOLEvent e, object sender, EventArgs args)
         {
-            //We get the player from the event arguments and check if he qualifies		
+            //We get the player from the event arguments and check if he qualifies
             GamePlayer player = ((SourceEventArgs)args).Source as GamePlayer;
             if (player == null)
                 return;
@@ -429,7 +420,7 @@ namespace DOL.GS.Quests.Albion
                 if ((quest.Step == 7) || (quest.Step == 8))
                     patrickYarley.SayTo(player, "Do you have the boogey teeth?");
                 return;
-            } 
+            }
             // The player whispered to Sir Quait (clicked on the text inside the [])
             else if (e == GameLivingEvent.WhisperReceive)
             {
@@ -447,26 +438,25 @@ namespace DOL.GS.Quests.Albion
                             patrickYarley.SayTo(player, "You may find the moor boogeys roaming the hill to the east.");
                             quest.Step = 7;
                         }
-                            break;
+                        break;
                 }
-
             }
         }
 
-		protected static void SubscribeQuest(DOLEvent e, object sender, EventArgs args)
-		{
-			QuestEventArgs qargs = args as QuestEventArgs;
-			if (qargs == null)
-				return;
+        protected static void SubscribeQuest(DOLEvent e, object sender, EventArgs args)
+        {
+            QuestEventArgs qargs = args as QuestEventArgs;
+            if (qargs == null)
+                return;
 
-			if (qargs.QuestID != QuestMgr.GetIDForQuestType(typeof(AFewRepairs)))
-				return;
+            if (qargs.QuestID != QuestMgr.GetIDForQuestType(typeof(AFewRepairs)))
+                return;
 
-			if (e == GamePlayerEvent.AcceptQuest)
-				CheckPlayerAcceptQuest(qargs.Player, 0x01);
-			else if (e == GamePlayerEvent.DeclineQuest)
-				CheckPlayerAcceptQuest(qargs.Player, 0x00);
-		}
+            if (e == GamePlayerEvent.AcceptQuest)
+                CheckPlayerAcceptQuest(qargs.Player, 0x01);
+            else if (e == GamePlayerEvent.DeclineQuest)
+                CheckPlayerAcceptQuest(qargs.Player, 0x00);
+        }
 
         /// <summary>
         /// This method checks if a player qualifies for this quest
@@ -485,7 +475,6 @@ namespace DOL.GS.Quests.Albion
 
             return true;
         }
-
 
         /* This is our callback hook that will be called when the player clicks
          * on any button in the quest offer dialog. We check if he accepts or
@@ -536,7 +525,6 @@ namespace DOL.GS.Quests.Albion
                     return;
 
                 briceYarley.SayTo(player, "Excellent, there are some [elder beech] creatures to the north just inside the tree line beyond the fallen tower. If you cut down a few of them they should yield enough wood for the project.");
-                
             }
         }
 
@@ -671,10 +659,8 @@ namespace DOL.GS.Quests.Albion
                             FinishQuest();
                         }
                         return;
-
                 }
             }
-            
         }
 
         public override void AbortQuest()
@@ -691,12 +677,10 @@ namespace DOL.GS.Quests.Albion
             base.FinishQuest(); //Defined in Quest, changes the state, stores in DB etc ...
 
             //Give reward to player here ...
-			m_questPlayer.GainExperience(GameLiving.eXPSource.Quest, (long)((m_questPlayer.ExperienceForNextLevel - m_questPlayer.ExperienceForCurrentLevel) / 6.57), true);
+            m_questPlayer.GainExperience(GameLiving.eXPSource.Quest, (long)((m_questPlayer.ExperienceForNextLevel - m_questPlayer.ExperienceForCurrentLevel) / 6.57), true);
             long money = Money.GetMoney(0, 0, 0, 81, 30 + Util.Random(60));
             m_questPlayer.AddMoney(money, "You are awarded 81 silver and some copper!");
             InventoryLogging.LogInventoryAction("(QUEST;" + Name + ")", m_questPlayer, eInventoryActionType.Quest, money);
-
         }
-
     }
 }

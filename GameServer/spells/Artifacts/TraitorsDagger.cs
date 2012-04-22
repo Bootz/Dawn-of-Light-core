@@ -1,41 +1,42 @@
 /*
  * DAWN OF LIGHT - The first free open source DAoC server emulator
- * 
+ *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
  * as published by the Free Software Foundation; either version 2
  * of the License, or (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
  */
+
 using System;
-using DOL.GS.Effects;
+using DOL.AI.Brain;
 using DOL.Database;
 using DOL.Events;
-using DOL.AI.Brain;
+using DOL.GS.Effects;
 
 namespace DOL.GS.Spells
 {
-	[SpellHandlerAttribute("TraitorsDaggerProc")]
-	public class TraitorsDaggerProc : OffensiveProcSpellHandler
-	{
-		public override void OnEffectStart(GameSpellEffect effect)
-		{
-			base.OnEffectStart(effect);
-			if (effect.Owner is GamePlayer)
-			{
-				GamePlayer player = effect.Owner as GamePlayer;
-				foreach (GameSpellEffect Effect in player.EffectList.GetAllOfType<GameSpellEffect>())
+    [SpellHandlerAttribute("TraitorsDaggerProc")]
+    public class TraitorsDaggerProc : OffensiveProcSpellHandler
+    {
+        public override void OnEffectStart(GameSpellEffect effect)
+        {
+            base.OnEffectStart(effect);
+            if (effect.Owner is GamePlayer)
+            {
+                GamePlayer player = effect.Owner as GamePlayer;
+                foreach (GameSpellEffect Effect in player.EffectList.GetAllOfType<GameSpellEffect>())
                 {
-                    if (Effect.SpellHandler.Spell.SpellType.Equals("ShadesOfMist") || 
+                    if (Effect.SpellHandler.Spell.SpellType.Equals("ShadesOfMist") ||
                         Effect.SpellHandler.Spell.SpellType.Equals("DreamMorph") ||
                         Effect.SpellHandler.Spell.SpellType.Equals("DreamGroupMorph") ||
                         Effect.SpellHandler.Spell.SpellType.Equals("MaddeningScalars") ||
@@ -46,33 +47,34 @@ namespace DOL.GS.Spells
                         return;
                     }
                 }
-				player.Shade(true);
+                player.Shade(true);
                 player.Out.SendUpdatePlayer();
-			}
-		}
-		public override int OnEffectExpires(GameSpellEffect effect, bool noMessages)
-		{
-			if (effect.Owner is GamePlayer)
-			{
-				GamePlayer player = effect.Owner as GamePlayer;
-				player.Shade(false);
+            }
+        }
+
+        public override int OnEffectExpires(GameSpellEffect effect, bool noMessages)
+        {
+            if (effect.Owner is GamePlayer)
+            {
+                GamePlayer player = effect.Owner as GamePlayer;
+                player.Shade(false);
                 player.Out.SendUpdatePlayer();
-			}
-			return base.OnEffectExpires(effect, noMessages);
-		}
-   
-		public TraitorsDaggerProc(GameLiving caster, Spell spell, SpellLine line) : base(caster, spell, line) { }
-	}
+            }
+            return base.OnEffectExpires(effect, noMessages);
+        }
+
+        public TraitorsDaggerProc(GameLiving caster, Spell spell, SpellLine line) : base(caster, spell, line) { }
+    }
 
     [SpellHandler("DdtProcDd")]
-    public class DdtProcDd:DirectDamageSpellHandler
+    public class DdtProcDd : DirectDamageSpellHandler
     {
-        public DdtProcDd(GameLiving caster,Spell spell,SpellLine line) : base(caster,spell,line) { }
+        public DdtProcDd(GameLiving caster, Spell spell, SpellLine line) : base(caster, spell, line) { }
 
-        public override void OnDirectEffect(GameLiving target,double effectiveness)
+        public override void OnDirectEffect(GameLiving target, double effectiveness)
         {
-            base.OnDirectEffect(target,effectiveness);
-            Caster.ChangeHealth(Caster,GameLiving.eHealthChangeType.Spell,-Spell.ResurrectHealth);
+            base.OnDirectEffect(target, effectiveness);
+            Caster.ChangeHealth(Caster, GameLiving.eHealthChangeType.Spell, -Spell.ResurrectHealth);
         }
     }
 
@@ -85,27 +87,30 @@ namespace DOL.GS.Spells
         {
             //Set pet infos & Brain
             base.ApplyEffectOnTarget(target, effectiveness);
-            ProcPetBrain petBrain = (ProcPetBrain) pet.Brain;
+            ProcPetBrain petBrain = (ProcPetBrain)pet.Brain;
             petBrain.AddToAggroList(target, 1);
             petBrain.Think();
         }
 
         protected override GamePet GetGamePet(INpcTemplate template) { return new TraitorDaggerPet(template); }
+
         protected override IControlledBrain GetPetBrain(GameLiving owner) { return new ProcPetBrain(owner); }
+
         protected override void SetBrainToOwner(IControlledBrain brain) { }
+
         protected override void AddHandlers() { GameEventMgr.AddHandler(pet, GameLivingEvent.AttackFinished, EventHandler); }
 
         protected void EventHandler(DOLEvent e, object sender, EventArgs arguments)
         {
             AttackFinishedEventArgs args = arguments as AttackFinishedEventArgs;
-            if(args == null || args.AttackData == null)
+            if (args == null || args.AttackData == null)
                 return;
             // Spirit procs lifetap when hitting ennemy
-            if(_trap == null)
+            if (_trap == null)
             {
                 _trap = MakeTrap();
             }
-            if(Util.Chance(50))
+            if (Util.Chance(50))
             {
                 _trap.CastSpell(args.AttackData.Target);
             }
@@ -143,13 +148,15 @@ namespace DOL.GS.Spells
 
 namespace DOL.GS
 {
-	public class TraitorDaggerPet : GamePet
-	{
-		public override int MaxHealth
-		{
-			get { return Level * 15; }
-		}
-		public override void OnAttackedByEnemy(AttackData ad) { }
-		public TraitorDaggerPet(INpcTemplate npcTemplate) : base(npcTemplate) { }
-	}
+    public class TraitorDaggerPet : GamePet
+    {
+        public override int MaxHealth
+        {
+            get { return Level * 15; }
+        }
+
+        public override void OnAttackedByEnemy(AttackData ad) { }
+
+        public TraitorDaggerPet(INpcTemplate npcTemplate) : base(npcTemplate) { }
+    }
 }

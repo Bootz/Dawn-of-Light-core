@@ -1,5 +1,4 @@
 using System;
-using System.Collections;
 using DOL.Database;
 using DOL.Events;
 using DOL.GS.Effects;
@@ -7,7 +6,6 @@ using DOL.GS.PacketHandler;
 
 namespace DOL.GS.Spells
 {
-
     [SpellHandler("ValkyrieOffensiveProc")]
     public class ValkyrieOffensiveProcSpellHandler : SpellHandler
     {
@@ -84,7 +82,6 @@ namespace DOL.GS.Spells
                         handler.StartSpell(ad.Attacker);
                 }
             }
-
         }
 
         // constructor

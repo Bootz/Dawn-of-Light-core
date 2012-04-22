@@ -16,117 +16,116 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
  */
-using System;
-using System.Collections;
+
 using DOL.Language;
 using System.Collections.Generic;
 
 namespace DOL.GS.PlayerClass
 {
-	/// <summary>
-	///
-	/// </summary>
-	[CharacterClassAttribute((int)eCharacterClass.Mercenary, "Mercenary", "Fighter")]
-	public class ClassMercenary : ClassFighter
-	{
-		private static readonly string[] AutotrainableSkills = new[] { Specs.Slash, Specs.Thrust };
+    /// <summary>
+    ///
+    /// </summary>
+    [CharacterClassAttribute((int)eCharacterClass.Mercenary, "Mercenary", "Fighter")]
+    public class ClassMercenary : ClassFighter
+    {
+        private static readonly string[] AutotrainableSkills = new[] { Specs.Slash, Specs.Thrust };
 
-		public ClassMercenary() : base()
-		{
-			m_profession = LanguageMgr.GetTranslation(ServerProperties.Properties.SERV_LANGUAGE, "PlayerClass.Profession.GuildofShadows");
-			m_specializationMultiplier = 20;
-			m_primaryStat = eStat.STR;
-			m_secondaryStat = eStat.DEX;
-			m_tertiaryStat = eStat.CON;
-			m_baseHP = 880;
-		}
+        public ClassMercenary()
+            : base()
+        {
+            m_profession = LanguageMgr.GetTranslation(ServerProperties.Properties.SERV_LANGUAGE, "PlayerClass.Profession.GuildofShadows");
+            m_specializationMultiplier = 20;
+            m_primaryStat = eStat.STR;
+            m_secondaryStat = eStat.DEX;
+            m_tertiaryStat = eStat.CON;
+            m_baseHP = 880;
+        }
 
-		public override string GetTitle(int level)
-		{
-			if (level >= 50) return LanguageMgr.GetTranslation(ServerProperties.Properties.SERV_LANGUAGE, "PlayerClass.Mercenary.GetTitle.50");
-			if (level >= 45) return LanguageMgr.GetTranslation(ServerProperties.Properties.SERV_LANGUAGE, "PlayerClass.Mercenary.GetTitle.45");
-			if (level >= 40) return LanguageMgr.GetTranslation(ServerProperties.Properties.SERV_LANGUAGE, "PlayerClass.Mercenary.GetTitle.40");
-			if (level >= 35) return LanguageMgr.GetTranslation(ServerProperties.Properties.SERV_LANGUAGE, "PlayerClass.Mercenary.GetTitle.35");
-			if (level >= 30) return LanguageMgr.GetTranslation(ServerProperties.Properties.SERV_LANGUAGE, "PlayerClass.Mercenary.GetTitle.30");
-			if (level >= 25) return LanguageMgr.GetTranslation(ServerProperties.Properties.SERV_LANGUAGE, "PlayerClass.Mercenary.GetTitle.25");
-			if (level >= 20) return LanguageMgr.GetTranslation(ServerProperties.Properties.SERV_LANGUAGE, "PlayerClass.Mercenary.GetTitle.20");
-			if (level >= 15) return LanguageMgr.GetTranslation(ServerProperties.Properties.SERV_LANGUAGE, "PlayerClass.Mercenary.GetTitle.15");
-			if (level >= 10) return LanguageMgr.GetTranslation(ServerProperties.Properties.SERV_LANGUAGE, "PlayerClass.Mercenary.GetTitle.10");
-			if (level >= 5) return LanguageMgr.GetTranslation(ServerProperties.Properties.SERV_LANGUAGE, "PlayerClass.Mercenary.GetTitle.5");
-			return LanguageMgr.GetTranslation(ServerProperties.Properties.SERV_LANGUAGE, "PlayerClass.GetTitle.none");
-		}
+        public override string GetTitle(int level)
+        {
+            if (level >= 50) return LanguageMgr.GetTranslation(ServerProperties.Properties.SERV_LANGUAGE, "PlayerClass.Mercenary.GetTitle.50");
+            if (level >= 45) return LanguageMgr.GetTranslation(ServerProperties.Properties.SERV_LANGUAGE, "PlayerClass.Mercenary.GetTitle.45");
+            if (level >= 40) return LanguageMgr.GetTranslation(ServerProperties.Properties.SERV_LANGUAGE, "PlayerClass.Mercenary.GetTitle.40");
+            if (level >= 35) return LanguageMgr.GetTranslation(ServerProperties.Properties.SERV_LANGUAGE, "PlayerClass.Mercenary.GetTitle.35");
+            if (level >= 30) return LanguageMgr.GetTranslation(ServerProperties.Properties.SERV_LANGUAGE, "PlayerClass.Mercenary.GetTitle.30");
+            if (level >= 25) return LanguageMgr.GetTranslation(ServerProperties.Properties.SERV_LANGUAGE, "PlayerClass.Mercenary.GetTitle.25");
+            if (level >= 20) return LanguageMgr.GetTranslation(ServerProperties.Properties.SERV_LANGUAGE, "PlayerClass.Mercenary.GetTitle.20");
+            if (level >= 15) return LanguageMgr.GetTranslation(ServerProperties.Properties.SERV_LANGUAGE, "PlayerClass.Mercenary.GetTitle.15");
+            if (level >= 10) return LanguageMgr.GetTranslation(ServerProperties.Properties.SERV_LANGUAGE, "PlayerClass.Mercenary.GetTitle.10");
+            if (level >= 5) return LanguageMgr.GetTranslation(ServerProperties.Properties.SERV_LANGUAGE, "PlayerClass.Mercenary.GetTitle.5");
+            return LanguageMgr.GetTranslation(ServerProperties.Properties.SERV_LANGUAGE, "PlayerClass.GetTitle.none");
+        }
 
-		public override bool CanUseLefthandedWeapon(GamePlayer player)
-		{
-			return true;
-		}
+        public override bool CanUseLefthandedWeapon(GamePlayer player)
+        {
+            return true;
+        }
 
-		public override IList<string> GetAutotrainableSkills()
-		{
-			return AutotrainableSkills;
-		}
+        public override IList<string> GetAutotrainableSkills()
+        {
+            return AutotrainableSkills;
+        }
 
-		/// <summary>
-		/// Update all skills and add new for current level
-		/// </summary>
-		/// <param name="player"></param>
-		public override void OnLevelUp(GamePlayer player)
-		{
-			base.OnLevelUp(player);
+        /// <summary>
+        /// Update all skills and add new for current level
+        /// </summary>
+        /// <param name="player"></param>
+        public override void OnLevelUp(GamePlayer player)
+        {
+            base.OnLevelUp(player);
 
-			player.AddSpecialization(SkillBase.GetSpecialization(Specs.Shields));
-			player.AddSpecialization(SkillBase.GetSpecialization(Specs.Dual_Wield));
+            player.AddSpecialization(SkillBase.GetSpecialization(Specs.Shields));
+            player.AddSpecialization(SkillBase.GetSpecialization(Specs.Dual_Wield));
 
-			if (player.Level >= 10)
-			{
-				player.AddAbility(SkillBase.GetAbility(Abilities.AlbArmor, ArmorLevel.Chain));
-				player.AddAbility(SkillBase.GetAbility(Abilities.Weapon_Shortbows));
-				player.AddAbility(SkillBase.GetAbility(Abilities.Evade, 1));
+            if (player.Level >= 10)
+            {
+                player.AddAbility(SkillBase.GetAbility(Abilities.AlbArmor, ArmorLevel.Chain));
+                player.AddAbility(SkillBase.GetAbility(Abilities.Weapon_Shortbows));
+                player.AddAbility(SkillBase.GetAbility(Abilities.Evade, 1));
+            }
+            if (player.Level >= 15)
+            {
+                player.AddAbility(SkillBase.GetAbility(Abilities.Protect, 1));
+                player.AddAbility(SkillBase.GetAbility(Abilities.Tireless));
+            }
+            if (player.Level >= 17)
+            {
+                player.AddSpecialization(SkillBase.GetSpecialization(Specs.Parry));
+            }
+            if (player.Level >= 19)
+            {
+                player.AddAbility(SkillBase.GetAbility(Abilities.Intercept));
+            }
+            if (player.Level >= 20)
+            {
+                player.AddAbility(SkillBase.GetAbility(Abilities.DirtyTricks));
+            }
+            if (player.Level >= 23)
+            {
+                player.AddAbility(SkillBase.GetAbility(Abilities.Protect, 2));
+            }
+            if (player.Level >= 24)
+            {
+                player.AddAbility(SkillBase.GetAbility(Abilities.PreventFlight));
+            }
+            if (player.Level >= 30)
+            {
+                player.AddAbility(SkillBase.GetAbility(Abilities.Flurry));
+            }
+            if (player.Level >= 32)
+            {
+                player.AddAbility(SkillBase.GetAbility(Abilities.Protect, 3));
+            }
+            if (player.Level >= 35)
+            {
+                player.AddAbility(SkillBase.GetAbility(Abilities.Advanced_Evade));
+                player.AddAbility(SkillBase.GetAbility(Abilities.Stoicism));
+            }
+        }
 
-			}
-			if (player.Level >= 15)
-			{
-				player.AddAbility(SkillBase.GetAbility(Abilities.Protect, 1));
-				player.AddAbility(SkillBase.GetAbility(Abilities.Tireless));
-			}
-			if (player.Level >= 17)
-			{
-				player.AddSpecialization(SkillBase.GetSpecialization(Specs.Parry));
-			}
-			if (player.Level >= 19)
-			{
-				player.AddAbility(SkillBase.GetAbility(Abilities.Intercept));
-			}
-			if (player.Level >= 20)
-			{
-				player.AddAbility(SkillBase.GetAbility(Abilities.DirtyTricks));
-			}
-			if (player.Level >= 23)
-			{
-				player.AddAbility(SkillBase.GetAbility(Abilities.Protect, 2));
-			}
-			if (player.Level >= 24)
-			{
-				player.AddAbility(SkillBase.GetAbility(Abilities.PreventFlight));
-			}
-			if (player.Level >= 30)
-			{
-				player.AddAbility(SkillBase.GetAbility(Abilities.Flurry));
-			}
-			if (player.Level >= 32)
-			{
-				player.AddAbility(SkillBase.GetAbility(Abilities.Protect, 3));
-			}
-			if (player.Level >= 35)
-			{
-				player.AddAbility(SkillBase.GetAbility(Abilities.Advanced_Evade));
-				player.AddAbility(SkillBase.GetAbility(Abilities.Stoicism));
-			}
-		}
-
-		public override bool HasAdvancedFromBaseClass()
-		{
-			return true;
-		}
-	}
+        public override bool HasAdvancedFromBaseClass()
+        {
+            return true;
+        }
+    }
 }

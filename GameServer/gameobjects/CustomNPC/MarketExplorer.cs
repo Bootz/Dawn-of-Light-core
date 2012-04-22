@@ -1,21 +1,12 @@
 using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.Timers;
-using DOL;
-using DOL.GS;
-using DOL.GS.GameEvents;
-using DOL.GS.PacketHandler;
 using DOL.Database;
-using DOL.Events;
 using DOL.GS.Housing;
-
+using DOL.GS.PacketHandler;
 
 namespace DOL.GS
 {
     public class MarketExplorer : GameNPC
     {
-
         private const string EXPLORER_ITEM_WEAK = "MarketExplorerItem";
 
         public override bool Interact(GamePlayer player)

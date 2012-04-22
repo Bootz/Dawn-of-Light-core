@@ -1,21 +1,21 @@
 /*
  * DAWN OF LIGHT - The first free open source DAoC server emulator
- * 
+ *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
  * as published by the Free Software Foundation; either version 2
  * of the License, or (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 */
-/*				
+/*
             Written by Doulbousiouf (27/11/2004)
 */
 
@@ -28,66 +28,66 @@ using DOL.Language;
 
 namespace DOL.GS
 {
-	/// <summary>
-	/// Represents an in-game GameHealer NPC
-	/// </summary>
-	[NPCGuildScript("Healer")]
-	public class GameHealer : GameNPC
-	{
-		private const string CURED_SPELL_TYPE = GlobalSpells.PvERessurectionIllnessSpellType;
+    /// <summary>
+    /// Represents an in-game GameHealer NPC
+    /// </summary>
+    [NPCGuildScript("Healer")]
+    public class GameHealer : GameNPC
+    {
+        private const string CURED_SPELL_TYPE = GlobalSpells.PvERessurectionIllnessSpellType;
 
-		private const string COST_BY_PTS = "cost";
+        private const string COST_BY_PTS = "cost";
 
-		/// <summary>
-		/// Constructor
-		/// </summary>
-		public GameHealer()
-			: base()
-		{
-		}
-
-		#region Examine/Interact Message
-
-		/// <summary>
-		/// Adds messages to ArrayList which are sent when object is targeted
-		/// </summary>
-		/// <param name="player">GamePlayer that is examining this object</param>
-		/// <returns>list with string messages</returns>
-		public override IList GetExamineMessages(GamePlayer player)
+        /// <summary>
+        /// Constructor
+        /// </summary>
+        public GameHealer()
+            : base()
         {
-			IList list = new ArrayList();
+        }
+
+        #region Examine/Interact Message
+
+        /// <summary>
+        /// Adds messages to ArrayList which are sent when object is targeted
+        /// </summary>
+        /// <param name="player">GamePlayer that is examining this object</param>
+        /// <returns>list with string messages</returns>
+        public override IList GetExamineMessages(GamePlayer player)
+        {
+            IList list = new ArrayList();
             list.Add(LanguageMgr.GetTranslation(player.Client, "Healer.GetExamineMessages.Text1", GetName(0, false), GetPronoun(0, true), GetAggroLevelString(player, false)));
             return list;
-		}
+        }
 
-		public override bool Interact(GamePlayer player)
-		{
-			if (!base.Interact(player))
-				return false;
+        public override bool Interact(GamePlayer player)
+        {
+            if (!base.Interact(player))
+                return false;
 
-			TurnTo(player, 5000);
+            TurnTo(player, 5000);
 
-			GameSpellEffect effect = SpellHandler.FindEffectOnTarget(player, CURED_SPELL_TYPE);
-			if (effect != null)
-			{
-				effect.Cancel(false);
+            GameSpellEffect effect = SpellHandler.FindEffectOnTarget(player, CURED_SPELL_TYPE);
+            if (effect != null)
+            {
+                effect.Cancel(false);
                 player.Out.SendMessage(LanguageMgr.GetTranslation(player.Client, "Healer.Interact.Text1", GetName(0, false)), eChatType.CT_System, eChatLoc.CL_SystemWindow);
             }
 
-			if (player.TotalConstitutionLostAtDeath > 0)
-			{
-				int oneConCost = GamePlayer.prcRestore[player.Level < GamePlayer.prcRestore.Length ? player.Level : GamePlayer.prcRestore.Length - 1];
-				player.TempProperties.setProperty(COST_BY_PTS, (long)oneConCost);
+            if (player.TotalConstitutionLostAtDeath > 0)
+            {
+                int oneConCost = GamePlayer.prcRestore[player.Level < GamePlayer.prcRestore.Length ? player.Level : GamePlayer.prcRestore.Length - 1];
+                player.TempProperties.setProperty(COST_BY_PTS, (long)oneConCost);
                 player.Out.SendCustomDialog(LanguageMgr.GetTranslation(player.Client, "Healer.Interact.Text2", Money.GetString(player.TotalConstitutionLostAtDeath * (long)oneConCost)), new CustomDialogResponse(HealerDialogResponse));
             }
-			else
-			{
+            else
+            {
                 player.Out.SendMessage(LanguageMgr.GetTranslation(player.Client, "Healer.Interact.Text3"), eChatType.CT_System, eChatLoc.CL_SystemWindow);
             }
-			return true;
-		}
+            return true;
+        }
 
-		protected void HealerDialogResponse(GamePlayer player, byte response)
+        protected void HealerDialogResponse(GamePlayer player, byte response)
         {
             if (!this.IsWithinRadius(player, WorldMgr.INTERACT_DISTANCE))
             {
@@ -120,6 +120,7 @@ namespace DOL.GS
             }
             return;
         }
-		#endregion Examine/Interact Message
-	}
+
+        #endregion Examine/Interact Message
+    }
 }

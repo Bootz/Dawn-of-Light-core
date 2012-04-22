@@ -1,23 +1,19 @@
-using System;
 using DOL.Database;
-using DOL.GS.PacketHandler;
-using DOL.GS.Effects;
-using DOL.GS.SkillHandler;
 
 namespace DOL.GS.RealmAbilities
 {
-	/// <summary>
-	/// Toughness
-	/// </summary>
-	public class ToughnessAbility : RAPropertyEnhancer
-	{
-		public ToughnessAbility(DBAbility dba, int level) : base(dba, level, eProperty.MaxHealth) { }
+    /// <summary>
+    /// Toughness
+    /// </summary>
+    public class ToughnessAbility : RAPropertyEnhancer
+    {
+        public ToughnessAbility(DBAbility dba, int level) : base(dba, level, eProperty.MaxHealth) { }
 
-		public override int GetAmountForLevel(int level)
-		{
-			if (level < 1) return 0;
+        public override int GetAmountForLevel(int level)
+        {
+            if (level < 1) return 0;
             if (ServerProperties.Properties.USE_NEW_PASSIVES_RAS_SCALING)
-            {     
+            {
                 switch (level)
                 {
                     case 1: return 25;
@@ -44,11 +40,11 @@ namespace DOL.GS.RealmAbilities
                     default: return 0;
                 }
             }
-		}
+        }
 
-		public override bool CheckRequirement(GamePlayer player)
-		{
-			return player.Level >= 40;
-		}
-	}
+        public override bool CheckRequirement(GamePlayer player)
+        {
+            return player.Level >= 40;
+        }
+    }
 }

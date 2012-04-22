@@ -16,10 +16,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
  */
-using DOL.GS;
-using DOL.GS.PacketHandler;
-using System;
-using System.Reflection;
+
 using System.Collections;
 using DOL.AI.Brain;
 
@@ -37,7 +34,7 @@ namespace DOL.GS.Spells
             {
                 GamePlayer casterPlayer = (GamePlayer)Caster;
                 Group group = casterPlayer.Group;
-                if(group == null) return list; // Should not appen since it is checked in ability handler
+                if (group == null) return list; // Should not appen since it is checked in ability handler
                 int spellRange = CalculateSpellRange();
                 if (group != null)
                 {
@@ -52,7 +49,7 @@ namespace DOL.GS.Spells
                                     list.Add(groupPlayer);
                                     IControlledBrain npc = groupPlayer.ControlledBrain;
                                     if (npc != null)
-                                        if (casterPlayer.IsWithinRadius( npc.Body, spellRange ))
+                                        if (casterPlayer.IsWithinRadius(npc.Body, spellRange))
                                             list.Add(npc.Body);
                                 }
                             }
@@ -61,7 +58,8 @@ namespace DOL.GS.Spells
                 }
             }
             return list;
-        }    	    	
+        }
+
         public MetalGuardSpellHandler(GameLiving caster, Spell spell, SpellLine line) : base(caster, spell, line) { }
     }
 }

@@ -1,8 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
+﻿using DOL.Events;
 using DOL.GS;
-using DOL.Events;
 
 namespace DOL.AI.Brain
 {
@@ -46,6 +43,6 @@ namespace DOL.AI.Brain
         {
         }
 
-        #endregion
+        #endregion IAttackBehaviour Members
     }
 }

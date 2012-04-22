@@ -16,44 +16,44 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
  */
+
 using System;
-using System.Collections;
 using DOL.GS.PacketHandler;
 
 namespace DOL.GS.Spells
 {
-	/// <summary>
-	///Handlers for the savage's special endurance heal that takes health instead of mana
-	/// </summary>
-	[SpellHandlerAttribute("SavageEnduranceHeal")]
-	public class SavageEnduranceHeal : EnduranceHealSpellHandler
-	{
-		public SavageEnduranceHeal(GameLiving caster, Spell spell, SpellLine line) : base(caster, spell, line) { }
+    /// <summary>
+    ///Handlers for the savage's special endurance heal that takes health instead of mana
+    /// </summary>
+    [SpellHandlerAttribute("SavageEnduranceHeal")]
+    public class SavageEnduranceHeal : EnduranceHealSpellHandler
+    {
+        public SavageEnduranceHeal(GameLiving caster, Spell spell, SpellLine line) : base(caster, spell, line) { }
 
-		protected override void RemoveFromStat(int value)
-		{
-			m_caster.Health -= value;
-		}
+        protected override void RemoveFromStat(int value)
+        {
+            m_caster.Health -= value;
+        }
 
-		public override int PowerCost(GameLiving target)
-		{
-			int cost = 0;
-			if (m_spell.Power < 0)
-				cost = (int)(m_caster.MaxHealth * Math.Abs(m_spell.Power) * 0.01);
-			else
-				cost = m_spell.Power;
-			return cost;
-		}
+        public override int PowerCost(GameLiving target)
+        {
+            int cost = 0;
+            if (m_spell.Power < 0)
+                cost = (int)(m_caster.MaxHealth * Math.Abs(m_spell.Power) * 0.01);
+            else
+                cost = m_spell.Power;
+            return cost;
+        }
 
-		public override bool CheckBeginCast(GameLiving selectedTarget)
-		{
-			int cost = PowerCost(Caster);
-			if (Caster.Health < cost)
-			{
-				MessageToCaster("You do not have enough health to cast that!", eChatType.CT_SpellResisted);
-				return false;
-			}
-			return base.CheckBeginCast(Caster);
-		}
-	}
+        public override bool CheckBeginCast(GameLiving selectedTarget)
+        {
+            int cost = PowerCost(Caster);
+            if (Caster.Health < cost)
+            {
+                MessageToCaster("You do not have enough health to cast that!", eChatType.CT_SpellResisted);
+                return false;
+            }
+            return base.CheckBeginCast(Caster);
+        }
+    }
 }

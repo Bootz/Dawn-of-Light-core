@@ -16,6 +16,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
  */
+
 using System;
 using DOL.AI.Brain;
 using DOL.Events;
@@ -24,91 +25,93 @@ using DOL.GS.PacketHandler;
 
 namespace DOL.GS.Spells
 {
-	[SpellHandler("IllusionBladeSummon")]
-	public class IllusionBladeSummon : SummonSpellHandler
-	{
-		private static readonly log4net.ILog log = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
+    [SpellHandler("IllusionBladeSummon")]
+    public class IllusionBladeSummon : SummonSpellHandler
+    {
+        private static readonly log4net.ILog log = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
 
-		public override void ApplyEffectOnTarget(GameLiving target, double effectiveness)
-		{
-			//Template of the Illusionblade NPC
-			INpcTemplate template = NpcTemplateMgr.GetTemplate(71980);
-			
-			
-			if (template == null)
-			{
-				if (log.IsWarnEnabled)
-					log.WarnFormat("NPC template {0} not found! Spell: {1}", Spell.LifeDrainReturn, Spell.ToString());
-				MessageToCaster("NPC template 71980 not found!", eChatType.CT_System);
-				return;
-			}
+        public override void ApplyEffectOnTarget(GameLiving target, double effectiveness)
+        {
+            //Template of the Illusionblade NPC
+            INpcTemplate template = NpcTemplateMgr.GetTemplate(71980);
 
-			GameSpellEffect effect = CreateSpellEffect(target, effectiveness);
+            if (template == null)
+            {
+                if (log.IsWarnEnabled)
+                    log.WarnFormat("NPC template {0} not found! Spell: {1}", Spell.LifeDrainReturn, Spell.ToString());
+                MessageToCaster("NPC template 71980 not found!", eChatType.CT_System);
+                return;
+            }
 
-			IControlledBrain brain = GetPetBrain(Caster);
-			pet = GetGamePet(template);
-			//brain.WalkState = eWalkState.Stay;
-			pet.SetOwnBrain(brain as AI.ABrain);
+            GameSpellEffect effect = CreateSpellEffect(target, effectiveness);
 
-			int x, y, z;
-			ushort heading;
-			Region region;
+            IControlledBrain brain = GetPetBrain(Caster);
+            pet = GetGamePet(template);
+            //brain.WalkState = eWalkState.Stay;
+            pet.SetOwnBrain(brain as AI.ABrain);
 
-			GetPetLocation(out x, out y, out z, out heading, out region);
+            int x, y, z;
+            ushort heading;
+            Region region;
 
-			pet.X = x;
-			pet.Y = y;
-			pet.Z = z;
-			pet.Heading = heading;
-			pet.CurrentRegion = region;
+            GetPetLocation(out x, out y, out z, out heading, out region);
 
-			pet.CurrentSpeed = 0;
-			pet.Realm = Caster.Realm;
-			pet.Level = Caster.Level;
-			pet.AddToWorld();
-			//Check for buffs
-			if (brain is ControlledNpcBrain)
-				(brain as ControlledNpcBrain).CheckSpells(StandardMobBrain.eCheckSpellType.Defensive);
+            pet.X = x;
+            pet.Y = y;
+            pet.Z = z;
+            pet.Heading = heading;
+            pet.CurrentRegion = region;
 
-			AddHandlers();
+            pet.CurrentSpeed = 0;
+            pet.Realm = Caster.Realm;
+            pet.Level = Caster.Level;
+            pet.AddToWorld();
+            //Check for buffs
+            if (brain is ControlledNpcBrain)
+                (brain as ControlledNpcBrain).CheckSpells(StandardMobBrain.eCheckSpellType.Defensive);
 
-			SetBrainToOwner(brain);
-			pet.AutoSetStats();
+            AddHandlers();
 
-			effect.Start(pet);
+            SetBrainToOwner(brain);
+            pet.AutoSetStats();
 
-			
-			
-			//Set pet infos & Brain
-			
-		}
+            effect.Start(pet);
 
-		protected override GamePet GetGamePet(INpcTemplate template) { return new IllusionBladePet(template); }
-		protected override IControlledBrain GetPetBrain(GameLiving owner) { return new ProcPetBrain(owner); }
-		protected override void SetBrainToOwner(IControlledBrain brain) { }
-		protected override void AddHandlers() { GameEventMgr.AddHandler(pet, GameLivingEvent.AttackFinished, EventHandler); }
+            //Set pet infos & Brain
+        }
 
-		protected void EventHandler(DOLEvent e, object sender, EventArgs arguments)
-		{
-			AttackFinishedEventArgs args = arguments as AttackFinishedEventArgs;
-			if(args == null || args.AttackData == null)
-				return;
-		}
-		public IllusionBladeSummon(GameLiving caster, Spell spell, SpellLine line)
-			: base(caster, spell, line) { }
-	}
+        protected override GamePet GetGamePet(INpcTemplate template) { return new IllusionBladePet(template); }
+
+        protected override IControlledBrain GetPetBrain(GameLiving owner) { return new ProcPetBrain(owner); }
+
+        protected override void SetBrainToOwner(IControlledBrain brain) { }
+
+        protected override void AddHandlers() { GameEventMgr.AddHandler(pet, GameLivingEvent.AttackFinished, EventHandler); }
+
+        protected void EventHandler(DOLEvent e, object sender, EventArgs arguments)
+        {
+            AttackFinishedEventArgs args = arguments as AttackFinishedEventArgs;
+            if (args == null || args.AttackData == null)
+                return;
+        }
+
+        public IllusionBladeSummon(GameLiving caster, Spell spell, SpellLine line)
+            : base(caster, spell, line) { }
+    }
 }
 
 namespace DOL.GS
 {
-	public class IllusionBladePet : GamePet
-	{
-		public override int MaxHealth
-		{
-			get { return Level * 10; }
-		}
-		public override void OnAttackedByEnemy(AttackData ad) { }
-		public IllusionBladePet (INpcTemplate npcTemplate) : base(npcTemplate) { }
-	}
+    public class IllusionBladePet : GamePet
+    {
+        public override int MaxHealth
+        {
+            get { return Level * 10; }
+        }
+
+        public override void OnAttackedByEnemy(AttackData ad) { }
+
+        public IllusionBladePet(INpcTemplate npcTemplate) : base(npcTemplate) { }
+    }
 }
 

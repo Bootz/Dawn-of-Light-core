@@ -16,10 +16,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
  */
-using DOL.GS;
-using DOL.GS.PacketHandler;
-using System;
-using System.Reflection;
+
 using System.Collections;
 using System.Collections.Generic;
 using DOL.AI.Brain;
@@ -38,13 +35,12 @@ namespace DOL.GS.Spells
             {
                 GamePlayer casterPlayer = (GamePlayer)Caster;
                 Group group = casterPlayer.Group;
-                if(group == null) return list; // Should not appen since it is checked in ability handler
+                if (group == null) return list; // Should not appen since it is checked in ability handler
                 int spellRange = CalculateSpellRange();
                 if (group != null)
                 {
                     lock (group)
                     {
-
                         foreach (GamePlayer groupPlayer in casterPlayer.GetPlayersInRadius((ushort)m_spell.Radius))
                         {
                             if (casterPlayer.Group.IsInTheGroup(groupPlayer))
@@ -55,7 +51,7 @@ namespace DOL.GS.Spells
                                     IControlledBrain npc = groupPlayer.ControlledBrain;
                                     if (npc != null)
                                     {
-                                        if (casterPlayer.IsWithinRadius( npc.Body, spellRange ))
+                                        if (casterPlayer.IsWithinRadius(npc.Body, spellRange))
                                             list.Add(npc.Body);
                                     }
                                 }
@@ -71,8 +67,8 @@ namespace DOL.GS.Spells
         public BolsteringRoarSpellHandler(GameLiving caster, Spell spell, SpellLine line)
             : base(caster, spell, line)
         {
- 			// RR4: now it's a list
-			m_spellTypesToRemove = new List<string>();       	
+            // RR4: now it's a list
+            m_spellTypesToRemove = new List<string>();
             m_spellTypesToRemove.Add("Mesmerize");
             m_spellTypesToRemove.Add("SpeedDecrease");
             m_spellTypesToRemove.Add("StyleSpeedDecrease");

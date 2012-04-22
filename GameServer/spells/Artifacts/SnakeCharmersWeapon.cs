@@ -1,25 +1,23 @@
 /*
  * DAWN OF LIGHT - The first free open source DAoC server emulator
- * 
+ *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
  * as published by the Free Software Foundation; either version 2
  * of the License, or (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
  */
-using System;
-using DOL.GS;
+
 using DOL.GS.PacketHandler;
-using DOL.GS.Effects;
 
 namespace DOL.GS.Spells
 {
@@ -29,10 +27,10 @@ namespace DOL.GS.Spells
     [SpellHandlerAttribute("SnakeCharmer")]
     public class SnakeCharmer : LifedrainSpellHandler
     {
-		public override int CalculateSpellResistChance(GameLiving target)
-		{
-			return 0;
-		}
+        public override int CalculateSpellResistChance(GameLiving target)
+        {
+            return 0;
+        }
 
         /// <summary>
         /// Uses percent of damage to heal the caster
@@ -51,7 +49,7 @@ namespace DOL.GS.Spells
                 MessageToCaster("You are diseased!", eChatType.CT_SpellResisted);
                 heal >>= 1;
             }
-            if (heal <= 0) return;            
+            if (heal <= 0) return;
             heal = m_caster.ChangeHealth(m_caster, GameLiving.eHealthChangeType.Spell, heal);
             if (heal > 0)
             {
@@ -61,9 +59,9 @@ namespace DOL.GS.Spells
             {
                 MessageToCaster("You cannot absorb any more life.", eChatType.CT_SpellResisted);
             }
-            
-            if (mana <=0) return;
-            mana = m_caster.ChangeMana(m_caster,GameLiving.eManaChangeType.Spell,mana);
+
+            if (mana <= 0) return;
+            mana = m_caster.ChangeMana(m_caster, GameLiving.eManaChangeType.Spell, mana);
             if (mana > 0)
             {
                 MessageToCaster("You steal " + mana + " power point" + (mana == 1 ? "." : "s."), eChatType.CT_Spell);
@@ -71,10 +69,10 @@ namespace DOL.GS.Spells
             else
             {
                 MessageToCaster("You cannot absorb any more power.", eChatType.CT_SpellResisted);
-            }     
-            
-            if (endu <=0) return;
-            endu = m_caster.ChangeEndurance(m_caster,GameLiving.eEnduranceChangeType.Spell,endu);            
+            }
+
+            if (endu <= 0) return;
+            endu = m_caster.ChangeEndurance(m_caster, GameLiving.eEnduranceChangeType.Spell, endu);
             if (heal > 0)
             {
                 MessageToCaster("You steal " + endu + " endurance point" + (endu == 1 ? "." : "s."), eChatType.CT_Spell);

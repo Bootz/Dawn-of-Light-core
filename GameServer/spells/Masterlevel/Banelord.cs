@@ -1,35 +1,35 @@
-using System;
-using System.Text;
-using System.Collections;
+using DOL.AI.Brain;
 using DOL.GS.Effects;
 using DOL.GS.PacketHandler;
-using System.Reflection;
-using DOL.AI.Brain;
-using DOL.Events;
 
 namespace DOL.GS.Spells
 {
     //http://www.camelotherald.com/masterlevels/ma.php?ml=Banelord
     //shared timer 1
+
     #region Banelord-1
+
     [SpellHandlerAttribute("CastingSpeedDebuff")]
     public class CastingSpeedDebuff : MasterlevelDebuffHandling
     {
         public override eProperty Property1 { get { return eProperty.CastingSpeed; } }
-		
-		public override void ApplyEffectOnTarget(GameLiving target, double effectiveness)
-		{
-			base.ApplyEffectOnTarget(target, effectiveness);
-			target.StartInterruptTimer(target.SpellInterruptDuration, AttackData.eAttackType.Spell, Caster);
-		}
+
+        public override void ApplyEffectOnTarget(GameLiving target, double effectiveness)
+        {
+            base.ApplyEffectOnTarget(target, effectiveness);
+            target.StartInterruptTimer(target.SpellInterruptDuration, AttackData.eAttackType.Spell, Caster);
+        }
 
         // constructor
         public CastingSpeedDebuff(GameLiving caster, Spell spell, SpellLine line) : base(caster, spell, line) { }
     }
-    #endregion
+
+    #endregion Banelord-1
 
     //shared timer 5 for ml2 - shared timer 3 for ml8
+
     #region Banelord-2/8
+
     [SpellHandlerAttribute("PBAEDamage")]
     public class PBAEDamage : MasterlevelHandling
     {
@@ -104,10 +104,13 @@ namespace DOL.GS.Spells
             return 25;
         }
     }
-    #endregion
+
+    #endregion Banelord-2/8
 
     //shared timer 3
+
     #region Banelord-3
+
     [SpellHandlerAttribute("Oppression")]
     public class OppressionSpellHandler : MasterlevelHandling
     {
@@ -115,21 +118,24 @@ namespace DOL.GS.Spells
         {
             return true;
         }
+
         public override void FinishSpellCast(GameLiving target)
         {
             m_caster.Mana -= PowerCost(target);
             base.FinishSpellCast(target);
         }
+
         public override int CalculateSpellResistChance(GameLiving target)
         {
             return 0;
         }
+
         public override void OnEffectStart(GameSpellEffect effect)
         {
             base.OnEffectStart(effect);
             if (effect.Owner is GamePlayer)
                 ((GamePlayer)effect.Owner).UpdateEncumberance();
-			effect.Owner.StartInterruptTimer(effect.Owner.SpellInterruptDuration, AttackData.eAttackType.Spell, Caster);
+            effect.Owner.StartInterruptTimer(effect.Owner.SpellInterruptDuration, AttackData.eAttackType.Spell, Caster);
         }
 
         public override void ApplyEffectOnTarget(GameLiving target, double effectiveness)
@@ -146,16 +152,20 @@ namespace DOL.GS.Spells
                 ((GamePlayer)effect.Owner).UpdateEncumberance();
             return base.OnEffectExpires(effect, noMessages);
         }
+
         public OppressionSpellHandler(GameLiving caster, Spell spell, SpellLine line) : base(caster, spell, line) { }
     }
-    #endregion
+
+    #endregion Banelord-3
 
     //shared timer 1
+
     #region Banelord-4
+
     [SpellHandler("MLFatDebuff")]
     public class MLFatDebuffHandler : MasterlevelDebuffHandling
     {
-        public override eProperty Property1 { get { return eProperty.FatigueConsumption; } }	
+        public override eProperty Property1 { get { return eProperty.FatigueConsumption; } }
 
         public override void ApplyEffectOnTarget(GameLiving target, double effectiveness)
         {
@@ -170,7 +180,7 @@ namespace DOL.GS.Spells
 
         public override void OnEffectStart(GameSpellEffect effect)
         {
-			effect.Owner.StartInterruptTimer(effect.Owner.SpellInterruptDuration, AttackData.eAttackType.Spell, Caster);
+            effect.Owner.StartInterruptTimer(effect.Owner.SpellInterruptDuration, AttackData.eAttackType.Spell, Caster);
             base.OnEffectStart(effect);
         }
 
@@ -182,10 +192,13 @@ namespace DOL.GS.Spells
         // constructor
         public MLFatDebuffHandler(GameLiving caster, Spell spell, SpellLine spellLine) : base(caster, spell, spellLine) { }
     }
-    #endregion
+
+    #endregion Banelord-4
 
     //shared timer 5
+
     #region Banelord-5
+
     [SpellHandlerAttribute("MissHit")]
     public class MissHit : MasterlevelBuffHandling
     {
@@ -194,11 +207,15 @@ namespace DOL.GS.Spells
         // constructor
         public MissHit(GameLiving caster, Spell spell, SpellLine line) : base(caster, spell, line) { }
     }
-    #endregion
+
+    #endregion Banelord-5
 
     //shared timer 1
+
     #region Banelord-6
+
     #region ML6Snare
+
     [SpellHandler("MLUnbreakableSnare")]
     public class MLUnbreakableSnare : BanelordSnare
     {
@@ -222,8 +239,11 @@ namespace DOL.GS.Spells
         {
         }
     }
-    #endregion
+
+    #endregion ML6Snare
+
     #region ML6Stun
+
     [SpellHandler("UnrresistableNonImunityStun")]
     public class UnrresistableNonImunityStun : MasterlevelHandling
     {
@@ -235,7 +255,7 @@ namespace DOL.GS.Spells
 
         public override void ApplyEffectOnTarget(GameLiving target, double effectiveness)
         {
-            if (target.HasAbility(Abilities.CCImmunity)||target.HasAbility(Abilities.StunImmunity))
+            if (target.HasAbility(Abilities.CCImmunity) || target.HasAbility(Abilities.StunImmunity))
             {
                 MessageToCaster(target.Name + " is immune to this effect!", eChatType.CT_SpellResisted);
                 return;
@@ -331,11 +351,15 @@ namespace DOL.GS.Spells
         {
         }
     }
-    #endregion
-    #endregion
+
+    #endregion ML6Stun
+
+    #endregion Banelord-6
 
     //shared timer 3
+
     #region Banelord-7
+
     [SpellHandlerAttribute("BLToHit")]
     public class BLToHit : MasterlevelBuffHandling
     {
@@ -344,10 +368,13 @@ namespace DOL.GS.Spells
         // constructor
         public BLToHit(GameLiving caster, Spell spell, SpellLine line) : base(caster, spell, line) { }
     }
-    #endregion
+
+    #endregion Banelord-7
 
     //shared timer 5
+
     #region Banelord-9
+
     [SpellHandlerAttribute("EffectivenessDebuff")]
     public class EffectivenessDeBuff : MasterlevelHandling
     {
@@ -359,7 +386,6 @@ namespace DOL.GS.Spells
             m_caster.Mana -= PowerCost(target);
             base.FinishSpellCast(target);
         }
-
 
         /// <summary>
         /// When an applied effect starts
@@ -398,10 +424,13 @@ namespace DOL.GS.Spells
 
         public EffectivenessDeBuff(GameLiving caster, Spell spell, SpellLine line) : base(caster, spell, line) { }
     }
-    #endregion
+
+    #endregion Banelord-9
 
     //no shared timer
+
     #region Banelord-10
+
     [SpellHandlerAttribute("Banespike")]
     public class BanespikeHandler : MasterlevelBuffHandling
     {
@@ -409,7 +438,8 @@ namespace DOL.GS.Spells
 
         public BanespikeHandler(GameLiving caster, Spell spell, SpellLine line) : base(caster, spell, line) { }
     }
-    #endregion
+
+    #endregion Banelord-10
 }
 
 #region MisshitCalc
@@ -439,4 +469,4 @@ namespace DOL.GS.PropertyCalc
     }
 }
 
-#endregion
+#endregion MisshitCalc

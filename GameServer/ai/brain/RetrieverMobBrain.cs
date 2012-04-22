@@ -1,48 +1,48 @@
 /*
  * DAWN OF LIGHT - The first free open source DAoC server emulator
- * 
+ *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
  * as published by the Free Software Foundation; either version 2
  * of the License, or (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
  */
+
 using System;
-using System.Collections.Generic;
-using System.Text;
+using System.Reflection;
 using DOL.Events;
 using DOL.GS;
 using log4net;
-using System.Reflection;
 
 namespace DOL.AI.Brain
 {
-	/// <summary>
-	/// A retriever type mob is an NPC that is spawned from a boss-like
-	/// mob (its master). Upon spawning, the master mob orders the
-	/// retriever to make for a certain location; once the retriever
-	/// has reached its target it reports back to its master. The player's
-	/// task usually is to prevent the retriever from reaching its target,
-	/// because bad things may happen should it succeed.
-	/// </summary>
-	/// <author>Aredhel</author>
-    class RetrieverMobBrain : StandardMobBrain
+    /// <summary>
+    /// A retriever type mob is an NPC that is spawned from a boss-like
+    /// mob (its master). Upon spawning, the master mob orders the
+    /// retriever to make for a certain location; once the retriever
+    /// has reached its target it reports back to its master. The player's
+    /// task usually is to prevent the retriever from reaching its target,
+    /// because bad things may happen should it succeed.
+    /// </summary>
+    /// <author>Aredhel</author>
+    internal class RetrieverMobBrain : StandardMobBrain
     {
-		/// <summary>
-		/// Defines a logger for this class.
-		/// </summary>
-		private static readonly ILog log = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
+        /// <summary>
+        /// Defines a logger for this class.
+        /// </summary>
+        private static readonly ILog log = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
 
         private enum State { Passive, GettingHelp, Aggressive };
+
         private State m_state;
 
         /// <summary>
@@ -62,7 +62,7 @@ namespace DOL.AI.Brain
         public GameNPC Master
         {
             get { return m_master; }
-			set { m_master = value; }
+            set { m_master = value; }
         }
 
         /// <summary>
@@ -83,8 +83,8 @@ namespace DOL.AI.Brain
                 m_state = State.GettingHelp;
             else if (e == GameNPCEvent.ArriveAtTarget && m_state == State.GettingHelp)
             {
-				if (Master != null && Master.Brain != null)
-					Master.Brain.Notify(GameNPCEvent.ArriveAtTarget, this.Body, new EventArgs());
+                if (Master != null && Master.Brain != null)
+                    Master.Brain.Notify(GameNPCEvent.ArriveAtTarget, this.Body, new EventArgs());
                 m_state = State.Aggressive;
             }
             else if (e == GameNPCEvent.TakeDamage)

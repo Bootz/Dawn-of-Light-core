@@ -1,18 +1,5 @@
-﻿using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.Collections.Specialized;
-using DOL.GS;
+﻿using DOL.AI.Brain;
 using DOL.GS.PacketHandler;
-using DOL.AI.Brain;
-using DOL.Events;
-using DOL.GS.Effects;
-using log4net;
-using System.Reflection;
-using DOL.GS.Atlantis;
-using DOL.Database;
-using DOL.Language;
-using DOL.GS.Spells;
 
 namespace DOL.GS.Atlantis
 {
@@ -68,6 +55,5 @@ namespace DOL.GS.Atlantis
             else
                 base.TakeDamage(source, damageType, damageAmount, criticalAmount);
         }
-
     }
 }

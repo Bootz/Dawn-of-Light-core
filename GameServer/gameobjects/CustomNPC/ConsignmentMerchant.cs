@@ -1,21 +1,22 @@
 ﻿/*
  * DAWN OF LIGHT - The first free open source DAoC server emulator
- * 
+ *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
  * as published by the Free Software Foundation; either version 2
  * of the License, or (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
  */
+
 using System;
 using System.Collections.Generic;
 using System.Reflection;
@@ -217,7 +218,7 @@ namespace DOL.GS
         /// <param name="playerInventory"></param>
         /// <param name="fromSlot"></param>
         /// <param name="toSlot"></param>
-        /// <returns></returns> 
+        /// <returns></returns>
         public void MoveItem(GamePlayer player, IGameInventory playerInventory, eInventorySlot fromSlot, eInventorySlot toSlot)
         {
             if (fromSlot == toSlot)
@@ -256,7 +257,7 @@ namespace DOL.GS
         }
 
         /// <summary>
-        /// Move an Item from the merchant 
+        /// Move an Item from the merchant
         /// </summary>
         /// <param name="playerInventory"></param>
         /// <param name="fromSlot"></param>
@@ -265,7 +266,7 @@ namespace DOL.GS
         protected IDictionary<int, InventoryItem> MoveItemFromMerchant(GamePlayer player, IGameInventory playerInventory,
                                                                        eInventorySlot fromSlot, eInventorySlot toSlot)
         {
-            // We will only allow moving to the backpack.            
+            // We will only allow moving to the backpack.
             if (toSlot < eInventorySlot.FirstBackpack || toSlot > eInventorySlot.LastBackpack)
                 return null;
 
@@ -362,7 +363,7 @@ namespace DOL.GS
         protected IDictionary<int, InventoryItem> MoveItemToMerchant(GamePlayer player, IGameInventory playerInventory,
                                                                      eInventorySlot fromSlot, eInventorySlot toSlot)
         {
-            // We will only allow moving from the backpack.            
+            // We will only allow moving from the backpack.
             if (fromSlot < eInventorySlot.FirstBackpack || fromSlot > eInventorySlot.LastBackpack)
                 return null;
 
@@ -497,7 +498,6 @@ namespace DOL.GS
                 NotifyObservers(MoveItemFromMerchant(player, playerInventory, fromSlot, toSlot));
             }
         }
-
 
         /// <summary>
         /// Send inventory updates to all players actively viewing this merchant;
@@ -668,7 +668,7 @@ namespace DOL.GS
             house.ConsignmentMerchant = this;
             SetEmblem();
 
-            // verify if OwnerLot is correct 
+            // verify if OwnerLot is correct
             var itemcon = GameServer.Database.SelectObjects<InventoryItem>("OwnerID = '" + house.OwnerID + "' AND SlotPosition >= 1500 AND SlotPosition <= 1599");
             if (itemcon.Count > 0)
             {
@@ -710,13 +710,12 @@ namespace DOL.GS
     }
 }
 
-
 /*
  * Just have to run this query, adds all needed token in the databse, also add the merchantlist
  * Albion = PortMerchantHousingAlb
  * Midgard = PortMerchantHousingMid
  * Hibernia = PortMerchantHousingHib
- * 
+ *
 INSERT INTO `itemtemplate` (`ItemTemplate_ID`, `Id_nb`, `Name`, `Level`, `Durability`, `Condition`, `MaxDurability`, `MaxCondition`, `Quality`, `DPS_AF`, `SPD_ABS`, `Hand`, `Type_Damage`, `Object_Type`, `Item_Type`, `Color`, `Emblem`, `Effect`, `Weight`, `Model`, `Extension`, `Bonus`, `Bonus1`, `Bonus2`, `Bonus3`, `Bonus4`, `Bonus5`, `Bonus6`, `Bonus7`, `Bonus8`, `Bonus9`, `Bonus10`, `ExtraBonus`, `Bonus1Type`, `Bonus2Type`, `Bonus3Type`, `Bonus4Type`, `Bonus5Type`, `Bonus6Type`, `Bonus7Type`, `Bonus8Type`, `Bonus9Type`, `Bonus10Type`, `ExtraBonusType`, `IsPickable`, `IsDropable`, `CanDropAsLoot`, `IsTradable`, `Price`, `MaxCount`, `IsIndestructible`, `IsNotLosingDur`, `PackSize`, `Charges`, `MaxCharges`, `Charges1`, `MaxCharges1`, `SpellID`, `SpellID1`, `ProcSpellID`, `ProcSpellID1`, `PoisonSpellID`, `PoisonMaxCharges`, `PoisonCharges`, `Realm`, `AllowedClasses`, `CanUseEvery`, `Flags`, `BonusLevel`, `LevelRequirement`, `PackageID`, `Description`, `ClassType`, `ProcChance`) VALUES
 ('entrancehousingalb', 'entrancehousingalb', 'Return token to Caerwent entrance', 0, 50000, 50000, 50000, 50000, 85, 0, 0, 0, 0, 0, 35, 0, 0, 0, 10, 485, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 500, 1, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, '0', 0, 0, 0, 0, '', '', '', 0),
 ('entrancehousinghib', 'entrancehousinghib', 'Return token to Meath entrance', 0, 50000, 50000, 50000, 50000, 85, 0, 0, 0, 0, 0, 35, 0, 0, 0, 10, 485, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 500, 1, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 3, '0', 0, 0, 0, 0, '', '', '', 0),
@@ -749,7 +748,7 @@ INSERT INTO `itemtemplate` (`ItemTemplate_ID`, `Id_nb`, `Name`, `Level`, `Durabi
 ('markettorrylin', 'markettorrylin', 'Token return to Market of Torrylin', 0, 50000, 50000, 50000, 50000, 85, 0, 0, 0, 0, 0, 35, 0, 0, 0, 10, 485, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 500, 1, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 3, '0', 0, 0, 0, 0, '', '', '', 0),
 ('markettullamore', 'markettullamore', 'Token return to Market of Tullamore', 0, 50000, 50000, 50000, 50000, 85, 0, 0, 0, 0, 0, 35, 0, 0, 0, 10, 485, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 500, 1, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 3, '0', 0, 0, 0, 0, '', '', '', 0),
 ('marketwyndham', 'marketwyndham', 'Token return to Market of Wyndham', 0, 50000, 50000, 50000, 50000, 85, 0, 0, 0, 0, 0, 35, 0, 0, 0, 10, 485, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 500, 1, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, '0', 0, 0, 0, 0, '', '', '', 0);
-    
+
 INSERT INTO `merchantitem` (`MerchantItem_ID`, `ItemListID`, `ItemTemplateID`, `PageNumber`, `SlotPosition`, `PackageID`) VALUES
 ('204280b2-b6fb-4041-bf11-3c9b434c2e4c', 'PortMerchantHousingHib', 'marketdunshire', 0, 9, NULL),
 ('20f4f965-5848-46aa-a211-56a3d25d5efb', 'PortMerchantHousingAlb', 'marketchiltern', 0, 5, NULL),

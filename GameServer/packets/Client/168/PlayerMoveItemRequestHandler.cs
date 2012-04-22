@@ -16,411 +16,409 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
  */
-using System;
+
+using System.Collections.Generic;
+using System.Reflection;
+ 
 using DOL.Database;
 using DOL.Events;
-using DOL.GS;
-using System.Reflection;
-using log4net;
 using DOL.Language;
-using System.Collections.Generic;
+using log4net;
 
 namespace DOL.GS.PacketHandler.Client.v168
 {
-	[PacketHandlerAttribute(PacketHandlerType.TCP,0x75^168,"Player move item")]
-	public class PlayerMoveItemRequestHandler : IPacketHandler
-	{
-		private static readonly ILog log = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
+    [PacketHandlerAttribute(PacketHandlerType.TCP, 0x75 ^ 168, "Player move item")]
+    public class PlayerMoveItemRequestHandler : IPacketHandler
+    {
+        private static readonly ILog log = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
 
-		public void HandlePacket(GameClient client, GSPacketIn packet)
-		{
-			ushort id		= packet.ReadShort();
-			ushort toSlot	= packet.ReadShort();
-			ushort fromSlot = packet.ReadShort();
-			ushort itemCount= packet.ReadShort();
+        public void HandlePacket(GameClient client, GSPacketIn packet)
+        {
+            ushort id = packet.ReadShort();
+            ushort toSlot = packet.ReadShort();
+            ushort fromSlot = packet.ReadShort();
+            ushort itemCount = packet.ReadShort();
 
-			//log.Debug("MoveItem, id=" + id + " toSlot=" + toSlot + " fromSlot=" + fromSlot + " itemCount=" + itemCount);
-			//ChatUtil.SendDebugMessage(client, "MoveItem, id=" + id.ToString() + " toSlot=" + toSlot.ToString() + " fromSlot=" + fromSlot.ToString() + " itemCount=" + itemCount.ToString());
+            //log.Debug("MoveItem, id=" + id + " toSlot=" + toSlot + " fromSlot=" + fromSlot + " itemCount=" + itemCount);
+            //ChatUtil.SendDebugMessage(client, "MoveItem, id=" + id.ToString() + " toSlot=" + toSlot.ToString() + " fromSlot=" + fromSlot.ToString() + " itemCount=" + itemCount.ToString());
 
-			//If our slot is > 1000 it is (objectID+1000) of target
-			if(toSlot>1000)
-			{
-				ushort objectID = (ushort)(toSlot-1000);
-				GameObject obj = WorldMgr.GetObjectByIDFromRegion(client.Player.CurrentRegionID,objectID);
-				if(obj==null || obj.ObjectState!=GameObject.eObjectState.Active)
-				{
-					client.Out.SendInventorySlotsUpdate(new int[] {fromSlot});
-					client.Out.SendMessage("Invalid trade target. ("+objectID+")", eChatType.CT_System, eChatLoc.CL_SystemWindow);
-					return;
-				}
+            //If our slot is > 1000 it is (objectID+1000) of target
+            if (toSlot > 1000)
+            {
+                ushort objectID = (ushort)(toSlot - 1000);
+                GameObject obj = WorldMgr.GetObjectByIDFromRegion(client.Player.CurrentRegionID, objectID);
+                if (obj == null || obj.ObjectState != GameObject.eObjectState.Active)
+                {
+                    client.Out.SendInventorySlotsUpdate(new int[] { fromSlot });
+                    client.Out.SendMessage("Invalid trade target. (" + objectID + ")", eChatType.CT_System, eChatLoc.CL_SystemWindow);
+                    return;
+                }
 
-				GamePlayer tradeTarget = obj as GamePlayer;
-				// If our target is another player we set the tradetarget
-				// trade permissions are done in GamePlayer
-				if (tradeTarget != null)
-				{
-					if(tradeTarget.Client.ClientState != GameClient.eClientState.Playing)
-					{
-						client.Out.SendInventorySlotsUpdate(new int[] {fromSlot});
-						client.Out.SendMessage("Can't trade with inactive players.", eChatType.CT_System,  eChatLoc.CL_SystemWindow);
-						return;
-					}
-					if(tradeTarget == client.Player)
-					{
-						client.Out.SendInventorySlotsUpdate(new int[] {fromSlot});
-						client.Out.SendMessage("You can't trade with yourself, silly!",eChatType.CT_System,eChatLoc.CL_SystemWindow);
-						return;
-					}
-					if(!GameServer.ServerRules.IsAllowedToTrade(client.Player, tradeTarget, false))
-					{
-						client.Out.SendInventorySlotsUpdate(new int[] {fromSlot});
-						return;
-					}
-				}
-				
-				// Is the item we want to move in our backpack?
-				// we also allow drag'n drop from equipped to blacksmith
-				if ((fromSlot >= (ushort)eInventorySlot.FirstBackpack && fromSlot <= (ushort)eInventorySlot.LastBackpack)
-				    || (obj is Blacksmith && fromSlot>=(ushort) eInventorySlot.MinEquipable && fromSlot<=(ushort) eInventorySlot.MaxEquipable))
-				{
-					if (!obj.IsWithinRadius(client.Player, WorldMgr.GIVE_ITEM_DISTANCE))
-					{
-						if (obj is GamePlayer)
-							client.Out.SendMessage(LanguageMgr.GetTranslation(client, "PlayerMoveItemRequestHandler.TooFarAway", client.Player.GetName((GamePlayer)obj)), eChatType.CT_System, eChatLoc.CL_SystemWindow);
-						else
-							client.Out.SendMessage(LanguageMgr.GetTranslation(client, "PlayerMoveItemRequestHandler.TooFarAway", obj.GetName(0, false)), eChatType.CT_System, eChatLoc.CL_SystemWindow);
-						//client.Out.SendMessage("You are too far away to give anything to " + obj.GetName(0, false) + ".", eChatType.CT_System, eChatLoc.CL_SystemWindow);
-						client.Out.SendInventorySlotsUpdate(new int[] { fromSlot });
-						return;
-					}
+                GamePlayer tradeTarget = obj as GamePlayer;
+                // If our target is another player we set the tradetarget
+                // trade permissions are done in GamePlayer
+                if (tradeTarget != null)
+                {
+                    if (tradeTarget.Client.ClientState != GameClient.eClientState.Playing)
+                    {
+                        client.Out.SendInventorySlotsUpdate(new int[] { fromSlot });
+                        client.Out.SendMessage("Can't trade with inactive players.", eChatType.CT_System, eChatLoc.CL_SystemWindow);
+                        return;
+                    }
+                    if (tradeTarget == client.Player)
+                    {
+                        client.Out.SendInventorySlotsUpdate(new int[] { fromSlot });
+                        client.Out.SendMessage("You can't trade with yourself, silly!", eChatType.CT_System, eChatLoc.CL_SystemWindow);
+                        return;
+                    }
+                    if (!GameServer.ServerRules.IsAllowedToTrade(client.Player, tradeTarget, false))
+                    {
+                        client.Out.SendInventorySlotsUpdate(new int[] { fromSlot });
+                        return;
+                    }
+                }
 
-					InventoryItem item = client.Player.Inventory.GetItem((eInventorySlot)fromSlot);
-					if (item == null)
-					{
-						client.Out.SendInventorySlotsUpdate(new int[] { fromSlot });
-						client.Out.SendMessage("Invalid item (slot# " + fromSlot + ").", eChatType.CT_System, eChatLoc.CL_SystemWindow);
-						return;
-					}
+                // Is the item we want to move in our backpack?
+                // we also allow drag'n drop from equipped to blacksmith
+                if ((fromSlot >= (ushort)eInventorySlot.FirstBackpack && fromSlot <= (ushort)eInventorySlot.LastBackpack)
+                    || (obj is Blacksmith && fromSlot >= (ushort)eInventorySlot.MinEquipable && fromSlot <= (ushort)eInventorySlot.MaxEquipable))
+                {
+                    if (!obj.IsWithinRadius(client.Player, WorldMgr.GIVE_ITEM_DISTANCE))
+                    {
+                        if (obj is GamePlayer)
+                            client.Out.SendMessage(LanguageMgr.GetTranslation(client, "PlayerMoveItemRequestHandler.TooFarAway", client.Player.GetName((GamePlayer)obj)), eChatType.CT_System, eChatLoc.CL_SystemWindow);
+                        else
+                            client.Out.SendMessage(LanguageMgr.GetTranslation(client, "PlayerMoveItemRequestHandler.TooFarAway", obj.GetName(0, false)), eChatType.CT_System, eChatLoc.CL_SystemWindow);
+                        //client.Out.SendMessage("You are too far away to give anything to " + obj.GetName(0, false) + ".", eChatType.CT_System, eChatLoc.CL_SystemWindow);
+                        client.Out.SendInventorySlotsUpdate(new int[] { fromSlot });
+                        return;
+                    }
 
-					if (obj is GameNPC == false || item.Count == 1)
-						client.Player.Notify(GamePlayerEvent.GiveItem, client.Player, new GiveItemEventArgs(client.Player, obj, item));
+                    InventoryItem item = client.Player.Inventory.GetItem((eInventorySlot)fromSlot);
+                    if (item == null)
+                    {
+                        client.Out.SendInventorySlotsUpdate(new int[] { fromSlot });
+                        client.Out.SendMessage("Invalid item (slot# " + fromSlot + ").", eChatType.CT_System, eChatLoc.CL_SystemWindow);
+                        return;
+                    }
 
-					//If the item has been removed by the event handlers, return;
-					//item = client.Player.Inventory.GetItem((eInventorySlot)fromSlot);
-					if (item == null || item.OwnerID == null)
-					{
-						client.Out.SendInventorySlotsUpdate(new int[] { fromSlot });
-						return;
-					}
+                    if (obj is GameNPC == false || item.Count == 1)
+                        client.Player.Notify(GamePlayerEvent.GiveItem, client.Player, new GiveItemEventArgs(client.Player, obj, item));
 
+                    //If the item has been removed by the event handlers, return;
+                    //item = client.Player.Inventory.GetItem((eInventorySlot)fromSlot);
+                    if (item == null || item.OwnerID == null)
+                    {
+                        client.Out.SendInventorySlotsUpdate(new int[] { fromSlot });
+                        return;
+                    }
 
-					if(client.Account.PrivLevel == (uint)ePrivLevel.Player && tradeTarget != null && tradeTarget.Client.Account.PrivLevel != (uint)ePrivLevel.Player)
-					{
-						if(!item.IsDropable && !(obj is GameNPC && (obj is Blacksmith || obj is Recharger || (obj as GameNPC).CanTradeAnyItem)))
-						{
-							client.Out.SendInventorySlotsUpdate(new int[] { fromSlot });
-							client.Out.SendMessage("You can not remove this item!", eChatType.CT_System, eChatLoc.CL_SystemWindow);
-							return;
-						}
-					}
+                    if (client.Account.PrivLevel == (uint)ePrivLevel.Player && tradeTarget != null && tradeTarget.Client.Account.PrivLevel != (uint)ePrivLevel.Player)
+                    {
+                        if (!item.IsDropable && !(obj is GameNPC && (obj is Blacksmith || obj is Recharger || (obj as GameNPC).CanTradeAnyItem)))
+                        {
+                            client.Out.SendInventorySlotsUpdate(new int[] { fromSlot });
+                            client.Out.SendMessage("You can not remove this item!", eChatType.CT_System, eChatLoc.CL_SystemWindow);
+                            return;
+                        }
+                    }
 
-					if(tradeTarget != null)
-					{
-						tradeTarget.ReceiveTradeItem(client.Player, item);
-						client.Out.SendInventorySlotsUpdate(new int[] { fromSlot });
-						return;
-					}
+                    if (tradeTarget != null)
+                    {
+                        tradeTarget.ReceiveTradeItem(client.Player, item);
+                        client.Out.SendInventorySlotsUpdate(new int[] { fromSlot });
+                        return;
+                    }
 
-					if (obj.ReceiveItem(client.Player, item))
-					{
-						client.Out.SendInventorySlotsUpdate(new int[] { fromSlot });
-						return;
-					}
+                    if (obj.ReceiveItem(client.Player, item))
+                    {
+                        client.Out.SendInventorySlotsUpdate(new int[] { fromSlot });
+                        return;
+                    }
 
-					client.Out.SendInventorySlotsUpdate(new int[] { fromSlot });
-					return;
-				}
+                    client.Out.SendInventorySlotsUpdate(new int[] { fromSlot });
+                    return;
+                }
 
-				//Is the "item" we want to move money? For Version 1.78+
-				if(client.Version >= GameClient.eClientVersion.Version178
-				   && fromSlot >= (int)eInventorySlot.Mithril178 && fromSlot <= (int)eInventorySlot.Copper178)
-				{
-					fromSlot -= eInventorySlot.Mithril178 - eInventorySlot.Mithril;
-				}
+                //Is the "item" we want to move money? For Version 1.78+
+                if (client.Version >= GameClient.eClientVersion.Version178
+                   && fromSlot >= (int)eInventorySlot.Mithril178 && fromSlot <= (int)eInventorySlot.Copper178)
+                {
+                    fromSlot -= eInventorySlot.Mithril178 - eInventorySlot.Mithril;
+                }
 
-				//Is the "item" we want to move money?
-				if(fromSlot>=(ushort)eInventorySlot.Mithril && fromSlot<=(ushort)eInventorySlot.Copper)
-				{
-					int[] money=new int[5];
-					money[fromSlot-(ushort)eInventorySlot.Mithril]=itemCount;
-					long flatmoney = Money.GetMoney(money[0],money[1],money[2],money[3],money[4]);
+                //Is the "item" we want to move money?
+                if (fromSlot >= (ushort)eInventorySlot.Mithril && fromSlot <= (ushort)eInventorySlot.Copper)
+                {
+                    int[] money = new int[5];
+                    money[fromSlot - (ushort)eInventorySlot.Mithril] = itemCount;
+                    long flatmoney = Money.GetMoney(money[0], money[1], money[2], money[3], money[4]);
 
-					if(client.Version >= GameClient.eClientVersion.Version178) // add it back for proper slot update...
-						fromSlot += eInventorySlot.Mithril178 - eInventorySlot.Mithril;
+                    if (client.Version >= GameClient.eClientVersion.Version178) // add it back for proper slot update...
+                        fromSlot += eInventorySlot.Mithril178 - eInventorySlot.Mithril;
 
-					if (!obj.IsWithinRadius(client.Player, WorldMgr.GIVE_ITEM_DISTANCE))
-					{
-						if (obj is GamePlayer)
-							client.Out.SendMessage(LanguageMgr.GetTranslation(client, "PlayerMoveItemRequestHandler.TooFarAway", client.Player.GetName((GamePlayer)obj)), eChatType.CT_System, eChatLoc.CL_SystemWindow);
-						else
-							client.Out.SendMessage(LanguageMgr.GetTranslation(client, "PlayerMoveItemRequestHandler.TooFarAway", obj.GetName(0, false)), eChatType.CT_System, eChatLoc.CL_SystemWindow);
+                    if (!obj.IsWithinRadius(client.Player, WorldMgr.GIVE_ITEM_DISTANCE))
+                    {
+                        if (obj is GamePlayer)
+                            client.Out.SendMessage(LanguageMgr.GetTranslation(client, "PlayerMoveItemRequestHandler.TooFarAway", client.Player.GetName((GamePlayer)obj)), eChatType.CT_System, eChatLoc.CL_SystemWindow);
+                        else
+                            client.Out.SendMessage(LanguageMgr.GetTranslation(client, "PlayerMoveItemRequestHandler.TooFarAway", obj.GetName(0, false)), eChatType.CT_System, eChatLoc.CL_SystemWindow);
 
-						//client.Out.SendMessage("You are too far away to give anything to " + obj.GetName(0, false) + ".", eChatType.CT_System, eChatLoc.CL_SystemWindow);
-						client.Out.SendInventorySlotsUpdate(new int[] {fromSlot});
-						return;
-					}
+                        //client.Out.SendMessage("You are too far away to give anything to " + obj.GetName(0, false) + ".", eChatType.CT_System, eChatLoc.CL_SystemWindow);
+                        client.Out.SendInventorySlotsUpdate(new int[] { fromSlot });
+                        return;
+                    }
 
-					if(flatmoney > client.Player.GetCurrentMoney())
-					{
-						client.Out.SendInventorySlotsUpdate(new int[] {fromSlot});
-						return;
-					}
+                    if (flatmoney > client.Player.GetCurrentMoney())
+                    {
+                        client.Out.SendInventorySlotsUpdate(new int[] { fromSlot });
+                        return;
+                    }
 
-					client.Player.Notify(GamePlayerEvent.GiveMoney, client.Player, new GiveMoneyEventArgs(client.Player, obj, flatmoney));
+                    client.Player.Notify(GamePlayerEvent.GiveMoney, client.Player, new GiveMoneyEventArgs(client.Player, obj, flatmoney));
 
-					if(tradeTarget!=null)
-					{
-						tradeTarget.ReceiveTradeMoney(client.Player, flatmoney);
-						client.Out.SendInventorySlotsUpdate(new int[] {fromSlot});
-						return;
-					}
+                    if (tradeTarget != null)
+                    {
+                        tradeTarget.ReceiveTradeMoney(client.Player, flatmoney);
+                        client.Out.SendInventorySlotsUpdate(new int[] { fromSlot });
+                        return;
+                    }
 
-					if(obj.ReceiveMoney(client.Player, flatmoney))
-					{
-						client.Out.SendInventorySlotsUpdate(new int[] {fromSlot});
-						return;
-					}
+                    if (obj.ReceiveMoney(client.Player, flatmoney))
+                    {
+                        client.Out.SendInventorySlotsUpdate(new int[] { fromSlot });
+                        return;
+                    }
 
-					client.Out.SendInventorySlotsUpdate(new int[] {fromSlot});
-					return;
-				}
+                    client.Out.SendInventorySlotsUpdate(new int[] { fromSlot });
+                    return;
+                }
 
-				client.Out.SendInventoryItemsUpdate(null);
-				return;
-			}
+                client.Out.SendInventoryItemsUpdate(null);
+                return;
+            }
 
-			// House Vaults and GameConsignmentMerchant Merchants deliver the same slot numbers
-			if (fromSlot >= (ushort)eInventorySlot.HousingInventory_First &&
-			    fromSlot <= (ushort)eInventorySlot.HousingInventory_Last)
-			{
-				GameVault ghv = client.Player.ActiveVault;
-				GameConsignmentMerchant cm = client.Player.ActiveConMerchant;
-				
+            // House Vaults and GameConsignmentMerchant Merchants deliver the same slot numbers
+            if (fromSlot >= (ushort)eInventorySlot.HousingInventory_First &&
+                fromSlot <= (ushort)eInventorySlot.HousingInventory_Last)
+            {
+                GameVault ghv = client.Player.ActiveVault;
+                GameConsignmentMerchant cm = client.Player.ActiveConMerchant;
 
-				if (cm != null) // we have an active GameConsignmentMerchant Merchant
-				{
-					if (ghv != null) //this should never happen
-					{
-						client.Out.SendInventoryItemsUpdate(null);
-						return;
-					}
-					fromSlot += 1350;
-				}
-			}
-			if (toSlot >= (ushort)eInventorySlot.HousingInventory_First &&
-			    toSlot <= (ushort)eInventorySlot.HousingInventory_Last)
-			{
-				GameVault ghv = client.Player.ActiveVault;
-				GameConsignmentMerchant cm = client.Player.ActiveConMerchant;
-				if (cm != null) // we have an active GameConsignmentMerchant Merchant
-				{
-					if (ghv != null) //this should never happen
-					{
-						client.Out.SendInventoryItemsUpdate(null);
-						return;
-					}
-					toSlot += 1350;
-				}
-			}
+                if (cm != null) // we have an active GameConsignmentMerchant Merchant
+                {
+                    if (ghv != null) //this should never happen
+                    {
+                        client.Out.SendInventoryItemsUpdate(null);
+                        return;
+                    }
+                    fromSlot += 1350;
+                }
+            }
+            if (toSlot >= (ushort)eInventorySlot.HousingInventory_First &&
+                toSlot <= (ushort)eInventorySlot.HousingInventory_Last)
+            {
+                GameVault ghv = client.Player.ActiveVault;
+                GameConsignmentMerchant cm = client.Player.ActiveConMerchant;
+                if (cm != null) // we have an active GameConsignmentMerchant Merchant
+                {
+                    if (ghv != null) //this should never happen
+                    {
+                        client.Out.SendInventoryItemsUpdate(null);
+                        return;
+                    }
+                    toSlot += 1350;
+                }
+            }
 
-			bool fromHousing = (fromSlot >= (ushort)eInventorySlot.HousingInventory_First && fromSlot <= (ushort)eInventorySlot.HousingInventory_Last);
-			bool toHousing = (toSlot >= (ushort)eInventorySlot.HousingInventory_First && toSlot <= (ushort)eInventorySlot.HousingInventory_Last);
+            bool fromHousing = (fromSlot >= (ushort)eInventorySlot.HousingInventory_First && fromSlot <= (ushort)eInventorySlot.HousingInventory_Last);
+            bool toHousing = (toSlot >= (ushort)eInventorySlot.HousingInventory_First && toSlot <= (ushort)eInventorySlot.HousingInventory_Last);
 
-			// Move an item from, to or inside a vault.
-			if (fromHousing || toHousing)
-			{
-				GameVault houseVault = client.Player.ActiveVault;
-				if (fromSlot >= (ushort)eInventorySlot.FirstBackpack && fromSlot <= (ushort)eInventorySlot.LastBackpack)
-				{
-					InventoryItem item = client.Player.Inventory.GetItem((eInventorySlot)fromSlot);
-					if (!item.IsTradable)
-					{
-						client.Out.SendMessage("You can not put this Item into a House Vault!", eChatType.CT_System, eChatLoc.CL_SystemWindow);
-						client.Out.SendInventoryItemsUpdate(null);
-						return;
-					}
-				}
+            // Move an item from, to or inside a vault.
+            if (fromHousing || toHousing)
+            {
+                GameVault houseVault = client.Player.ActiveVault;
+                if (fromSlot >= (ushort)eInventorySlot.FirstBackpack && fromSlot <= (ushort)eInventorySlot.LastBackpack)
+                {
+                    InventoryItem item = client.Player.Inventory.GetItem((eInventorySlot)fromSlot);
+                    if (!item.IsTradable)
+                    {
+                        client.Out.SendMessage("You can not put this Item into a House Vault!", eChatType.CT_System, eChatLoc.CL_SystemWindow);
+                        client.Out.SendInventoryItemsUpdate(null);
+                        return;
+                    }
+                }
 
-				if (houseVault == null)
-				{
-					client.Out.SendMessage("You are not actively viewing a vault!", eChatType.CT_System, eChatLoc.CL_SystemWindow);
-					client.Out.SendInventoryItemsUpdate(null);
+                if (houseVault == null)
+                {
+                    client.Out.SendMessage("You are not actively viewing a vault!", eChatType.CT_System, eChatLoc.CL_SystemWindow);
+                    client.Out.SendInventoryItemsUpdate(null);
 
-					return;
-				}
+                    return;
+                }
 
-				if (toHousing && !houseVault.CanAddItems(client.Player))
-				{
-					client.Out.SendMessage("You don't have permission to add items!",  eChatType.CT_System, eChatLoc.CL_SystemWindow);
-					return;
-				}
+                if (toHousing && !houseVault.CanAddItems(client.Player))
+                {
+                    client.Out.SendMessage("You don't have permission to add items!", eChatType.CT_System, eChatLoc.CL_SystemWindow);
+                    return;
+                }
 
-				if (fromHousing && !houseVault.CanRemoveItems(client.Player))
-				{
-					client.Out.SendMessage("You don't have permission to remove items!", eChatType.CT_System, eChatLoc.CL_SystemWindow);
-					return;
-				}
+                if (fromHousing && !houseVault.CanRemoveItems(client.Player))
+                {
+                    client.Out.SendMessage("You don't have permission to remove items!", eChatType.CT_System, eChatLoc.CL_SystemWindow);
+                    return;
+                }
 
-				houseVault.MoveItem(client.Player, (eInventorySlot)fromSlot, (eInventorySlot)toSlot);
+                houseVault.MoveItem(client.Player, (eInventorySlot)fromSlot, (eInventorySlot)toSlot);
 
-				return;
-			}
+                return;
+            }
 
-			// Move an item from, to or inside a GameConsignmentMerchant Merchant.
+            // Move an item from, to or inside a GameConsignmentMerchant Merchant.
 
-			if ((fromSlot >= (ushort)eInventorySlot.Consignment_First &&
-			     fromSlot <= (ushort)eInventorySlot.Consignment_Last) ||
-			    (toSlot >= (ushort)eInventorySlot.Consignment_First &&
-			     toSlot <= (ushort)eInventorySlot.Consignment_Last))
-			{
-				GameConsignmentMerchant con = client.Player.ActiveConMerchant;
-				if (con == null)
-				{
-					client.Out.SendMessage("You are not actively interacting with a GameConsignmentMerchant Merchant!",
-					                       eChatType.CT_System, eChatLoc.CL_SystemWindow);
-					client.Out.SendInventoryItemsUpdate(null);
-					return;
-				}
-				if (fromSlot >= (ushort)eInventorySlot.FirstBackpack && fromSlot <= (ushort)eInventorySlot.LastBackpack)
-				{
-					InventoryItem item = client.Player.Inventory.GetItem((eInventorySlot)fromSlot);
-					if (!item.IsTradable)
-					{
-						client.Out.SendMessage("You can not put this Item into a GameConsignmentMerchant Merchant!",
-						                       eChatType.CT_System, eChatLoc.CL_SystemWindow);
-						client.Out.SendInventoryItemsUpdate(null);
-						return;
-					}
-				}
-				if (toSlot >= (ushort)eInventorySlot.Consignment_First &&
-				    toSlot <= (ushort)eInventorySlot.Consignment_Last)
-				{
-					if (!con.CanMove(client.Player))
-					{
-						client.Out.SendMessage("You don't have permission to add or move Items!",
-						                       eChatType.CT_System, eChatLoc.CL_SystemWindow);
-						return;
-					}
-				}
-				con.MoveItem(client.Player, client.Player.Inventory, (eInventorySlot)fromSlot, (eInventorySlot)toSlot);
-				return;
-			}
+            if ((fromSlot >= (ushort)eInventorySlot.Consignment_First &&
+                 fromSlot <= (ushort)eInventorySlot.Consignment_Last) ||
+                (toSlot >= (ushort)eInventorySlot.Consignment_First &&
+                 toSlot <= (ushort)eInventorySlot.Consignment_Last))
+            {
+                GameConsignmentMerchant con = client.Player.ActiveConMerchant;
+                if (con == null)
+                {
+                    client.Out.SendMessage("You are not actively interacting with a GameConsignmentMerchant Merchant!",
+                                           eChatType.CT_System, eChatLoc.CL_SystemWindow);
+                    client.Out.SendInventoryItemsUpdate(null);
+                    return;
+                }
+                if (fromSlot >= (ushort)eInventorySlot.FirstBackpack && fromSlot <= (ushort)eInventorySlot.LastBackpack)
+                {
+                    InventoryItem item = client.Player.Inventory.GetItem((eInventorySlot)fromSlot);
+                    if (!item.IsTradable)
+                    {
+                        client.Out.SendMessage("You can not put this Item into a GameConsignmentMerchant Merchant!",
+                                               eChatType.CT_System, eChatLoc.CL_SystemWindow);
+                        client.Out.SendInventoryItemsUpdate(null);
+                        return;
+                    }
+                }
+                if (toSlot >= (ushort)eInventorySlot.Consignment_First &&
+                    toSlot <= (ushort)eInventorySlot.Consignment_Last)
+                {
+                    if (!con.CanMove(client.Player))
+                    {
+                        client.Out.SendMessage("You don't have permission to add or move Items!",
+                                               eChatType.CT_System, eChatLoc.CL_SystemWindow);
+                        return;
+                    }
+                }
+                con.MoveItem(client.Player, client.Player.Inventory, (eInventorySlot)fromSlot, (eInventorySlot)toSlot);
+                return;
+            }
 
-			if (fromSlot >= (ushort)eInventorySlot.MarketExplorerFirst && toSlot >= (ushort)eInventorySlot.FirstBackpack && toSlot <= (ushort)eInventorySlot.LastBackpack && client.Player.ActiveVault == null) // a possible buy from a market explorer
-			{
-				if (client.Player.TargetObject == null)
-					return;
+            if (fromSlot >= (ushort)eInventorySlot.MarketExplorerFirst && toSlot >= (ushort)eInventorySlot.FirstBackpack && toSlot <= (ushort)eInventorySlot.LastBackpack && client.Player.ActiveVault == null) // a possible buy from a market explorer
+            {
+                if (client.Player.TargetObject == null)
+                    return;
 
-				if (!(client.Player.TargetObject is MarketExplorer))
-					return;
+                if (!(client.Player.TargetObject is MarketExplorer))
+                    return;
 
-				var list = client.Player.TempProperties.getProperty<List<InventoryItem>>(PlayerMarketSearchRequestHandler.EXPLORER_LIST, null);
-				if (list == null)
-					return;
+                var list = client.Player.TempProperties.getProperty<List<InventoryItem>>(PlayerMarketSearchRequestHandler.EXPLORER_LIST, null);
+                if (list == null)
+                    return;
 
-				var me = client.Player.TargetObject as MarketExplorer;
+                var me = client.Player.TargetObject as MarketExplorer;
 
-				int itemnr = fromSlot - (int)eInventorySlot.MarketExplorerFirst;
+                int itemnr = fromSlot - (int)eInventorySlot.MarketExplorerFirst;
 
-				InventoryItem item = list[itemnr];
+                InventoryItem item = list[itemnr];
 
-				me.BuyItem(item, client.Player);
-			}
-			
-			//Do we want to move an item from inventory/vault/quiver into inventory/vault/quiver?
-			if (((fromSlot>=(ushort)eInventorySlot.Ground && fromSlot<=(ushort)eInventorySlot.LastBackpack)
-			    || (fromSlot >=(ushort)eInventorySlot.FirstVault && fromSlot<=(ushort)eInventorySlot.LastVault)
-				|| (fromSlot >=(ushort)eInventorySlot.FirstBagHorse && fromSlot <=(ushort)eInventorySlot.LastBagHorse))
-			    &&((toSlot >=(ushort)eInventorySlot.Ground && toSlot<=(ushort)eInventorySlot.LastBackpack)
-			    || (toSlot >=(ushort)eInventorySlot.FirstVault && toSlot<=(ushort)eInventorySlot.LastVault)
-			    || (toSlot >=(ushort)eInventorySlot.HousingInventory_First && toSlot<=(ushort)eInventorySlot.HousingInventory_Last)
-				|| (toSlot >=(ushort)eInventorySlot.FirstBagHorse && toSlot <=(ushort)eInventorySlot.LastBagHorse)))
-			{
-				//We want to drop the item
-				if (toSlot==(ushort)eInventorySlot.Ground)
-				{
-					InventoryItem item = client.Player.Inventory.GetItem((eInventorySlot)fromSlot);
-					if (item == null)
-					{
-						client.Out.SendInventorySlotsUpdate(new int[] {fromSlot});
-						client.Out.SendMessage("Invalid item (slot# "+fromSlot+").",eChatType.CT_System,eChatLoc.CL_SystemWindow);
-						return;
-					}
-					if (fromSlot<(ushort)eInventorySlot.FirstBackpack)
-					{
-						client.Out.SendInventorySlotsUpdate(new int[] {fromSlot});
-						return;
-					}
-					if(!item.IsDropable)
-					{
-						client.Out.SendInventorySlotsUpdate(new int[] {fromSlot});
-						client.Out.SendMessage("You can not drop this item!",eChatType.CT_System,eChatLoc.CL_SystemWindow);
-						return;
-					}
+                me.BuyItem(item, client.Player);
+            }
 
-					if (client.Player.DropItem((eInventorySlot)fromSlot))
-					{
-						client.Out.SendMessage("You drop " + item.GetName(0, false) + " on the ground!",eChatType.CT_System,eChatLoc.CL_SystemWindow);
-						return;
-					}
-					client.Out.SendInventoryItemsUpdate(null);
-					return;
-				}
+            //Do we want to move an item from inventory/vault/quiver into inventory/vault/quiver?
+            if (((fromSlot >= (ushort)eInventorySlot.Ground && fromSlot <= (ushort)eInventorySlot.LastBackpack)
+                || (fromSlot >= (ushort)eInventorySlot.FirstVault && fromSlot <= (ushort)eInventorySlot.LastVault)
+                || (fromSlot >= (ushort)eInventorySlot.FirstBagHorse && fromSlot <= (ushort)eInventorySlot.LastBagHorse))
+                && ((toSlot >= (ushort)eInventorySlot.Ground && toSlot <= (ushort)eInventorySlot.LastBackpack)
+                || (toSlot >= (ushort)eInventorySlot.FirstVault && toSlot <= (ushort)eInventorySlot.LastVault)
+                || (toSlot >= (ushort)eInventorySlot.HousingInventory_First && toSlot <= (ushort)eInventorySlot.HousingInventory_Last)
+                || (toSlot >= (ushort)eInventorySlot.FirstBagHorse && toSlot <= (ushort)eInventorySlot.LastBagHorse)))
+            {
+                //We want to drop the item
+                if (toSlot == (ushort)eInventorySlot.Ground)
+                {
+                    InventoryItem item = client.Player.Inventory.GetItem((eInventorySlot)fromSlot);
+                    if (item == null)
+                    {
+                        client.Out.SendInventorySlotsUpdate(new int[] { fromSlot });
+                        client.Out.SendMessage("Invalid item (slot# " + fromSlot + ").", eChatType.CT_System, eChatLoc.CL_SystemWindow);
+                        return;
+                    }
+                    if (fromSlot < (ushort)eInventorySlot.FirstBackpack)
+                    {
+                        client.Out.SendInventorySlotsUpdate(new int[] { fromSlot });
+                        return;
+                    }
+                    if (!item.IsDropable)
+                    {
+                        client.Out.SendInventorySlotsUpdate(new int[] { fromSlot });
+                        client.Out.SendMessage("You can not drop this item!", eChatType.CT_System, eChatLoc.CL_SystemWindow);
+                        return;
+                    }
 
-				//We want to move the item in inventory
-				client.Player.Inventory.MoveItem((eInventorySlot)fromSlot, (eInventorySlot)toSlot, itemCount);
-				return;
-			}
-			
-			if (((fromSlot>=(ushort)eInventorySlot.Ground && fromSlot<=(ushort)eInventorySlot.LastBackpack)
-			    || (fromSlot>=(ushort)eInventorySlot.FirstVault && fromSlot<=(ushort)eInventorySlot.LastVault)
-				|| (fromSlot >=(ushort)eInventorySlot.FirstBagHorse && fromSlot <=(ushort)eInventorySlot.LastBagHorse))
-			    && ((toSlot==(ushort)eInventorySlot.PlayerPaperDoll || toSlot==(ushort)eInventorySlot.NewPlayerPaperDoll)
-				|| (toSlot>=(ushort)eInventorySlot.Ground && toSlot<=(ushort)eInventorySlot.LastBackpack)
-			    || (toSlot>=(ushort)eInventorySlot.FirstVault && toSlot<=(ushort)eInventorySlot.LastVault)
-				|| (toSlot >=(ushort)eInventorySlot.FirstBagHorse && toSlot <=(ushort)eInventorySlot.LastBagHorse)))
-			{
-				InventoryItem item = client.Player.Inventory.GetItem((eInventorySlot)fromSlot);
-				if(item==null) return;
+                    if (client.Player.DropItem((eInventorySlot)fromSlot))
+                    {
+                        client.Out.SendMessage("You drop " + item.GetName(0, false) + " on the ground!", eChatType.CT_System, eChatLoc.CL_SystemWindow);
+                        return;
+                    }
+                    client.Out.SendInventoryItemsUpdate(null);
+                    return;
+                }
 
-				toSlot=0;
-				if(item.Item_Type >= (int)eInventorySlot.MinEquipable && item.Item_Type <= (int)eInventorySlot.MaxEquipable)
-					toSlot = (ushort)item.Item_Type;
-				if (toSlot==0)
-				{
-					client.Out.SendInventorySlotsUpdate(new int[] {fromSlot});
-					return;
-				}
-				if( toSlot == (int)eInventorySlot.LeftBracer || toSlot == (int)eInventorySlot.RightBracer)
-				{
-					if(client.Player.Inventory.GetItem(eInventorySlot.LeftBracer) == null)
-						toSlot = (int)eInventorySlot.LeftBracer;
-					else
-						toSlot = (int)eInventorySlot.RightBracer;
-				}
+                //We want to move the item in inventory
+                client.Player.Inventory.MoveItem((eInventorySlot)fromSlot, (eInventorySlot)toSlot, itemCount);
+                return;
+            }
 
-				if( toSlot == (int)eInventorySlot.LeftRing || toSlot == (int)eInventorySlot.RightRing)
-				{
-					if(client.Player.Inventory.GetItem(eInventorySlot.LeftRing) == null)
-						toSlot = (int)eInventorySlot.LeftRing;
-					else
-						toSlot = (int)eInventorySlot.RightRing;
-				}
+            if (((fromSlot >= (ushort)eInventorySlot.Ground && fromSlot <= (ushort)eInventorySlot.LastBackpack)
+                || (fromSlot >= (ushort)eInventorySlot.FirstVault && fromSlot <= (ushort)eInventorySlot.LastVault)
+                || (fromSlot >= (ushort)eInventorySlot.FirstBagHorse && fromSlot <= (ushort)eInventorySlot.LastBagHorse))
+                && ((toSlot == (ushort)eInventorySlot.PlayerPaperDoll || toSlot == (ushort)eInventorySlot.NewPlayerPaperDoll)
+                || (toSlot >= (ushort)eInventorySlot.Ground && toSlot <= (ushort)eInventorySlot.LastBackpack)
+                || (toSlot >= (ushort)eInventorySlot.FirstVault && toSlot <= (ushort)eInventorySlot.LastVault)
+                || (toSlot >= (ushort)eInventorySlot.FirstBagHorse && toSlot <= (ushort)eInventorySlot.LastBagHorse)))
+            {
+                InventoryItem item = client.Player.Inventory.GetItem((eInventorySlot)fromSlot);
+                if (item == null) return;
 
-				client.Player.Inventory.MoveItem((eInventorySlot)fromSlot,(eInventorySlot)toSlot, itemCount);
-				return;
-			}
-			client.Out.SendInventoryItemsUpdate(null);
-		}
-	}
+                toSlot = 0;
+                if (item.Item_Type >= (int)eInventorySlot.MinEquipable && item.Item_Type <= (int)eInventorySlot.MaxEquipable)
+                    toSlot = (ushort)item.Item_Type;
+                if (toSlot == 0)
+                {
+                    client.Out.SendInventorySlotsUpdate(new int[] { fromSlot });
+                    return;
+                }
+                if (toSlot == (int)eInventorySlot.LeftBracer || toSlot == (int)eInventorySlot.RightBracer)
+                {
+                    if (client.Player.Inventory.GetItem(eInventorySlot.LeftBracer) == null)
+                        toSlot = (int)eInventorySlot.LeftBracer;
+                    else
+                        toSlot = (int)eInventorySlot.RightBracer;
+                }
+
+                if (toSlot == (int)eInventorySlot.LeftRing || toSlot == (int)eInventorySlot.RightRing)
+                {
+                    if (client.Player.Inventory.GetItem(eInventorySlot.LeftRing) == null)
+                        toSlot = (int)eInventorySlot.LeftRing;
+                    else
+                        toSlot = (int)eInventorySlot.RightRing;
+                }
+
+                client.Player.Inventory.MoveItem((eInventorySlot)fromSlot, (eInventorySlot)toSlot, itemCount);
+                return;
+            }
+            client.Out.SendInventoryItemsUpdate(null);
+        }
+    }
 }

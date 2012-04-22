@@ -16,196 +16,196 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
  */
+
 using System;
 using System.Collections.Generic;
-using System.Text;
 using DOL.Database;
 using DOL.Events;
-using DOL.Language;
 using DOL.GS.PacketHandler;
+using DOL.Language;
 
 namespace DOL.GS.Quests
 {
-	/// <summary>
-	/// A quest type with basic and optional item rewards using
-	/// the enhanced quest dialog.
-	/// </summary>
-	/// <author>Aredhel</author>
-	public class RewardQuest : BaseQuest
-	{
-		private static readonly log4net.ILog log = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
+    /// <summary>
+    /// A quest type with basic and optional item rewards using
+    /// the enhanced quest dialog.
+    /// </summary>
+    /// <author>Aredhel</author>
+    public class RewardQuest : BaseQuest
+    {
+        private static readonly log4net.ILog log = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
 
-		private GameNPC m_questGiver;
-		private List<QuestGoal> m_goals;
-		private QuestRewards m_rewards;
+        private GameNPC m_questGiver;
+        private List<QuestGoal> m_goals;
+        private QuestRewards m_rewards;
 
-		public RewardQuest() : base()
-		{
-			m_rewards = new QuestRewards(this);
-			m_goals = new List<QuestGoal>();
-		}
+        public RewardQuest()
+            : base()
+        {
+            m_rewards = new QuestRewards(this);
+            m_goals = new List<QuestGoal>();
+        }
 
-		/// <summary>
-		/// Constructs a new RewardQuest.
-		/// </summary>
-		/// <param name="questingPlayer">The player doing this quest</param>
-		public RewardQuest(GamePlayer questingPlayer) 
-			: this(questingPlayer, 1) { }
+        /// <summary>
+        /// Constructs a new RewardQuest.
+        /// </summary>
+        /// <param name="questingPlayer">The player doing this quest</param>
+        public RewardQuest(GamePlayer questingPlayer)
+            : this(questingPlayer, 1) { }
 
-		/// <summary>
-		/// Constructs a new RewardQuest.
-		/// </summary>
-		/// <param name="questingPlayer">The player doing this quest</param>
-		/// <param name="step">The current step the player is on</param>
-		public RewardQuest(GamePlayer questingPlayer,int step) 
-			: base(questingPlayer, step)
-		{
-			m_rewards = new QuestRewards(this);
-			m_goals = new List<QuestGoal>();
-		}
+        /// <summary>
+        /// Constructs a new RewardQuest.
+        /// </summary>
+        /// <param name="questingPlayer">The player doing this quest</param>
+        /// <param name="step">The current step the player is on</param>
+        public RewardQuest(GamePlayer questingPlayer, int step)
+            : base(questingPlayer, step)
+        {
+            m_rewards = new QuestRewards(this);
+            m_goals = new List<QuestGoal>();
+        }
 
-		/// <summary>
-		/// Constructs a new RewardQuest from a database Object
-		/// </summary>
-		/// <param name="questingPlayer">The player doing the quest</param>
-		/// <param name="dbQuest">The database object</param>
-		public RewardQuest(GamePlayer questingPlayer, DBQuest dbQuest) 
-			: base(questingPlayer, dbQuest)
-		{
-			m_rewards = new QuestRewards(this);
-			m_goals = new List<QuestGoal>();
-		}
+        /// <summary>
+        /// Constructs a new RewardQuest from a database Object
+        /// </summary>
+        /// <param name="questingPlayer">The player doing the quest</param>
+        /// <param name="dbQuest">The database object</param>
+        public RewardQuest(GamePlayer questingPlayer, DBQuest dbQuest)
+            : base(questingPlayer, dbQuest)
+        {
+            m_rewards = new QuestRewards(this);
+            m_goals = new List<QuestGoal>();
+        }
 
-		/// <summary>
-		/// Add a goal for this quest.
-		/// </summary>
-		/// <param name="description"></param>
-		/// <param name="type"></param>
-		/// <param name="targetNumber"></param>
-		/// <param name="questItem"></param>
-		protected QuestGoal AddGoal(string description, QuestGoal.GoalType type, int targetNumber, ItemTemplate questItem)
-		{
-			QuestGoal goal = new QuestGoal("none", this, description, type, m_goals.Count + 1, targetNumber, questItem);
-			m_goals.Add(goal);
-			return goal;
-		}
+        /// <summary>
+        /// Add a goal for this quest.
+        /// </summary>
+        /// <param name="description"></param>
+        /// <param name="type"></param>
+        /// <param name="targetNumber"></param>
+        /// <param name="questItem"></param>
+        protected QuestGoal AddGoal(string description, QuestGoal.GoalType type, int targetNumber, ItemTemplate questItem)
+        {
+            QuestGoal goal = new QuestGoal("none", this, description, type, m_goals.Count + 1, targetNumber, questItem);
+            m_goals.Add(goal);
+            return goal;
+        }
 
-		/// <summary>
-		/// Add a goal for this quest and give it a unique identifier
-		/// </summary>
-		/// <param name="ID"></param>
-		/// <param name="description"></param>
-		/// <param name="type"></param>
-		/// <param name="targetNumber"></param>
-		/// <param name="questItem"></param>
-		/// <returns></returns>
-		protected QuestGoal AddGoal(string id, string description, QuestGoal.GoalType type, int targetNumber, ItemTemplate questItem)
-		{
-			QuestGoal goal = new QuestGoal(id, this, description, type, m_goals.Count + 1, targetNumber, questItem);
-			m_goals.Add(goal);
-			return goal;
-		}
+        /// <summary>
+        /// Add a goal for this quest and give it a unique identifier
+        /// </summary>
+        /// <param name="ID"></param>
+        /// <param name="description"></param>
+        /// <param name="type"></param>
+        /// <param name="targetNumber"></param>
+        /// <param name="questItem"></param>
+        /// <returns></returns>
+        protected QuestGoal AddGoal(string id, string description, QuestGoal.GoalType type, int targetNumber, ItemTemplate questItem)
+        {
+            QuestGoal goal = new QuestGoal(id, this, description, type, m_goals.Count + 1, targetNumber, questItem);
+            m_goals.Add(goal);
+            return goal;
+        }
 
+        /// <summary>
+        /// The NPC giving the quest.
+        /// </summary>
+        public GameNPC QuestGiver
+        {
+            get { return m_questGiver; }
+            set { m_questGiver = value; }
+        }
 
-		/// <summary>
-		/// The NPC giving the quest.
-		/// </summary>
-		public GameNPC QuestGiver
-		{
-			get { return m_questGiver; }
-			set { m_questGiver = value; }
-		}
+        /// <summary>
+        /// List of all goals for this quest
+        /// </summary>
+        public List<QuestGoal> Goals
+        {
+            get { return m_goals; }
+        }
 
-		/// <summary>
-		/// List of all goals for this quest
-		/// </summary>
-		public List<QuestGoal> Goals
-		{
-			get { return m_goals; }
-		}
+        /// <summary>
+        /// The rewards given on successful completion of this quest.
+        /// </summary>
+        public QuestRewards Rewards
+        {
+            get { return m_rewards; }
+            set { m_rewards = value; }
+        }
 
-		/// <summary>
-		/// The rewards given on successful completion of this quest.
-		/// </summary>
-		public QuestRewards Rewards
-		{
-			get { return m_rewards; }
-			set { m_rewards = value; }
-		}
+        /// <summary>
+        /// The fully-fledged story to the quest.
+        /// </summary>
+        public virtual String Story
+        {
+            get { return "QUEST STORY UNDEFINED"; }
+        }
 
-		/// <summary>
-		/// The fully-fledged story to the quest.
-		/// </summary>
-		public virtual String Story
-		{
-			get { return "QUEST STORY UNDEFINED"; }
-		}
+        /// <summary>
+        /// A summary of the quest text.
+        /// </summary>
+        public virtual String Summary
+        {
+            get { return "QUEST SUMMARY UNDEFINED"; }
+        }
 
-		/// <summary>
-		/// A summary of the quest text.
-		/// </summary>
-		public virtual String Summary
-		{
-			get { return "QUEST SUMMARY UNDEFINED"; }
-		}
+        /// <summary>
+        /// Text showing upon finishing the quest.
+        /// </summary>
+        public virtual String Conclusion
+        {
+            get { return "QUEST CONCLUSION UNDEFINED"; }
+        }
 
-		/// <summary>
-		/// Text showing upon finishing the quest.
-		/// </summary>
-		public virtual String Conclusion
-		{
-			get { return "QUEST CONCLUSION UNDEFINED"; }
-		}
+        public override bool CheckQuestQualification(GamePlayer player)
+        {
+            throw new Exception("The method or operation is not implemented.");
+        }
 
-		public override bool CheckQuestQualification(GamePlayer player)
-		{
-			throw new Exception("The method or operation is not implemented.");
-		}
+        /// <summary>
+        /// Offer this quest to a player.
+        /// </summary>
+        /// <param name="player"></param>
+        public virtual void OfferQuest(GamePlayer player)
+        {
+            if (CheckQuestQualification(player))
+            {
+                OfferPlayer = player;
+                player.Out.SendQuestOfferWindow(QuestGiver, player, this);
+            }
+        }
 
-		/// <summary>
-		/// Offer this quest to a player.
-		/// </summary>
-		/// <param name="player"></param>
-		public virtual void OfferQuest(GamePlayer player)
-		{
-			if (CheckQuestQualification(player))
-			{
-				OfferPlayer = player;
-				player.Out.SendQuestOfferWindow(QuestGiver, player, this);
-			}
-		}
+        /// <summary>
+        /// Let player choose rewards (if any).
+        /// </summary>
+        /// <param name="player"></param>
+        public virtual void ChooseRewards(GamePlayer player)
+        {
+            player.Out.SendQuestRewardWindow(QuestGiver, player, this);
+        }
 
-		/// <summary>
-		/// Let player choose rewards (if any).
-		/// </summary>
-		/// <param name="player"></param>
-		public virtual void ChooseRewards(GamePlayer player)
-		{
-			player.Out.SendQuestRewardWindow(QuestGiver, player, this);
-		}
+        /// <summary>
+        /// Handles events.
+        /// </summary>
+        /// <param name="e"></param>
+        /// <param name="sender"></param>
+        /// <param name="args"></param>
+        public override void Notify(DOLEvent e, object sender, EventArgs args)
+        {
+            base.Notify(e, sender, args);
+            if (e == GamePlayerEvent.QuestRewardChosen)
+            {
+                QuestRewardChosenEventArgs rewardArgs = args as QuestRewardChosenEventArgs;
+                if (rewardArgs == null)
+                    return;
 
-		/// <summary>
-		/// Handles events.
-		/// </summary>
-		/// <param name="e"></param>
-		/// <param name="sender"></param>
-		/// <param name="args"></param>
-		public override void Notify(DOLEvent e, object sender, EventArgs args)
-		{
-			base.Notify(e, sender, args);
-			if (e == GamePlayerEvent.QuestRewardChosen)
-			{
-				QuestRewardChosenEventArgs rewardArgs = args as QuestRewardChosenEventArgs;
-				if (rewardArgs == null)
-					return;
+                // Check if this particular quest has been finished.
 
-				// Check if this particular quest has been finished.
+                if (QuestMgr.GetIDForQuestType(this.GetType()) != rewardArgs.QuestID)
+                    return;
 
-				if (QuestMgr.GetIDForQuestType(this.GetType()) != rewardArgs.QuestID)
-					return;
-
-				for (int reward = 0; reward < rewardArgs.CountChosen; ++reward)
-					Rewards.Choose(rewardArgs.ItemsChosen[reward]);
+                for (int reward = 0; reward < rewardArgs.CountChosen; ++reward)
+                    Rewards.Choose(rewardArgs.ItemsChosen[reward]);
 
                 //k109: Handle the player not choosing a reward.
                 if (Rewards.ChoiceOf > 0 && rewardArgs.CountChosen <= 0)
@@ -214,298 +214,297 @@ namespace DOL.GS.Quests
                     return;
                 }
 
-				FinishQuest();
-			}
-		}
+                FinishQuest();
+            }
+        }
 
-		/// <summary>
-		/// Play a sound effect when player has acquired the quest.
-		/// </summary>
-		/// <param name="player"></param>
-		public override void OnQuestAssigned(GamePlayer player)
-		{
+        /// <summary>
+        /// Play a sound effect when player has acquired the quest.
+        /// </summary>
+        /// <param name="player"></param>
+        public override void OnQuestAssigned(GamePlayer player)
+        {
             player.Out.SendMessage(String.Format(LanguageMgr.GetTranslation(ServerProperties.Properties.SERV_LANGUAGE, "RewardQuest.OnQuestAssigned", Name)), eChatType.CT_ScreenCenter, eChatLoc.CL_SystemWindow);
             player.Out.SendSoundEffect(7, 0, 0, 0, 0, 0);
-		}
+        }
 
-		/// <summary>
-		/// Called when quest is finished, hands out rewards.
-		/// </summary>
-		public override void FinishQuest()
-		{
-			int inventorySpaceRequired = Rewards.BasicItems.Count + Rewards.ChosenItems.Count;
+        /// <summary>
+        /// Called when quest is finished, hands out rewards.
+        /// </summary>
+        public override void FinishQuest()
+        {
+            int inventorySpaceRequired = Rewards.BasicItems.Count + Rewards.ChosenItems.Count;
 
-			if (QuestPlayer.Inventory.IsSlotsFree(inventorySpaceRequired, eInventorySlot.FirstBackpack, eInventorySlot.LastBackpack))
-			{
-				base.FinishQuest();
-				QuestPlayer.Out.SendSoundEffect(11, 0, 0, 0, 0, 0);
-				QuestPlayer.GainExperience(GameLiving.eXPSource.Quest, Rewards.Experience);
-				QuestPlayer.AddMoney(Rewards.Money);
+            if (QuestPlayer.Inventory.IsSlotsFree(inventorySpaceRequired, eInventorySlot.FirstBackpack, eInventorySlot.LastBackpack))
+            {
+                base.FinishQuest();
+                QuestPlayer.Out.SendSoundEffect(11, 0, 0, 0, 0, 0);
+                QuestPlayer.GainExperience(GameLiving.eXPSource.Quest, Rewards.Experience);
+                QuestPlayer.AddMoney(Rewards.Money);
                 InventoryLogging.LogInventoryAction("(QUEST;" + Name + ")", QuestPlayer, eInventoryActionType.Quest, Rewards.Money);
-				if (Rewards.GiveBountyPoints > 0)
-					QuestPlayer.GainBountyPoints(Rewards.GiveBountyPoints);
-				if (Rewards.GiveRealmPoints > 0)
-					QuestPlayer.GainRealmPoints(Rewards.GiveRealmPoints);
+                if (Rewards.GiveBountyPoints > 0)
+                    QuestPlayer.GainBountyPoints(Rewards.GiveBountyPoints);
+                if (Rewards.GiveRealmPoints > 0)
+                    QuestPlayer.GainRealmPoints(Rewards.GiveRealmPoints);
 
-				foreach (ItemTemplate basicReward in Rewards.BasicItems)
-				{
-					GiveItem(QuestPlayer, basicReward);
-				}
+                foreach (ItemTemplate basicReward in Rewards.BasicItems)
+                {
+                    GiveItem(QuestPlayer, basicReward);
+                }
 
-				foreach (ItemTemplate optionalReward in Rewards.ChosenItems)
-				{
-					GiveItem(QuestPlayer, optionalReward);
-				}
+                foreach (ItemTemplate optionalReward in Rewards.ChosenItems)
+                {
+                    GiveItem(QuestPlayer, optionalReward);
+                }
                 eQuestIndicator indicator = eQuestIndicator.None;
                 if (QuestGiver.CanGiveOneQuest(QuestPlayer))
                     indicator = eQuestIndicator.Available;
-				QuestPlayer.Out.SendNPCsQuestEffect(QuestGiver, indicator);
-			}
-			else
-			{
-				QuestPlayer.Out.SendMessage(string.Format("Your inventory is full, you need {0} free slot(s) to complete this quest.", inventorySpaceRequired), eChatType.CT_System, eChatLoc.CL_SystemWindow);
-				Rewards.ChosenItems.Clear();
-			}
-		}
+                QuestPlayer.Out.SendNPCsQuestEffect(QuestGiver, indicator);
+            }
+            else
+            {
+                QuestPlayer.Out.SendMessage(string.Format("Your inventory is full, you need {0} free slot(s) to complete this quest.", inventorySpaceRequired), eChatType.CT_System, eChatLoc.CL_SystemWindow);
+                Rewards.ChosenItems.Clear();
+            }
+        }
 
-		/// <summary>
-		/// A single quest goal.
-		/// </summary>
-		public class QuestGoal
-		{
-			private string m_id;
-			private RewardQuest m_quest;
-			private string m_description;
-			private int m_index;
-			private int m_current, m_target;
-			private int m_zoneID1 = 0, m_xOffset1 = 0, m_yOffset1 = 0;
-			private int m_zoneID2 = 0, m_xOffset2 = 0, m_yOffset2 = 0;
-			private GoalType m_goalType;
-			private ItemTemplate m_questItem = null;
+        /// <summary>
+        /// A single quest goal.
+        /// </summary>
+        public class QuestGoal
+        {
+            private string m_id;
+            private RewardQuest m_quest;
+            private string m_description;
+            private int m_index;
+            private int m_current, m_target;
+            private int m_zoneID1 = 0, m_xOffset1 = 0, m_yOffset1 = 0;
+            private int m_zoneID2 = 0, m_xOffset2 = 0, m_yOffset2 = 0;
+            private GoalType m_goalType;
+            private ItemTemplate m_questItem = null;
 
-			public enum GoalType { KillTask = 3, ScoutMission = 5 };	// These are just a hunch for now.
+            public enum GoalType { KillTask = 3, ScoutMission = 5 };	// These are just a hunch for now.
 
-			/// <summary>
-			/// Constructs a new QuestGoal.
-			/// </summary>
-			/// <param name="id">An id used to fidn this quest goal.</param>
-			/// <param name="quest">The quest this goal is a part of.</param>
-			/// <param name="description">The description of the goal.</param>
-			/// <param name="type"></param>
-			/// <param name="index"></param>
-			/// <param name="target"></param>
-			public QuestGoal(string id, RewardQuest quest, string description, GoalType type, int index, int target, ItemTemplate questItem)
-			{
-				m_id = id;
-				m_quest = quest;
-				m_description = description;
-				m_goalType = type;
-				m_index = index;
-				m_current = 0;
-				m_target = 0;
-				Target = target;
-				m_questItem = questItem;
-			}
+            /// <summary>
+            /// Constructs a new QuestGoal.
+            /// </summary>
+            /// <param name="id">An id used to fidn this quest goal.</param>
+            /// <param name="quest">The quest this goal is a part of.</param>
+            /// <param name="description">The description of the goal.</param>
+            /// <param name="type"></param>
+            /// <param name="index"></param>
+            /// <param name="target"></param>
+            public QuestGoal(string id, RewardQuest quest, string description, GoalType type, int index, int target, ItemTemplate questItem)
+            {
+                m_id = id;
+                m_quest = quest;
+                m_description = description;
+                m_goalType = type;
+                m_index = index;
+                m_current = 0;
+                m_target = 0;
+                Target = target;
+                m_questItem = questItem;
+            }
 
-			/// <summary>
-			/// An id for this quest goal
-			/// </summary>
-			public string Id
-			{
-				get { return m_id; }
-			}
+            /// <summary>
+            /// An id for this quest goal
+            /// </summary>
+            public string Id
+            {
+                get { return m_id; }
+            }
 
-			/// <summary>
-			/// Ready-to-use description of the goal and its current status.
-			/// </summary>
-			public string Description
-			{
+            /// <summary>
+            /// Ready-to-use description of the goal and its current status.
+            /// </summary>
+            public string Description
+            {
                 get { return String.Format(LanguageMgr.GetTranslation(ServerProperties.Properties.SERV_LANGUAGE, "RewardQuest.Description", m_description, Current, Target)); }
-			}
+            }
 
-			/// <summary>
-			/// The type of the goal, i.e. whether to scout or to kill things.
-			/// </summary>
-			public GoalType Type
-			{
-				get { return m_goalType; }
-			}
+            /// <summary>
+            /// The type of the goal, i.e. whether to scout or to kill things.
+            /// </summary>
+            public GoalType Type
+            {
+                get { return m_goalType; }
+            }
 
-			/// <summary>
-			/// The quest item required for this goal.
-			/// </summary>
-			public ItemTemplate QuestItem
-			{
-				get { return (Current > 0) ? m_questItem : null; }
-				set { m_questItem = value; }
-			}
+            /// <summary>
+            /// The quest item required for this goal.
+            /// </summary>
+            public ItemTemplate QuestItem
+            {
+                get { return (Current > 0) ? m_questItem : null; }
+                set { m_questItem = value; }
+            }
 
-			/// <summary>
-			/// Current status of this goal.
-			/// </summary>
-			protected int Current
-			{
-				get 
-				{
-					if (m_quest.QuestPlayer == null)
-						return m_current;
-					String propertyValue = m_quest.GetCustomProperty(String.Format("goal{0}Current", m_index));
-					if (propertyValue == null)
-					{
-						Current = 0;
-						return Current;
-					}
-					return Int16.Parse(propertyValue); 
-				}
-				set 
-				{
-					if (m_quest.QuestPlayer == null)
-						m_current = value;
-					else
-					{
-						m_quest.SetCustomProperty(String.Format("goal{0}Current", m_index), value.ToString());
-						m_quest.SaveIntoDatabase();
-					}
-				}
-			}
+            /// <summary>
+            /// Current status of this goal.
+            /// </summary>
+            protected int Current
+            {
+                get
+                {
+                    if (m_quest.QuestPlayer == null)
+                        return m_current;
+                    String propertyValue = m_quest.GetCustomProperty(String.Format("goal{0}Current", m_index));
+                    if (propertyValue == null)
+                    {
+                        Current = 0;
+                        return Current;
+                    }
+                    return Int16.Parse(propertyValue);
+                }
+                set
+                {
+                    if (m_quest.QuestPlayer == null)
+                        m_current = value;
+                    else
+                    {
+                        m_quest.SetCustomProperty(String.Format("goal{0}Current", m_index), value.ToString());
+                        m_quest.SaveIntoDatabase();
+                    }
+                }
+            }
 
-			/// <summary>
-			/// Target status of this goal.
-			/// </summary>
-			protected int Target
-			{
-				get 
-				{
-					if (m_quest.QuestPlayer == null)
-						return m_current;
-					String propertyValue = m_quest.GetCustomProperty(String.Format("goal{0}Target", m_index));
-					if (propertyValue == null)
-					{
-						Target = 0;
-						return Target;
-					}
-					return Int16.Parse(propertyValue); 
-				}
-				set 
-				{
-					if (m_quest.QuestPlayer == null)
-						m_target = value;
-					else
-					{
-						m_quest.SetCustomProperty(String.Format("goal{0}Target", m_index), value.ToString());
-						m_quest.SaveIntoDatabase();
-					}
-				}
-			}
+            /// <summary>
+            /// Target status of this goal.
+            /// </summary>
+            protected int Target
+            {
+                get
+                {
+                    if (m_quest.QuestPlayer == null)
+                        return m_current;
+                    String propertyValue = m_quest.GetCustomProperty(String.Format("goal{0}Target", m_index));
+                    if (propertyValue == null)
+                    {
+                        Target = 0;
+                        return Target;
+                    }
+                    return Int16.Parse(propertyValue);
+                }
+                set
+                {
+                    if (m_quest.QuestPlayer == null)
+                        m_target = value;
+                    else
+                    {
+                        m_quest.SetCustomProperty(String.Format("goal{0}Target", m_index), value.ToString());
+                        m_quest.SaveIntoDatabase();
+                    }
+                }
+            }
 
-			/// <summary>
-			/// Whether or not the goal has been achieved yet.
-			/// </summary>
-			public bool IsAchieved
-			{
-				get { return (Current == Target); }
-			}
+            /// <summary>
+            /// Whether or not the goal has been achieved yet.
+            /// </summary>
+            public bool IsAchieved
+            {
+                get { return (Current == Target); }
+            }
 
-			public void Advance()
-			{
-				if (Current < Target)
-				{
-					Current++;
-					m_quest.QuestPlayer.Out.SendMessage(Description, eChatType.CT_ScreenCenter, 
-						eChatLoc.CL_SystemWindow);
-					m_quest.QuestPlayer.Out.SendQuestUpdate(m_quest);
-				}
-			}
+            public void Advance()
+            {
+                if (Current < Target)
+                {
+                    Current++;
+                    m_quest.QuestPlayer.Out.SendMessage(Description, eChatType.CT_ScreenCenter,
+                        eChatLoc.CL_SystemWindow);
+                    m_quest.QuestPlayer.Out.SendQuestUpdate(m_quest);
+                }
+            }
 
-			/*
-			 * Not quite sure about the meaning of the following locations data,
-			 * but have to provide it for the quest update packet nonetheless.
-			 */
+            /*
+             * Not quite sure about the meaning of the following locations data,
+             * but have to provide it for the quest update packet nonetheless.
+             */
 
-			public int ZoneID1
-			{
-				get { return m_zoneID1; }
-			}
+            public int ZoneID1
+            {
+                get { return m_zoneID1; }
+            }
 
-			public int XOffset1
-			{
-				get { return m_xOffset1; }
-			}
+            public int XOffset1
+            {
+                get { return m_xOffset1; }
+            }
 
-			public int YOffset1
-			{
-				get { return m_yOffset1; }
-			}
+            public int YOffset1
+            {
+                get { return m_yOffset1; }
+            }
 
-			public int ZoneID2
-			{
-				get { return m_zoneID2; }
-			}
+            public int ZoneID2
+            {
+                get { return m_zoneID2; }
+            }
 
-			public int XOffset2
-			{
-				get { return m_xOffset2; }
-			}
+            public int XOffset2
+            {
+                get { return m_xOffset2; }
+            }
 
-			public int YOffset2
-			{
-				get { return m_yOffset2; }
-			}
-		}
+            public int YOffset2
+            {
+                get { return m_yOffset2; }
+            }
+        }
 
-		/// <summary>
-		/// Class encapsulating the different types of rewards.
-		/// </summary>
-		public class QuestRewards
-		{
-			private RewardQuest m_quest;
-			private int m_moneyPercent;
-			private long m_experience;
-			private List<ItemTemplate> m_basicItems, m_optionalItems;
-			private int m_choiceOf;
-			private List<ItemTemplate> m_chosenItems;
-			private int m_bountypoints;
-			private int	m_realmpoints;
-			private int	m_gold;
-			
-			public QuestRewards(RewardQuest quest)
-			{
-				m_quest = quest;
-				m_moneyPercent = 0;
-				m_experience = 0;
-				m_basicItems = new List<ItemTemplate>();
-				m_optionalItems = new List<ItemTemplate>();
-				m_choiceOf = 0;
-				m_chosenItems = new List<ItemTemplate>();
-				m_bountypoints = 0;
-				m_realmpoints = 0;
-				m_gold = 0;
-				
-			}
-			
-			public int GiveGold
-			{
-				get { return m_gold; }
-				set { m_gold = value;}
-			}
-			
-			public int GiveRealmPoints
-			{
-				get { return m_realmpoints; }
-				set { m_realmpoints = value;}
-			}
-			
-			public int GiveBountyPoints
-			{
-				get { return m_bountypoints; }
-				set { m_bountypoints = value;}
-			}
-			
-			/// <summary>
-			/// The maximum amount of copper awarded for a quest with a
-			/// particular level.
-			/// </summary>
-			private long[] m_maxCopperForLevel = {
+        /// <summary>
+        /// Class encapsulating the different types of rewards.
+        /// </summary>
+        public class QuestRewards
+        {
+            private RewardQuest m_quest;
+            private int m_moneyPercent;
+            private long m_experience;
+            private List<ItemTemplate> m_basicItems, m_optionalItems;
+            private int m_choiceOf;
+            private List<ItemTemplate> m_chosenItems;
+            private int m_bountypoints;
+            private int m_realmpoints;
+            private int m_gold;
+
+            public QuestRewards(RewardQuest quest)
+            {
+                m_quest = quest;
+                m_moneyPercent = 0;
+                m_experience = 0;
+                m_basicItems = new List<ItemTemplate>();
+                m_optionalItems = new List<ItemTemplate>();
+                m_choiceOf = 0;
+                m_chosenItems = new List<ItemTemplate>();
+                m_bountypoints = 0;
+                m_realmpoints = 0;
+                m_gold = 0;
+            }
+
+            public int GiveGold
+            {
+                get { return m_gold; }
+                set { m_gold = value; }
+            }
+
+            public int GiveRealmPoints
+            {
+                get { return m_realmpoints; }
+                set { m_realmpoints = value; }
+            }
+
+            public int GiveBountyPoints
+            {
+                get { return m_bountypoints; }
+                set { m_bountypoints = value; }
+            }
+
+            /// <summary>
+            /// The maximum amount of copper awarded for a quest with a
+            /// particular level.
+            /// </summary>
+            private long[] m_maxCopperForLevel = {
 				0,
 				115,
 				310,
@@ -558,136 +557,136 @@ namespace DOL.GS.Quests
 				11018817,
 				11018817	// level 50, this appears to be the overall cap
 			};
-			
-			/// <summary>
-			/// Add a basic reward (up to a maximum of 8).
-			/// </summary>
-			/// <param name="reward"></param>
-			public void AddBasicItem(ItemTemplate reward)
-			{
-				if (m_basicItems.Count < 8)
-					m_basicItems.Add(reward);
-			}
 
-			/// <summary>
-			/// Add an optional reward (up to a maximum of 8).
-			/// </summary>
-			/// <param name="reward"></param>
-			public void AddOptionalItem(ItemTemplate reward)
-			{
-				if (m_optionalItems.Count < 8)
-					m_optionalItems.Add(reward);
-			}
+            /// <summary>
+            /// Add a basic reward (up to a maximum of 8).
+            /// </summary>
+            /// <param name="reward"></param>
+            public void AddBasicItem(ItemTemplate reward)
+            {
+                if (m_basicItems.Count < 8)
+                    m_basicItems.Add(reward);
+            }
 
-			/// <summary>
-			/// Pick an optional reward from the list.
-			/// </summary>
-			/// <param name="reward"></param>
-			/// <returns></returns>
-			public bool Choose(int reward)
-			{
-				if (reward > m_optionalItems.Count)
-					return false;
+            /// <summary>
+            /// Add an optional reward (up to a maximum of 8).
+            /// </summary>
+            /// <param name="reward"></param>
+            public void AddOptionalItem(ItemTemplate reward)
+            {
+                if (m_optionalItems.Count < 8)
+                    m_optionalItems.Add(reward);
+            }
 
-				m_chosenItems.Add(m_optionalItems[reward]);
-				return true;
-			}
+            /// <summary>
+            /// Pick an optional reward from the list.
+            /// </summary>
+            /// <param name="reward"></param>
+            /// <returns></returns>
+            public bool Choose(int reward)
+            {
+                if (reward > m_optionalItems.Count)
+                    return false;
 
-			/// <summary>
-			/// Money awarded for completing this quest. This is a percentage 
-			/// of the maximum amount of money awarded for a quest with this level.
-			/// This in turn means that there is a cap (100%) to earning money
-			/// from quests.
-			/// </summary>
-			public int MoneyPercent
-			{
-				get { return m_moneyPercent; }
-				set { if (value >= 0 && value <= 100) m_moneyPercent = value; }
-			}
+                m_chosenItems.Add(m_optionalItems[reward]);
+                return true;
+            }
 
-			/// <summary>
-			/// Money awarded for completing this quest. This is a flat value.
-			/// You shouldn't be able to set this directly, because a level dependent
-			/// cap applies to all money earned from quests.
-			/// </summary>
-			public long Money
-			{
-				get 
-				{
-					return (long)((m_maxCopperForLevel[m_quest.Level] * MoneyPercent / 100) + (GiveGold * 10000));
-				}
-			}
+            /// <summary>
+            /// Money awarded for completing this quest. This is a percentage
+            /// of the maximum amount of money awarded for a quest with this level.
+            /// This in turn means that there is a cap (100%) to earning money
+            /// from quests.
+            /// </summary>
+            public int MoneyPercent
+            {
+                get { return m_moneyPercent; }
+                set { if (value >= 0 && value <= 100) m_moneyPercent = value; }
+            }
 
-			/// <summary>
-			/// Experience awarded for completing this quest. This is a percentage 
-			/// of the amount of experience the questing player needs to get from
-			/// their current level to the next level, not taking into account any
-			/// experience the player already has gained towards the next level.
-			/// Because this depends on the current level of the interacting player
-			/// it doesn't make sense to change it from your scripts.
-			/// </summary>
-			public int ExperiencePercent(GamePlayer player)
-			{
-				int currentLevel = player.Level;
-				if (currentLevel > player.MaxLevel)
-					return 0;
-				long experienceToLevel = player.GetExperienceNeededForLevel(currentLevel + 1) -
-					player.GetExperienceNeededForLevel(currentLevel);
+            /// <summary>
+            /// Money awarded for completing this quest. This is a flat value.
+            /// You shouldn't be able to set this directly, because a level dependent
+            /// cap applies to all money earned from quests.
+            /// </summary>
+            public long Money
+            {
+                get
+                {
+                    return (long)((m_maxCopperForLevel[m_quest.Level] * MoneyPercent / 100) + (GiveGold * 10000));
+                }
+            }
 
-				return (int)((m_experience * 100) / experienceToLevel);
-			}
+            /// <summary>
+            /// Experience awarded for completing this quest. This is a percentage
+            /// of the amount of experience the questing player needs to get from
+            /// their current level to the next level, not taking into account any
+            /// experience the player already has gained towards the next level.
+            /// Because this depends on the current level of the interacting player
+            /// it doesn't make sense to change it from your scripts.
+            /// </summary>
+            public int ExperiencePercent(GamePlayer player)
+            {
+                int currentLevel = player.Level;
+                if (currentLevel > player.MaxLevel)
+                    return 0;
+                long experienceToLevel = player.GetExperienceNeededForLevel(currentLevel + 1) -
+                    player.GetExperienceNeededForLevel(currentLevel);
 
-			/// <summary>
-			/// Experience awarded for completing this quest. This is a flat value.
-			/// </summary>
-			public long Experience
-			{
-				get { return m_experience; }
-				set
+                return (int)((m_experience * 100) / experienceToLevel);
+            }
+
+            /// <summary>
+            /// Experience awarded for completing this quest. This is a flat value.
+            /// </summary>
+            public long Experience
+            {
+                get { return m_experience; }
+                set
                 {
                     m_experience = value;
                     if (m_experience < 0)
                         m_experience = 0;
                 }
-			}
+            }
 
-			/// <summary>
-			/// List of basic item rewards.
-			/// </summary>
-			public List<ItemTemplate> BasicItems
-			{
-				get { return m_basicItems; }
-			}
+            /// <summary>
+            /// List of basic item rewards.
+            /// </summary>
+            public List<ItemTemplate> BasicItems
+            {
+                get { return m_basicItems; }
+            }
 
-			/// <summary>
-			/// List of optional item rewards.
-			/// </summary>
-			public List<ItemTemplate> OptionalItems
-			{
-				get { return m_optionalItems; }
-			}
+            /// <summary>
+            /// List of optional item rewards.
+            /// </summary>
+            public List<ItemTemplate> OptionalItems
+            {
+                get { return m_optionalItems; }
+            }
 
-			/// <summary>
-			/// List of optional rewards the player actually picked.
-			/// </summary>
-			public List<ItemTemplate> ChosenItems
-			{
-				get { return m_chosenItems; }
-			}
+            /// <summary>
+            /// List of optional rewards the player actually picked.
+            /// </summary>
+            public List<ItemTemplate> ChosenItems
+            {
+                get { return m_chosenItems; }
+            }
 
-			/// <summary>
-			/// The number of items the player can choose from the optional
-			/// item reward list.
-			/// </summary>
-			public int ChoiceOf
-			{
-				get { return m_choiceOf; }
-				set 
-				{
-					if (m_optionalItems.Count > 0)
-						m_choiceOf = Math.Min(Math.Max(1, value), m_optionalItems.Count);
-				}
-			}
-		}
-	}
+            /// <summary>
+            /// The number of items the player can choose from the optional
+            /// item reward list.
+            /// </summary>
+            public int ChoiceOf
+            {
+                get { return m_choiceOf; }
+                set
+                {
+                    if (m_optionalItems.Count > 0)
+                        m_choiceOf = Math.Min(Math.Max(1, value), m_optionalItems.Count);
+                }
+            }
+        }
+    }
 }

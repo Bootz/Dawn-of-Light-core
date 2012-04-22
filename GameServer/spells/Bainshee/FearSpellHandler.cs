@@ -1,83 +1,77 @@
-using System;
-using DOL.AI.Brain;
-using DOL.Database;
-using DOL.GS.PacketHandler;
-using DOL.GS.Effects;
-using DOL.GS.SkillHandler;
 using System.Collections;
-using log4net;
-using System.Reflection;
+using DOL.AI.Brain;
+using DOL.GS.Effects;
+
 namespace DOL.GS.Spells
 {
-	[SpellHandlerAttribute("Fear")]
-	public class FearSpellHandler : SpellHandler 
-	{
-		//VaNaTiC->
-		/*
-		/// <summary>
-		/// Defines a logger for this class.
-		/// </summary>
-		private static readonly ILog Log = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
-		*/
-		//VaNaTiC<-
+    [SpellHandlerAttribute("Fear")]
+    public class FearSpellHandler : SpellHandler
+    {
+        //VaNaTiC->
+        /*
+        /// <summary>
+        /// Defines a logger for this class.
+        /// </summary>
+        private static readonly ILog Log = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
+        */
+        //VaNaTiC<-
 
-		public override void FinishSpellCast(GameLiving target)
-		{
-			m_caster.Mana -= PowerCost(target);
-			base.FinishSpellCast (target);
-			
-			GameNPC t = target as GameNPC;
-			if(t!=null)
-				t.WalkToSpawn();
-		}
+        public override void FinishSpellCast(GameLiving target)
+        {
+            m_caster.Mana -= PowerCost(target);
+            base.FinishSpellCast(target);
 
-		public override IList SelectTargets(GameObject castTarget)
-		{
-			ArrayList list = new ArrayList();
-			GameLiving target;
-			
-			target=Caster;
-			foreach (GameNPC npc in target.GetNPCsInRadius((ushort)Spell.Radius)) 
-			{
-				if(npc is GameNPC)
-					list.Add(npc);
-			}
+            GameNPC t = target as GameNPC;
+            if (t != null)
+                t.WalkToSpawn();
+        }
 
-			return list;
-		}
+        public override IList SelectTargets(GameObject castTarget)
+        {
+            ArrayList list = new ArrayList();
+            GameLiving target;
 
-		/// <summary>
-		/// called when spell effect has to be started and applied to targets
-		/// </summary>
-		public override bool StartSpell(GameLiving target)
-		{
-			if (target == null) return false;
+            target = Caster;
+            foreach (GameNPC npc in target.GetNPCsInRadius((ushort)Spell.Radius))
+            {
+                if (npc is GameNPC)
+                    list.Add(npc);
+            }
 
-			IList targets = SelectTargets(target);
+            return list;
+        }
 
-			foreach (GameLiving t in targets)
-			{
-				if(t is GameNPC && t.Level <= m_spell.Value)
-				{
-					((GameNPC)t).AddBrain(new FearBrain());
-				}
-			}
+        /// <summary>
+        /// called when spell effect has to be started and applied to targets
+        /// </summary>
+        public override bool StartSpell(GameLiving target)
+        {
+            if (target == null) return false;
 
-			return true;
-		}
+            IList targets = SelectTargets(target);
 
-		public override int OnEffectExpires(GameSpellEffect effect, bool noMessages)
-		{
-			GameNPC mob = (GameNPC)effect.Owner;
-			mob.RemoveBrain(mob.Brain);
+            foreach (GameLiving t in targets)
+            {
+                if (t is GameNPC && t.Level <= m_spell.Value)
+                {
+                    ((GameNPC)t).AddBrain(new FearBrain());
+                }
+            }
 
-			if(mob.Brain==null)
-				mob.AddBrain(new StandardMobBrain());
+            return true;
+        }
 
-			return base.OnEffectExpires (effect, noMessages);
-		}
+        public override int OnEffectExpires(GameSpellEffect effect, bool noMessages)
+        {
+            GameNPC mob = (GameNPC)effect.Owner;
+            mob.RemoveBrain(mob.Brain);
 
+            if (mob.Brain == null)
+                mob.AddBrain(new StandardMobBrain());
 
-		public FearSpellHandler(GameLiving caster, Spell spell, SpellLine line) : base(caster, spell, line) {}
-	}
+            return base.OnEffectExpires(effect, noMessages);
+        }
+
+        public FearSpellHandler(GameLiving caster, Spell spell, SpellLine line) : base(caster, spell, line) { }
+    }
 }

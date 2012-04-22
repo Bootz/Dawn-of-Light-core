@@ -16,16 +16,10 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
  */
+
 using System;
 using DOL.Database;
 using DOL.GS.PacketHandler;
-using DOL.Language;
-using System.Collections;
-using System.Collections.Generic;
-using System.Reflection;
-using DOL.GS.Utils;
-using DOL.GS.Quests;
-using DOL.GS.PacketHandler.Client.v168;
 using log4net;
 
 namespace DOL.GS.Commands
@@ -34,17 +28,17 @@ namespace DOL.GS.Commands
     /// A command to manage teleport destinations.
     /// </summary>
     /// <author>Aredhel</author>
-	[CmdAttribute(
-		"&teleport",
-		ePrivLevel.GM,
+    [CmdAttribute(
+        "&teleport",
+        ePrivLevel.GM,
         "Manage teleport destinations",
         "'/teleport add <ID> <type>' add a teleport destination",
-		"'/teleport reload' reload all teleport locations from the db")]
+        "'/teleport reload' reload all teleport locations from the db")]
     public class TeleportCommandHandler : AbstractCommandHandler, ICommandHandler
     {
-		private static readonly ILog log = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
+        private static readonly ILog log = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
 
-		/// <summary>
+        /// <summary>
         /// Handle command.
         /// </summary>
         /// <param name="client"></param>
@@ -80,17 +74,17 @@ namespace DOL.GS.Commands
                     }
                     break;
 
-				case "reload":
+                case "reload":
 
-					string results = WorldMgr.LoadTeleports();
-					log.Info(results);
-					client.Out.SendMessage(results, eChatType.CT_System, eChatLoc.CL_SystemWindow);
-					break;
+                    string results = WorldMgr.LoadTeleports();
+                    log.Info(results);
+                    client.Out.SendMessage(results, eChatType.CT_System, eChatLoc.CL_SystemWindow);
+                    break;
 
                 default:
                     DisplaySyntax(client);
                     break;
-            }    
+            }
         }
 
         /// <summary>
@@ -107,7 +101,7 @@ namespace DOL.GS.Commands
 
             if (WorldMgr.GetTeleportLocation(realm, String.Format("{0}:{1}", type, teleportID)) != null)
             {
-                client.Out.SendMessage(String.Format("Teleport ID [{0}] already exists!", teleportID), 
+                client.Out.SendMessage(String.Format("Teleport ID [{0}] already exists!", teleportID),
                     eChatType.CT_System, eChatLoc.CL_SystemWindow);
                 return;
             }
@@ -124,7 +118,7 @@ namespace DOL.GS.Commands
 
             if (!WorldMgr.AddTeleportLocation(teleport))
             {
-                client.Out.SendMessage(String.Format("Failed to add teleport ID [{0}] in memory!", teleportID), 
+                client.Out.SendMessage(String.Format("Failed to add teleport ID [{0}] in memory!", teleportID),
                     eChatType.CT_System, eChatLoc.CL_SystemWindow);
                 return;
             }

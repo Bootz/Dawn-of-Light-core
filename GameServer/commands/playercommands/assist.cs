@@ -1,37 +1,35 @@
 /*
  * DAWN OF LIGHT - The first free open source DAoC server emulator
- * 
+ *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
  * as published by the Free Software Foundation; either version 2
  * of the License, or (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
  */
 
-using System;
-
-using DOL.Language;
 using DOL.GS.Keeps;
 using DOL.GS.PacketHandler;
+using DOL.Language;
 
 namespace DOL.GS.Commands
 {
-	[CmdAttribute("&assist", ePrivLevel.Player, "Assist your target", "/assist [playerName]")]
-	public class AssistCommandHandler : AbstractCommandHandler, ICommandHandler
-	{
-		public void OnCommand(GameClient client, string[] args)
-		{
-			if (IsSpammingCommand(client.Player, "assist"))
-				return;
+    [CmdAttribute("&assist", ePrivLevel.Player, "Assist your target", "/assist [playerName]")]
+    public class AssistCommandHandler : AbstractCommandHandler, ICommandHandler
+    {
+        public void OnCommand(GameClient client, string[] args)
+        {
+            if (IsSpammingCommand(client.Player, "assist"))
+                return;
 
             if (args.Length > 1)
             {
@@ -47,24 +45,25 @@ namespace DOL.GS.Commands
                 }
 
                 GamePlayer assistPlayer = null;
-                
+
                 //Should be faster then WorldMgr.GetClientByPlayerName
-                foreach(GamePlayer plr in client.Player.GetPlayersInRadius(2048))
+                foreach (GamePlayer plr in client.Player.GetPlayersInRadius(2048))
                 {
                     //ToLower() is correct, don't change it!
-                    if(plr.Name.ToLower() != args[1].ToLower())
+                    if (plr.Name.ToLower() != args[1].ToLower())
                         continue;
 
                     assistPlayer = plr;
                     break;
                 }
 
-                if(assistPlayer != null)
+                if (assistPlayer != null)
                 {
                     //Each server type handles the assist command on it's own way.
-                    switch(GameServer.Instance.Configuration.ServerType)
+                    switch (GameServer.Instance.Configuration.ServerType)
                     {
-                            #region Normal rules
+                        #region Normal rules
+
                         case eGameServerType.GST_Normal:
                             {
                                 //We cannot assist players of an enemy realm.
@@ -78,8 +77,11 @@ namespace DOL.GS.Commands
                                 YouAssist(client, assistPlayer.Name, assistPlayer.TargetObject);
                                 return;
                             }
-                            #endregion
-                            #region PvE rules
+
+                        #endregion Normal rules
+
+                        #region PvE rules
+
                         case eGameServerType.GST_PvE:
                             {
                                 //We cannot assist our target when it has no target.
@@ -89,55 +91,32 @@ namespace DOL.GS.Commands
                                 YouAssist(client, assistPlayer.Name, assistPlayer.TargetObject);
                                 return;
                             }
-                            #endregion
-                            #region PvP rules
+
+                        #endregion PvE rules
+
+                        #region PvP rules
+
                         case eGameServerType.GST_PvP:
                             {
                                 //Note:
                                 //I absolutely don't have experience with pvp servers - change it when something is wrong.
 
                                 //Lets check if the client and it's targeted player are in the same alliance.
-								if (client.Player.Guild != null)
-								{
-									if (client.Player.Guild.alliance != null &&
-										client.Player.Guild.alliance.Contains(assistPlayer.Guild))
-									{
-										//We cannot assist our target when it has no target.
-										if (!HasTarget(client, assistPlayer))
-											return;
-
-										YouAssist(client, assistPlayer.Name, assistPlayer.TargetObject);
-										return;
-									}
-
-									//They are no alliance members, maybe guild members?
-									if (client.Player.Guild.GetOnlineMemberByID(assistPlayer.InternalID) != null)
-									{
-										//We cannot assist our target when it has no target.
-										if (!HasTarget(client, assistPlayer))
-											return;
-
-										YouAssist(client, assistPlayer.Name, assistPlayer.TargetObject);
-										return;
-									}
-								}
-
-                            	//They are no alliance or guild members - maybe group members?
-								if (client.Player.Group != null && client.Player.Group.IsInTheGroup(assistPlayer))
-								{
-									//We cannot assist our target when it has no target.
-									if (!HasTarget(client, assistPlayer))
-										return;
-
-									YouAssist(client, assistPlayer.Name, assistPlayer.TargetObject);
-									return;
-								}
-
-                            	//Ok, they are not in the same alliance, guild or group - maybe in the same battle group?
-                                BattleGroup clientBattleGroup = client.Player.TempProperties.getProperty<BattleGroup>(BattleGroup.BATTLEGROUP_PROPERTY, null);
-                                if(clientBattleGroup != null)
+                                if (client.Player.Guild != null)
                                 {
-                                    if(clientBattleGroup.Members.Contains(assistPlayer))
+                                    if (client.Player.Guild.alliance != null &&
+                                        client.Player.Guild.alliance.Contains(assistPlayer.Guild))
+                                    {
+                                        //We cannot assist our target when it has no target.
+                                        if (!HasTarget(client, assistPlayer))
+                                            return;
+
+                                        YouAssist(client, assistPlayer.Name, assistPlayer.TargetObject);
+                                        return;
+                                    }
+
+                                    //They are no alliance members, maybe guild members?
+                                    if (client.Player.Guild.GetOnlineMemberByID(assistPlayer.InternalID) != null)
                                     {
                                         //We cannot assist our target when it has no target.
                                         if (!HasTarget(client, assistPlayer))
@@ -147,12 +126,38 @@ namespace DOL.GS.Commands
                                         return;
                                     }
                                 }
-                                            
-                                //Ok, they are not in the same alliance, guild, group or battle group - maybe in the same chat group?
-								ChatGroup clientChatGroup = client.Player.TempProperties.getProperty<ChatGroup>(ChatGroup.CHATGROUP_PROPERTY, null);
-                                if(clientChatGroup != null)
+
+                                //They are no alliance or guild members - maybe group members?
+                                if (client.Player.Group != null && client.Player.Group.IsInTheGroup(assistPlayer))
                                 {
-                                    if(clientChatGroup.Members.Contains(assistPlayer))
+                                    //We cannot assist our target when it has no target.
+                                    if (!HasTarget(client, assistPlayer))
+                                        return;
+
+                                    YouAssist(client, assistPlayer.Name, assistPlayer.TargetObject);
+                                    return;
+                                }
+
+                                //Ok, they are not in the same alliance, guild or group - maybe in the same battle group?
+                                BattleGroup clientBattleGroup = client.Player.TempProperties.getProperty<BattleGroup>(BattleGroup.BATTLEGROUP_PROPERTY, null);
+                                if (clientBattleGroup != null)
+                                {
+                                    if (clientBattleGroup.Members.Contains(assistPlayer))
+                                    {
+                                        //We cannot assist our target when it has no target.
+                                        if (!HasTarget(client, assistPlayer))
+                                            return;
+
+                                        YouAssist(client, assistPlayer.Name, assistPlayer.TargetObject);
+                                        return;
+                                    }
+                                }
+
+                                //Ok, they are not in the same alliance, guild, group or battle group - maybe in the same chat group?
+                                ChatGroup clientChatGroup = client.Player.TempProperties.getProperty<ChatGroup>(ChatGroup.CHATGROUP_PROPERTY, null);
+                                if (clientChatGroup != null)
+                                {
+                                    if (clientChatGroup.Members.Contains(assistPlayer))
                                     {
                                         //We cannot assist our target when it has no target.
                                         if (!HasTarget(client, assistPlayer))
@@ -167,14 +172,15 @@ namespace DOL.GS.Commands
                                 NoValidTarget(client, assistPlayer);
                                 return;
                             }
-                            #endregion
+
+                        #endregion PvP rules
                     }
                 }
 
                 client.Out.SendMessage(LanguageMgr.GetTranslation(client, "Scripts.Players.Assist.MemberNotFound"), eChatType.CT_System, eChatLoc.CL_SystemWindow);
                 return;
             }
-            
+
             if (client.Player.TargetObject != null)
             {
                 //This makes absolutely no sense, but it's one of the weird features of the live servers
@@ -185,7 +191,7 @@ namespace DOL.GS.Commands
                 }
 
                 //Only assist npc's or players!
-                if(client.Player.TargetObject is GameNPC || client.Player.TargetObject is GamePlayer)
+                if (client.Player.TargetObject is GameNPC || client.Player.TargetObject is GamePlayer)
                 {
                     //We cannot assist game objects!
                     if (client.Player.TargetObject is GameMovingObject)
@@ -195,28 +201,32 @@ namespace DOL.GS.Commands
                     }
 
                     //Each server type handles the assist command on it's own way.
-                    switch(GameServer.Instance.Configuration.ServerType)
+                    switch (GameServer.Instance.Configuration.ServerType)
                     {
                         #region Normal rules
-						case eGameServerType.GST_Normal:
-						{
-							GameLiving targetLiving = (GameLiving)client.Player.TargetObject;
-							//We cannot assist npc's or players of an enemy realm.
-							if (!SameRealm(client, targetLiving, false))
-								return;
 
-							//We cannot assist our target when it has no target.
-							if (!HasTarget(client, targetLiving))
-								return;
+                        case eGameServerType.GST_Normal:
+                            {
+                                GameLiving targetLiving = (GameLiving)client.Player.TargetObject;
+                                //We cannot assist npc's or players of an enemy realm.
+                                if (!SameRealm(client, targetLiving, false))
+                                    return;
 
-							YouAssist(client, client.Player.TargetObject.GetName(0, true), targetLiving.TargetObject);
-							return;
-						}
-						#endregion
+                                //We cannot assist our target when it has no target.
+                                if (!HasTarget(client, targetLiving))
+                                    return;
+
+                                YouAssist(client, client.Player.TargetObject.GetName(0, true), targetLiving.TargetObject);
+                                return;
+                            }
+
+                        #endregion Normal rules
+
                         #region PvE rules
+
                         case eGameServerType.GST_PvE:
                             {
-                                if(client.Player.TargetObject is GamePlayer)
+                                if (client.Player.TargetObject is GamePlayer)
                                 {
                                     //We cannot assist our target when it has no target.
                                     if (!HasTarget(client, (client.Player.TargetObject as GameLiving)))
@@ -225,7 +235,7 @@ namespace DOL.GS.Commands
                                     YouAssist(client, client.Player.TargetObject.Name, (client.Player.TargetObject as GameLiving).TargetObject);
                                     return;
                                 }
-                                        
+
                                 if (client.Player.TargetObject is GameNPC)
                                 {
                                     if (!SameRealm(client, (client.Player.TargetObject as GameNPC), true))
@@ -241,30 +251,33 @@ namespace DOL.GS.Commands
                                     }
                                 }
                             } break;
-                        #endregion
+
+                        #endregion PvE rules
+
                         #region PvP rules
+
                         case eGameServerType.GST_PvP:
                             {
                                 //Note:
                                 //I absolutely don't have experience with pvp servers - change it when something is wrong.
 
-                                if(client.Player.TargetObject is GamePlayer)
+                                if (client.Player.TargetObject is GamePlayer)
                                 {
                                     GamePlayer targetPlayer = client.Player.TargetObject as GamePlayer;
 
                                     //Lets check if the client and it's targeted player are in the same alliance.
-									if (client.Player.Guild != null && client.Player.Guild.alliance != null && client.Player.Guild.alliance.Contains(targetPlayer.Guild))
-									{
-										//We cannot assist our target when it has no target
-										if (!HasTarget(client, targetPlayer))
-											return;
+                                    if (client.Player.Guild != null && client.Player.Guild.alliance != null && client.Player.Guild.alliance.Contains(targetPlayer.Guild))
+                                    {
+                                        //We cannot assist our target when it has no target
+                                        if (!HasTarget(client, targetPlayer))
+                                            return;
 
-										YouAssist(client, targetPlayer.Name, targetPlayer.TargetObject);
-										return;
-									}
+                                        YouAssist(client, targetPlayer.Name, targetPlayer.TargetObject);
+                                        return;
+                                    }
 
-									//They are no alliance members, maybe guild members?
-									if (client.Player.Guild != null && client.Player.Guild.GetOnlineMemberByID(targetPlayer.InternalID) != null)
+                                    //They are no alliance members, maybe guild members?
+                                    if (client.Player.Guild != null && client.Player.Guild.GetOnlineMemberByID(targetPlayer.InternalID) != null)
                                     {
                                         //We cannot assist our target when it has no target
                                         if (!HasTarget(client, targetPlayer))
@@ -275,7 +288,7 @@ namespace DOL.GS.Commands
                                     }
 
                                     //They are no alliance or guild members - maybe group members?
-									if (client.Player.Group != null && client.Player.Group.IsInTheGroup(targetPlayer))
+                                    if (client.Player.Group != null && client.Player.Group.IsInTheGroup(targetPlayer))
                                     {
                                         //We cannot assist our target when it has no target
                                         if (!HasTarget(client, targetPlayer))
@@ -287,9 +300,9 @@ namespace DOL.GS.Commands
 
                                     //Ok, they are not in the same alliance, guild or group - maybe in the same battle group?
                                     BattleGroup clientBattleGroup = (BattleGroup)client.Player.TempProperties.getProperty<object>(BattleGroup.BATTLEGROUP_PROPERTY, null);
-                                    if(clientBattleGroup != null)
+                                    if (clientBattleGroup != null)
                                     {
-                                        if(clientBattleGroup.Members.Contains(targetPlayer))
+                                        if (clientBattleGroup.Members.Contains(targetPlayer))
                                         {
                                             //We cannot assist our target when it has no target
                                             if (!HasTarget(client, targetPlayer))
@@ -299,12 +312,12 @@ namespace DOL.GS.Commands
                                             return;
                                         }
                                     }
-                                            
+
                                     //Ok, they are not in the same alliance, guild, group or battle group - maybe in the same chat group?
                                     ChatGroup clientChatGroup = client.Player.TempProperties.getProperty<ChatGroup>(ChatGroup.CHATGROUP_PROPERTY, null);
-                                    if(clientChatGroup != null)
+                                    if (clientChatGroup != null)
                                     {
-                                        if(clientChatGroup.Members.Contains(targetPlayer))
+                                        if (clientChatGroup.Members.Contains(targetPlayer))
                                         {
                                             //We cannot assist our target when it has no target
                                             if (!HasTarget(client, targetPlayer))
@@ -319,30 +332,30 @@ namespace DOL.GS.Commands
                                     NoValidTarget(client, targetPlayer);
                                     return;
                                 }
-                                        
-                                if(client.Player.TargetObject is GameNPC)
+
+                                if (client.Player.TargetObject is GameNPC)
                                 {
-                                    if(client.Player.TargetObject is GamePet)
+                                    if (client.Player.TargetObject is GamePet)
                                     {
                                         GamePet targetPet = client.Player.TargetObject as GamePet;
 
-                                        if(targetPet.Owner is GamePlayer)
+                                        if (targetPet.Owner is GamePlayer)
                                         {
                                             GamePlayer targetPlayer = targetPet.Owner as GamePlayer;
 
                                             //Lets check if the client and it's targeted pets owner are in the same alliance.
-											if (client.Player.Guild != null && client.Player.Guild.alliance != null && client.Player.Guild.alliance.Contains(targetPlayer.Guild))
-											{
-												//We cannot assist our target when it has no target
-												if (!HasTarget(client, targetPet))
-													return;
+                                            if (client.Player.Guild != null && client.Player.Guild.alliance != null && client.Player.Guild.alliance.Contains(targetPlayer.Guild))
+                                            {
+                                                //We cannot assist our target when it has no target
+                                                if (!HasTarget(client, targetPet))
+                                                    return;
 
-												YouAssist(client, targetPet.GetName(0, false), targetPet.TargetObject);
-												return;
-											}
+                                                YouAssist(client, targetPet.GetName(0, false), targetPet.TargetObject);
+                                                return;
+                                            }
 
-											//They are no alliance members, maybe guild members?
-											if (client.Player.Guild != null && client.Player.Guild.GetOnlineMemberByID(targetPlayer.InternalID) != null)
+                                            //They are no alliance members, maybe guild members?
+                                            if (client.Player.Guild != null && client.Player.Guild.GetOnlineMemberByID(targetPlayer.InternalID) != null)
                                             {
                                                 //We cannot assist our target when it has no target
                                                 if (!HasTarget(client, targetPet))
@@ -353,7 +366,7 @@ namespace DOL.GS.Commands
                                             }
 
                                             //They are no alliance or guild members - maybe group members?
-											if (client.Player.Group != null && client.Player.Group.IsInTheGroup(targetPlayer))
+                                            if (client.Player.Group != null && client.Player.Group.IsInTheGroup(targetPlayer))
                                             {
                                                 //We cannot assist our target when it has no target
                                                 if (!HasTarget(client, targetPet))
@@ -365,9 +378,9 @@ namespace DOL.GS.Commands
 
                                             //Ok, they are not in the same alliance, guild or group - maybe in the same battle group?
                                             BattleGroup clientBattleGroup = client.Player.TempProperties.getProperty<BattleGroup>(BattleGroup.BATTLEGROUP_PROPERTY, null);
-                                            if(clientBattleGroup != null)
+                                            if (clientBattleGroup != null)
                                             {
-                                                if(clientBattleGroup.Members.Contains(targetPlayer))
+                                                if (clientBattleGroup.Members.Contains(targetPlayer))
                                                 {
                                                     //We cannot assist our target when it has no target
                                                     if (!HasTarget(client, targetPet))
@@ -377,12 +390,12 @@ namespace DOL.GS.Commands
                                                     return;
                                                 }
                                             }
-                                            
+
                                             //Ok, they are not in the same alliance, guild, group or battle group - maybe in the same chat group?
-											ChatGroup clientChatGroup = client.Player.TempProperties.getProperty<ChatGroup>(ChatGroup.CHATGROUP_PROPERTY, null);
-                                            if(clientChatGroup != null)
+                                            ChatGroup clientChatGroup = client.Player.TempProperties.getProperty<ChatGroup>(ChatGroup.CHATGROUP_PROPERTY, null);
+                                            if (clientChatGroup != null)
                                             {
-                                                if(clientChatGroup.Members.Contains(targetPlayer))
+                                                if (clientChatGroup.Members.Contains(targetPlayer))
                                                 {
                                                     //We cannot assist our target when it has no target
                                                     if (!HasTarget(client, targetPet))
@@ -398,7 +411,7 @@ namespace DOL.GS.Commands
                                             return;
                                         }
 
-                                        if(targetPet.Owner is GameNPC)
+                                        if (targetPet.Owner is GameNPC)
                                         {
                                             if (!SameRealm(client, (targetPet.Owner as GameNPC), true))
                                                 return;
@@ -414,7 +427,7 @@ namespace DOL.GS.Commands
                                         }
                                     }
 
-                                    if(client.Player.TargetObject is GameKeepGuard)
+                                    if (client.Player.TargetObject is GameKeepGuard)
                                     {
                                         //Note:
                                         //We do not check if the targeted guard is attacking us, because this can be a bug!
@@ -423,7 +436,7 @@ namespace DOL.GS.Commands
                                         Guild targetedGuardGuild = GuildMgr.GetGuildByName(targetGuard.GuildName);
 
                                         //We can assist guards of an unclaimed keep!
-                                        if(targetedGuardGuild == null)
+                                        if (targetedGuardGuild == null)
                                         {
                                             //We cannot assist our target when it has no target
                                             if (!HasTarget(client, targetGuard))
@@ -434,7 +447,7 @@ namespace DOL.GS.Commands
                                         }
 
                                         //Is the guard of our guild?
-                                        if(client.Player.Guild == targetedGuardGuild)
+                                        if (client.Player.Guild == targetedGuardGuild)
                                         {
                                             //We cannot assist our target when it has no target
                                             if (!HasTarget(client, targetGuard))
@@ -445,7 +458,7 @@ namespace DOL.GS.Commands
                                         }
 
                                         //Is the guard of one of our alliance guilds?
-                                        if(client.Player.Guild.alliance.Contains(targetedGuardGuild))
+                                        if (client.Player.Guild.alliance.Contains(targetedGuardGuild))
                                         {
                                             //We cannot assist our target when it has no target
                                             if (!HasTarget(client, targetGuard))
@@ -472,14 +485,15 @@ namespace DOL.GS.Commands
                                     return;
                                 }
                             } break;
-                            #endregion
+
+                        #endregion PvP rules
                     }
                 }
             }
 
             client.Out.SendMessage(LanguageMgr.GetTranslation(client, "Scripts.Players.Assist.SelectMember"), eChatType.CT_System, eChatLoc.CL_SystemWindow);
             return;
-		}
+        }
 
         #region OnCommand member methods
 
@@ -529,6 +543,6 @@ namespace DOL.GS.Commands
             return;
         }
 
-        #endregion
+        #endregion OnCommand member methods
     }
 }

@@ -16,17 +16,17 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
  */
+
 using System;
+using System.Collections;
 using System.Collections.Generic;
-using DOL.Database;
-using DOL.GS;
+using System.Reflection;
 using DOL.Events;
+using DOL.GS;
 using DOL.GS.PacketHandler;
 using DOL.GS.ServerProperties;
 using DOL.GS.Spells;
-using System.Collections;
 using log4net;
-using System.Reflection;
 
 namespace DOL.AI.Brain
 {
@@ -44,7 +44,7 @@ namespace DOL.AI.Brain
         private static readonly ILog log = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
 
         public AggressiveBrain()
-        {           
+        {
         }
 
         /// <summary>
@@ -147,7 +147,7 @@ namespace DOL.AI.Brain
             }
         }
 
-        #endregion
+        #endregion Behaviour
 
         #region Idle handler.
 
@@ -187,7 +187,7 @@ namespace DOL.AI.Brain
 
         /// <summary>
         /// Chance to aggro on this living; the default implementation
-        /// is a flat chance if the living is attackable. A custom implementation 
+        /// is a flat chance if the living is attackable. A custom implementation
         /// could make this dependent on distance, faction, whatever.
         /// </summary>
         /// <param name="living"></param>
@@ -199,7 +199,7 @@ namespace DOL.AI.Brain
                 : (ushort)0;
         }
 
-        #endregion
+        #endregion Idle handler.
 
         #region Aggression handler.
 
@@ -338,7 +338,7 @@ namespace DOL.AI.Brain
             }
         }
 
-        #endregion
+        #endregion Aggression handler.
 
         #region Notify handler.
 
@@ -370,7 +370,7 @@ namespace DOL.AI.Brain
                     return;
                 }
 
-                if (e == GameLivingEvent.CastFinished || e == GameNPCEvent.CastFinished || 
+                if (e == GameLivingEvent.CastFinished || e == GameNPCEvent.CastFinished ||
                     e == GameLivingEvent.CrowdControlExpired ||
                     e == GameLivingEvent.InterruptExpired)
                 {
@@ -401,7 +401,7 @@ namespace DOL.AI.Brain
                 if (args is EnemyHealedEventArgs)
                 {
                     EnemyHealedEventArgs healed = args as EnemyHealedEventArgs;
-                    
+
                     if (IsEnemy(healed.Enemy))
                         OnEnemyHealed(healed.HealSource, healed.HealAmount);
                 }
@@ -445,7 +445,7 @@ namespace DOL.AI.Brain
             }
         }
 
-        #endregion
+        #endregion Notify handler.
 
         #region Other handlers
 
@@ -471,12 +471,12 @@ namespace DOL.AI.Brain
         {
         }
 
-        #endregion
+        #endregion Other handlers
 
         #region Aggression management
 
         private InternalAggression m_aggression;
-        
+
         /// <summary>
         /// This brain's aggression towards various targets.
         /// </summary>
@@ -691,6 +691,6 @@ namespace DOL.AI.Brain
             }
         }
 
-        #endregion
+        #endregion Aggression management
     }
 }

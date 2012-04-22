@@ -1,21 +1,23 @@
 using System;
 using System.Collections;
+using DOL.Events;
 using DOL.GS.Effects;
 using DOL.GS.PacketHandler;
-using DOL.Events;
+
 namespace DOL.GS.Spells
 {
-
-	[SpellHandlerAttribute("HereticPiercingMagic")]
-	public class HereticPiercingMagic : SpellHandler
-	{
+    [SpellHandlerAttribute("HereticPiercingMagic")]
+    public class HereticPiercingMagic : SpellHandler
+    {
         protected GameLiving focustarget = null;
         protected ArrayList m_focusTargets = null;
+
         public override void FinishSpellCast(GameLiving target)
         {
             base.FinishSpellCast(target);
             focustarget = target;
         }
+
         public override void OnEffectStart(GameSpellEffect effect)
         {
             base.OnEffectStart(effect);
@@ -30,6 +32,7 @@ namespace DOL.GS.Spells
                 MessageToCaster("You concentrated on the spell!", eChatType.CT_Spell);
             }
         }
+
         protected virtual void BeginEffect()
         {
             GameEventMgr.AddHandler(m_caster, GamePlayerEvent.AttackFinished, new DOLEventHandler(EventAction));
@@ -38,6 +41,7 @@ namespace DOL.GS.Spells
             GameEventMgr.AddHandler(m_caster, GamePlayerEvent.Dying, new DOLEventHandler(EventAction));
             GameEventMgr.AddHandler(m_caster, GamePlayerEvent.AttackedByEnemy, new DOLEventHandler(EventAction));
         }
+
         public void EventAction(DOLEvent e, object sender, EventArgs args)
         {
             GameLiving player = sender as GameLiving;
@@ -46,6 +50,7 @@ namespace DOL.GS.Spells
             MessageToCaster("You lose your concentration!", eChatType.CT_SpellExpires);
             RemoveEffect();
         }
+
         protected virtual void RemoveEffect()
         {
             if (m_focusTargets != null)
@@ -74,7 +79,7 @@ namespace DOL.GS.Spells
                 player.Out.SendInterruptAnimation(m_caster);
             }
         }
-	
-		public HereticPiercingMagic(GameLiving caster, Spell spell, SpellLine line) : base(caster, spell, line) {}
-	}
+
+        public HereticPiercingMagic(GameLiving caster, Spell spell, SpellLine line) : base(caster, spell, line) { }
+    }
 }

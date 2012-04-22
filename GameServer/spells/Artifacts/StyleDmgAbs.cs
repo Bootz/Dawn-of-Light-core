@@ -1,46 +1,41 @@
 /*
  * DAWN OF LIGHT - The first free open source DAoC server emulator
- * 
+ *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
  * as published by the Free Software Foundation; either version 2
  * of the License, or (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
  */
+
 //made by DeMAN
 using System;
 using System.Collections.Generic;
-using System.Reflection;
-using System.Collections;
 using DOL.Database;
-using DOL.GS.PacketHandler;
-using DOL.GS.Effects;
 using DOL.Events;
-
-using log4net;
-
+using DOL.GS.Effects;
+using DOL.GS.PacketHandler;
 
 namespace DOL.GS.Spells
 {
     [SpellHandlerAttribute("StyleDmgAbs")]
     public class StyleDmgAbsSpellHandler : SpellHandler
     {
-
         //This spell should be a buffer that absorbs 50% of the style damage
         //there is no cap to how much is absorbs, just simply the duration of the spell
         public override void OnEffectStart(GameSpellEffect effect)
         {
             base.OnEffectStart(effect);
-            
+
             GameEventMgr.AddHandler(effect.Owner, GameLivingEvent.AttackedByEnemy, new DOLEventHandler(OnAttack));
 
             eChatType toLiving = (Spell.Pulse == 0) ? eChatType.CT_Spell : eChatType.CT_SpellPulse;
@@ -59,7 +54,7 @@ namespace DOL.GS.Spells
         public override int OnEffectExpires(GameSpellEffect effect, bool noMessages)
         {
             GameEventMgr.RemoveHandler(effect.Owner, GameLivingEvent.AttackedByEnemy, new DOLEventHandler(OnAttack));
-            
+
             if (!noMessages && Spell.Pulse == 0)
             {
                 MessageToLiving(effect.Owner, Spell.Message3, eChatType.CT_SpellExpires);
@@ -100,7 +95,7 @@ namespace DOL.GS.Spells
                 absorbPercent = 100;
             //This only absorbs style damage.
             int damageAbsorbed = (int)(0.01 * absorbPercent * (ad.StyleDamage));
-            
+
             ad.Damage -= damageAbsorbed;
 
             OnDamageAbsorbed(ad, damageAbsorbed);
@@ -108,7 +103,6 @@ namespace DOL.GS.Spells
             //TODO correct messages
             MessageToLiving(ad.Target, string.Format("Your style absorbtion absorbs {0} damage!", damageAbsorbed), eChatType.CT_Spell);
             MessageToLiving(ad.Attacker, string.Format("A barrier absorbs {0} damage of your attack!", damageAbsorbed), eChatType.CT_Spell);
-
         }
 
         protected virtual void OnDamageAbsorbed(AttackData ad, int DamageAmount)
@@ -146,6 +140,7 @@ namespace DOL.GS.Spells
             }
             return 0;
         }
+
         public override IList<string> DelveInfo
         {
             get
@@ -212,6 +207,7 @@ namespace DOL.GS.Spells
                 return list;
             }
         }
+
         public StyleDmgAbsSpellHandler(GameLiving caster, Spell spell, SpellLine line) : base(caster, spell, line) { }
     }
 }

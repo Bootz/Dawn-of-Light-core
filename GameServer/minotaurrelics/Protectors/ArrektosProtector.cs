@@ -1,47 +1,41 @@
 ﻿/*
  * DAWN OF LIGHT - The first free open source DAoC server emulator
- * 
+ *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
  * as published by the Free Software Foundation; either version 2
  * of the License, or (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
  * [StephenxPimentel: Example usage of Mino-Relic protectors]
  * I've created this script to help show what needs to be in
- * each protector to make it work properly. 
- * 
+ * each protector to make it work properly.
+ *
  * Please make note of the AddToWorld function,
  * aswell as the Die function.
- * 
+ *
  * Add To World:
  * - you MUST set the mobs spawn location
  * - you MUST name your mob
  * - you MUST set the Relic associated by Relic ID, or Relic InternalID.
  * - you MUST call the LockRelic(); method.
- * 
+ *
  * Die:
  * - you MUST call the UnlockRelic(); method.
- * 
- * 
+ *
+ *
  * Other than these things, you are free to do whatever you want.
  * Classes should inherit from "BaseProtector"
- * 
+ *
  */
-using System;
-using System.Collections.Generic;
-using System.Text;
-using DOL.GS.Effects;
-using DOL.GS.PacketHandler;
-using DOL.GS.Spells;
 
 namespace DOL.GS
 {
@@ -72,12 +66,11 @@ namespace DOL.GS
             Relic = MinotaurRelicManager.GetRelic(1);
             LockRelic();
 
-
-
             TempProperties.setProperty(ALREADY_GOT_HELP, false);
 
             return base.AddToWorld();
         }
+
         public override void StartAttack(GameObject target)
         {
             base.StartAttack(target);
@@ -88,12 +81,13 @@ namespace DOL.GS
                 {
                     //on initial attack, all fireborn in range add!
                     if (npc.Name == "minotaur fireborn")
-                    npc.StartAttack(target);
+                        npc.StartAttack(target);
                 }
 
                 TempProperties.setProperty(ALREADY_GOT_HELP, true);
             }
         }
+
         public override void Die(GameObject killer)
         {
             base.Die(killer);

@@ -20,142 +20,142 @@
 using System;
 using System.Collections;
 using DOL.Database;
-using DOL.Language;
 using DOL.GS.PacketHandler;
+using DOL.Language;
 
 namespace DOL.GS
 {
-	[NPCGuildScript("Recharger")]
-	public class Recharger : GameNPC
-	{
-		private const string RECHARGE_ITEM_WEAK = "recharged item";
+    [NPCGuildScript("Recharger")]
+    public class Recharger : GameNPC
+    {
+        private const string RECHARGE_ITEM_WEAK = "recharged item";
 
-		/// <summary>
-		/// Can accept any item
-		/// </summary>
-		public override bool CanTradeAnyItem
-		{
-			get { return true; }
-		}
+        /// <summary>
+        /// Can accept any item
+        /// </summary>
+        public override bool CanTradeAnyItem
+        {
+            get { return true; }
+        }
 
-		#region Examine/Interact Message
+        #region Examine/Interact Message
 
-		public override IList GetExamineMessages(GamePlayer player)
-		{
-			IList list = new ArrayList();
-			list.Add(LanguageMgr.GetTranslation(player.Client, "Scripts.Recharger.GetExamineMessages", GetName(0, false), GetPronoun(0, true), GetAggroLevelString(player, false)));
-			return list;
-		}
+        public override IList GetExamineMessages(GamePlayer player)
+        {
+            IList list = new ArrayList();
+            list.Add(LanguageMgr.GetTranslation(player.Client, "Scripts.Recharger.GetExamineMessages", GetName(0, false), GetPronoun(0, true), GetAggroLevelString(player, false)));
+            return list;
+        }
 
-		public override bool Interact(GamePlayer player)
-		{
-			if (!base.Interact(player))
-				return false;
+        public override bool Interact(GamePlayer player)
+        {
+            if (!base.Interact(player))
+                return false;
 
-			TurnTo(player.X, player.Y);
-			SayTo(player, eChatLoc.CL_ChatWindow, LanguageMgr.GetTranslation(player.Client, "Scripts.Recharger.Interact"));
-			return true;
-		}
+            TurnTo(player.X, player.Y);
+            SayTo(player, eChatLoc.CL_ChatWindow, LanguageMgr.GetTranslation(player.Client, "Scripts.Recharger.Interact"));
+            return true;
+        }
 
-		#endregion Examine/Interact Message
+        #endregion Examine/Interact Message
 
-		#region Receive item
+        #region Receive item
 
-		public override bool ReceiveItem(GameLiving source, InventoryItem item)
-		{
-			GamePlayer player = source as GamePlayer;
-			if (player == null || item == null)
-				return false;
+        public override bool ReceiveItem(GameLiving source, InventoryItem item)
+        {
+            GamePlayer player = source as GamePlayer;
+            if (player == null || item == null)
+                return false;
 
-			if (item.Count != 1)
-			{
-				player.Out.SendMessage(LanguageMgr.GetTranslation(player.Client, "Scripts.Recharger.ReceiveItem.StackedObjects", GetName(0, false)), eChatType.CT_System, eChatLoc.CL_SystemWindow);
-				return false;
-			}
+            if (item.Count != 1)
+            {
+                player.Out.SendMessage(LanguageMgr.GetTranslation(player.Client, "Scripts.Recharger.ReceiveItem.StackedObjects", GetName(0, false)), eChatType.CT_System, eChatLoc.CL_SystemWindow);
+                return false;
+            }
 
-			if((item.SpellID == 0 && item.SpellID1 == 0) ||
-				(item.Object_Type == (int)eObjectType.Poison) ||
-				(item.Object_Type == (int)eObjectType.Magical && (item.Item_Type == 40 || item.Item_Type == 41)))
-			{
-				SayTo(player, LanguageMgr.GetTranslation(player.Client, "Scripts.Recharger.ReceiveItem.CantThat"));
-				return false;
-			}
-			if(item.Charges == item.MaxCharges && item.Charges1 == item.MaxCharges1)
-			{
-				SayTo(player, LanguageMgr.GetTranslation(player.Client, "Scripts.Recharger.ReceiveItem.FullyCharged"));
-				return false;
-			}
+            if ((item.SpellID == 0 && item.SpellID1 == 0) ||
+                (item.Object_Type == (int)eObjectType.Poison) ||
+                (item.Object_Type == (int)eObjectType.Magical && (item.Item_Type == 40 || item.Item_Type == 41)))
+            {
+                SayTo(player, LanguageMgr.GetTranslation(player.Client, "Scripts.Recharger.ReceiveItem.CantThat"));
+                return false;
+            }
+            if (item.Charges == item.MaxCharges && item.Charges1 == item.MaxCharges1)
+            {
+                SayTo(player, LanguageMgr.GetTranslation(player.Client, "Scripts.Recharger.ReceiveItem.FullyCharged"));
+                return false;
+            }
 
-			long NeededMoney=0;
-			if (item.Charges < item.MaxCharges)
-			{
-				player.TempProperties.setProperty(RECHARGE_ITEM_WEAK, new WeakRef(item));
-				NeededMoney += (item.MaxCharges - item.Charges)*Money.GetMoney(0,0,10,0,0);
-			}
-			if (item.Charges1 < item.MaxCharges1)
-			{
-				player.TempProperties.setProperty(RECHARGE_ITEM_WEAK, new WeakRef(item));
-				NeededMoney += (item.MaxCharges1 - item.Charges1)*Money.GetMoney(0,0,10,0,0);
-			}
-			if(NeededMoney > 0)
-			{
-				player.Client.Out.SendCustomDialog(LanguageMgr.GetTranslation(player.Client, "Scripts.Recharger.ReceiveItem.Cost", Money.GetString(NeededMoney)), new CustomDialogResponse(RechargerDialogResponse));
-				return true;
-			}
-			return false;
-		}
+            long NeededMoney = 0;
+            if (item.Charges < item.MaxCharges)
+            {
+                player.TempProperties.setProperty(RECHARGE_ITEM_WEAK, new WeakRef(item));
+                NeededMoney += (item.MaxCharges - item.Charges) * Money.GetMoney(0, 0, 10, 0, 0);
+            }
+            if (item.Charges1 < item.MaxCharges1)
+            {
+                player.TempProperties.setProperty(RECHARGE_ITEM_WEAK, new WeakRef(item));
+                NeededMoney += (item.MaxCharges1 - item.Charges1) * Money.GetMoney(0, 0, 10, 0, 0);
+            }
+            if (NeededMoney > 0)
+            {
+                player.Client.Out.SendCustomDialog(LanguageMgr.GetTranslation(player.Client, "Scripts.Recharger.ReceiveItem.Cost", Money.GetString(NeededMoney)), new CustomDialogResponse(RechargerDialogResponse));
+                return true;
+            }
+            return false;
+        }
 
-		protected void RechargerDialogResponse(GamePlayer player, byte response)
-		{
-			WeakReference itemWeak =
-				(WeakReference) player.TempProperties.getProperty<object>(
-				RECHARGE_ITEM_WEAK,
-				new WeakRef(null)
-				);
-			player.TempProperties.removeProperty(RECHARGE_ITEM_WEAK);
+        protected void RechargerDialogResponse(GamePlayer player, byte response)
+        {
+            WeakReference itemWeak =
+                (WeakReference)player.TempProperties.getProperty<object>(
+                RECHARGE_ITEM_WEAK,
+                new WeakRef(null)
+                );
+            player.TempProperties.removeProperty(RECHARGE_ITEM_WEAK);
 
-			InventoryItem item = (InventoryItem) itemWeak.Target;
+            InventoryItem item = (InventoryItem)itemWeak.Target;
 
-			if (item == null || item.SlotPosition == (int) eInventorySlot.Ground
-				|| item.OwnerID == null || item.OwnerID != player.InternalID)
-			{
-				player.Out.SendMessage(LanguageMgr.GetTranslation(player.Client, "Scripts.Recharger.RechargerDialogResponse.InvalidItem"), eChatType.CT_System, eChatLoc.CL_SystemWindow);
-				return;
-			}
+            if (item == null || item.SlotPosition == (int)eInventorySlot.Ground
+                || item.OwnerID == null || item.OwnerID != player.InternalID)
+            {
+                player.Out.SendMessage(LanguageMgr.GetTranslation(player.Client, "Scripts.Recharger.RechargerDialogResponse.InvalidItem"), eChatType.CT_System, eChatLoc.CL_SystemWindow);
+                return;
+            }
 
-			if (response != 0x01)
-			{
-				player.Out.SendMessage(LanguageMgr.GetTranslation(player.Client, "Scripts.Recharger.RechargerDialogResponse.Decline", item.Name), eChatType.CT_System, eChatLoc.CL_SystemWindow);
-				return;
-			}
+            if (response != 0x01)
+            {
+                player.Out.SendMessage(LanguageMgr.GetTranslation(player.Client, "Scripts.Recharger.RechargerDialogResponse.Decline", item.Name), eChatType.CT_System, eChatLoc.CL_SystemWindow);
+                return;
+            }
 
-			long cost = 0;
-			if (item.Charges < item.MaxCharges)
-			{
-				cost += (item.MaxCharges - item.Charges)*Money.GetMoney(0,0,10,0,0);
-			}
+            long cost = 0;
+            if (item.Charges < item.MaxCharges)
+            {
+                cost += (item.MaxCharges - item.Charges) * Money.GetMoney(0, 0, 10, 0, 0);
+            }
 
-			if (item.Charges1 < item.MaxCharges1)
-			{
-				cost += (item.MaxCharges1 - item.Charges1)*Money.GetMoney(0,0,10,0,0);
-			}
+            if (item.Charges1 < item.MaxCharges1)
+            {
+                cost += (item.MaxCharges1 - item.Charges1) * Money.GetMoney(0, 0, 10, 0, 0);
+            }
 
-			if(!player.RemoveMoney(cost))
-			{
-				player.Out.SendMessage(LanguageMgr.GetTranslation(player.Client, "Scripts.Recharger.RechargerDialogResponse.NotMoney"), eChatType.CT_System, eChatLoc.CL_SystemWindow);
-				return;
-			}
+            if (!player.RemoveMoney(cost))
+            {
+                player.Out.SendMessage(LanguageMgr.GetTranslation(player.Client, "Scripts.Recharger.RechargerDialogResponse.NotMoney"), eChatType.CT_System, eChatLoc.CL_SystemWindow);
+                return;
+            }
             InventoryLogging.LogInventoryAction(player, this, eInventoryActionType.Merchant, cost);
 
-			player.Out.SendMessage(LanguageMgr.GetTranslation(player.Client, "Scripts.Recharger.RechargerDialogResponse.GiveMoney", GetName(0, false), Money.GetString((long)cost)), eChatType.CT_System, eChatLoc.CL_SystemWindow);
-			item.Charges = item.MaxCharges;
-			item.Charges1 = item.MaxCharges1;
+            player.Out.SendMessage(LanguageMgr.GetTranslation(player.Client, "Scripts.Recharger.RechargerDialogResponse.GiveMoney", GetName(0, false), Money.GetString((long)cost)), eChatType.CT_System, eChatLoc.CL_SystemWindow);
+            item.Charges = item.MaxCharges;
+            item.Charges1 = item.MaxCharges1;
 
-			player.Out.SendInventoryItemsUpdate(new InventoryItem[] {item});
-			SayTo(player, LanguageMgr.GetTranslation(player.Client, "Scripts.Recharger.RechargerDialogResponse.FullyCharged"));
-			return;
-		}
+            player.Out.SendInventoryItemsUpdate(new InventoryItem[] { item });
+            SayTo(player, LanguageMgr.GetTranslation(player.Client, "Scripts.Recharger.RechargerDialogResponse.FullyCharged"));
+            return;
+        }
 
-		#endregion Receive item
-	}
+        #endregion Receive item
+    }
 }

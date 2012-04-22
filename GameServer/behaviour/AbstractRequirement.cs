@@ -1,44 +1,44 @@
 /*
  * DAWN OF LIGHT - The first free open source DAoC server emulator
- * 
+ *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
  * as published by the Free Software Foundation; either version 2
  * of the License, or (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
  */
+
 using System;
-using System.Text;
-using DOL.Events;
-using DOL.GS.Behaviour.Attributes;using DOL.GS.Behaviour;
-using log4net;
 using System.Reflection;
+using DOL.Events;
+using DOL.GS.Behaviour.Attributes;
+using log4net;
 
 namespace DOL.GS.Behaviour
 {
     /// <summary>
     /// Requirements describe what must be true to allow a QuestAction to fire.
     /// Level of player, Step of Quest, Class of Player, etc... There are also some variables to add
-    /// additional parameters. To fire a QuestAction ALL requirements must be fulfilled.         
+    /// additional parameters. To fire a QuestAction ALL requirements must be fulfilled.
     /// </summary>
-    public abstract class AbstractRequirement<TypeN,TypeV> : IBehaviourRequirement
+    public abstract class AbstractRequirement<TypeN, TypeV> : IBehaviourRequirement
     {
         private static readonly ILog log = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
 
-		private eRequirementType type;
+        private eRequirementType type;
         private TypeN n;
         private TypeV v;
         private eComparator comparator;
-		private GameNPC defaultNPC;		
+        private GameNPC defaultNPC;
 
         /// <summary>
         /// R: RequirmentType
@@ -48,22 +48,25 @@ namespace DOL.GS.Behaviour
             get { return type; }
             set { type = value; }
         }
+
         /// <summary>
         /// N: first Requirment Variable
         /// </summary>
         public TypeN N
         {
             get { return n; }
-			set { n = value; }
+            set { n = value; }
         }
+
         /// <summary>
         /// V: Secoond Requirmenet Variable
         /// </summary>
         public TypeV V
         {
             get { return v; }
-			set { v = value; }
+            set { v = value; }
         }
+
         /// <summary>
         /// C: Requirement Comparator
         /// </summary>
@@ -80,8 +83,7 @@ namespace DOL.GS.Behaviour
         {
             get { return defaultNPC; }
             set { defaultNPC = value; }
-        }		
-        
+        }
 
         public AbstractRequirement(GameNPC npc, eRequirementType type, eComparator comp)
         {
@@ -90,28 +92,27 @@ namespace DOL.GS.Behaviour
             this.comparator = comp;
         }
 
-		/// <summary>
+        /// <summary>
         /// Creates a new QuestRequirement and does some basich compativilite checks for the parameters
-		/// </summary>
-		/// <param name="defaultNPC"></param>
-		/// <param name="type"></param>
-		/// <param name="n"></param>
-		/// <param name="v"></param>
-		/// <param name="comp"></param>
-        public AbstractRequirement(GameNPC defaultNPC, eRequirementType type, Object n, Object v, eComparator comp) : this(defaultNPC,type,comp)
-        {            			            
-
+        /// </summary>
+        /// <param name="defaultNPC"></param>
+        /// <param name="type"></param>
+        /// <param name="n"></param>
+        /// <param name="v"></param>
+        /// <param name="comp"></param>
+        public AbstractRequirement(GameNPC defaultNPC, eRequirementType type, Object n, Object v, eComparator comp)
+            : this(defaultNPC, type, comp)
+        {
             RequirementAttribute attr = BehaviourMgr.getRequirementAttribute(this.GetType());
             // handle parameter N
-            object defaultValueN = GetDefaultValue(attr.DefaultValueN);            
+            object defaultValueN = GetDefaultValue(attr.DefaultValueN);
             this.N = (TypeN)BehaviourUtils.ConvertObject(n, defaultValueN, typeof(TypeN));
             CheckParameter(this.N, attr.IsNullableN, typeof(TypeN));
-            
+
             // handle parameter V
-            object defaultValueV = GetDefaultValue(attr.DefaultValueV);            
+            object defaultValueV = GetDefaultValue(attr.DefaultValueV);
             this.v = (TypeV)BehaviourUtils.ConvertObject(v, defaultValueV, typeof(TypeV));
             CheckParameter(this.V, attr.IsNullableV, typeof(TypeV));
-            
         }
 
         protected virtual object GetDefaultValue(Object defaultValue)
@@ -121,7 +122,7 @@ namespace DOL.GS.Behaviour
                 if (defaultValue is eDefaultValueConstants)
                 {
                     switch ((eDefaultValueConstants)defaultValue)
-                    {                        
+                    {
                         case eDefaultValueConstants.NPC:
                             defaultValue = NPC;
                             break;
@@ -170,7 +171,7 @@ namespace DOL.GS.Behaviour
         public abstract bool Check(DOLEvent e, object sender, EventArgs args);
 
         /// <summary>
-        /// Compares value1 with value2 
+        /// Compares value1 with value2
         /// Allowed Comparators: Less,Greater,Equal, NotEqual, None
         /// </summary>
         /// <param name="value1">Value1 one to compare</param>
@@ -197,7 +198,7 @@ namespace DOL.GS.Behaviour
         }
 
         /// <summary>
-        /// Compares value1 with value2 
+        /// Compares value1 with value2
         /// Allowed Comparators: Less,Greater,Equal, NotEqual, None
         /// </summary>
         /// <param name="value1">Value1 one to compare</param>

@@ -1,32 +1,29 @@
-/* 
+/*
  * DAWN OF LIGHT - The first free open source DAoC server emulator
- * 
+ *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
  * as published by the Free Software Foundation; either version 2
  * of the License, or (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
  */
 
-using System.Reflection;
 using System.Collections.Generic;
-using log4net;
+using DOL.GS.Appeal;
 using DOL.GS.PacketHandler;
 using DOL.Language;
-using DOL.GS.Appeal;
 
 namespace DOL.GS.Commands
 {
-
     [CmdAttribute(
         "&gmappeal",
         new string[] { "&gmhelp" },
@@ -62,8 +59,8 @@ namespace DOL.GS.Commands
 
             switch (args[1])
             {
-
                 #region gmappeal assist
+
                 case "assist":
                     {
                         if (args.Length < 3)
@@ -86,7 +83,6 @@ namespace DOL.GS.Commands
 
                         if (targetClient == null)
                         {
-
                             // nothing found
                             AppealMgr.MessageToClient(client, LanguageMgr.GetTranslation(client, "Scripts.Players.Appeal.PlayerNotFound", targetName));
                             return;
@@ -113,7 +109,9 @@ namespace DOL.GS.Commands
                         AppealMgr.MessageToClient(client, LanguageMgr.GetTranslation(client, "Scripts.Players.Appeal.DoesntHaveAppeal"));
                         break;
                     }
+
                 #endregion gmappeal assist
+
                 #region gmappeal view
 
                 case "view":
@@ -128,7 +126,6 @@ namespace DOL.GS.Commands
                         GameClient targetClient = WorldMgr.GuessClientByPlayerNameAndRealm(targetName, 0, false, out result);
                         switch (result)
                         {
-
                             case 2: // name not unique
                                 AppealMgr.MessageToClient(client, LanguageMgr.GetTranslation(client, "Scripts.Players.Appeal.NameNotUnique"));
                                 return;
@@ -138,7 +135,6 @@ namespace DOL.GS.Commands
                         }
                         if (targetClient == null)
                         {
-
                             // nothing found
                             AppealMgr.MessageToClient(client, LanguageMgr.GetTranslation(client, "Scripts.Players.Appeal.PlayerNotFound", targetName));
                             return;
@@ -158,8 +154,11 @@ namespace DOL.GS.Commands
                         AppealMgr.MessageToClient(client, LanguageMgr.GetTranslation(client, "Scripts.Players.Appeal.DoesntHaveAppeal"));
                         break;
                     }
+
                 #endregion gmappeal view
+
                 #region gmappeal release
+
                 case "release":
                     {
                         if (args.Length < 3)
@@ -182,7 +181,6 @@ namespace DOL.GS.Commands
 
                         if (targetClient == null)
                         {
-
                             // nothing found
                             AppealMgr.MessageToClient(client, LanguageMgr.GetTranslation(client, "Scripts.Players.Appeal.PlayerNotFound", targetName));
                             return;
@@ -206,12 +204,14 @@ namespace DOL.GS.Commands
                         AppealMgr.MessageToClient(client, LanguageMgr.GetTranslation(client, "Scripts.Players.Appeal.DoesntHaveAppeal"));
                         return;
                     }
+
                 #endregion gmappeal release
+
                 #region gmappeal list
+
                 case "list":
                 case "listall":
                     {
-
                         int low = 0;
                         int med = 0;
                         int high = 0;
@@ -307,8 +307,11 @@ namespace DOL.GS.Commands
                     }
 
                     break;
+
                 #endregion gmappeal list
+
                 #region gmappeal close
+
                 case "close":
                     {
                         if (args.Length < 3)
@@ -331,7 +334,6 @@ namespace DOL.GS.Commands
 
                         if (targetClient == null)
                         {
-
                             // nothing found
                             AppealMgr.MessageToClient(client, LanguageMgr.GetTranslation(client, "Scripts.Players.Appeal.PlayerNotFound", targetName));
                             return;
@@ -349,7 +351,9 @@ namespace DOL.GS.Commands
                     }
 
                 #endregion gmappeal close
+
                 #region gmappeal closeoffline
+
                 case "closeoffline":
                     {
                         if (args.Length < 3)
@@ -381,7 +385,6 @@ namespace DOL.GS.Commands
                         }
                         if (targetClient == null)
                         {
-
                             // player isn't online so we're fine.
                             return;
                         }
@@ -396,7 +399,9 @@ namespace DOL.GS.Commands
                     }
 
                 #endregion gmappeal closeoffline
+
                 #region gmappeal jumpto
+
                 case "jumpto":
                     {
                         try
@@ -434,7 +439,9 @@ namespace DOL.GS.Commands
                     }
 
                 #endregion gmappeal jumpto
+
                 #region gmappeal mute
+
                 case "mute":
                     {
                         bool mute = client.Player.TempProperties.getProperty<bool>("AppealMute");
@@ -455,8 +462,11 @@ namespace DOL.GS.Commands
 
                         break;
                     }
+
                 #endregion gmappeal mute
+
                 #region gmappeal commands
+
                 case "commands":
                 case "cmds":
                 case "help":
@@ -475,7 +485,9 @@ namespace DOL.GS.Commands
                     helpmsg.Add("/gmappeal mute - Toggles receiving appeal notices, for yourself, for this session.");
                     client.Out.SendCustomTextWindow("/gmappeal commands list", helpmsg);
                     break;
+
                 #endregion gmappeal commands
+
                 default:
                     {
                         DisplaySyntax(client);

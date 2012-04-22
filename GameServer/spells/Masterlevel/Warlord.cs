@@ -16,27 +16,26 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
  */
-using System.Collections.Generic;
-using System.Reflection;
-using log4net;
-using System;
+
 using System.Collections;
+using DOL.AI.Brain;
 using DOL.GS.Effects;
 using DOL.GS.PacketHandler;
-using DOL.AI.Brain;
-using DOL.GS;
-using DOL.Events;
-using System.Collections.Specialized;
 
 namespace DOL.GS.Spells
-{    
+{
     //http://www.camelotherald.com/masterlevels/ma.php?ml=Warlord
+
     #region Warlord-1
+
     //Gamesiegeweapon - getactiondelay
-    #endregion
+
+    #endregion Warlord-1
 
     //shared timer 1 for 2 - shared timer 4 for 8
+
     #region Warlord-2/8
+
     [SpellHandlerAttribute("PBAEHeal")]
     public class PBAEHealHandler : MasterlevelHandling
     {
@@ -102,11 +101,11 @@ namespace DOL.GS.Spells
                         {
                             int healvalue = (int)m_spell.Value;
                             int heal;
-                                if (target.IsAlive && !GameServer.ServerRules.IsAllowedToAttack(Caster, player, true))
-                                {
-                                    heal = target.ChangeHealth(target, GameLiving.eHealthChangeType.Spell, healvalue);
-                                    if (heal != 0) player.Out.SendMessage(m_caster.Name + " heal you for " + heal + " hit point!", eChatType.CT_YouWereHit, eChatLoc.CL_SystemWindow);
-                                }
+                            if (target.IsAlive && !GameServer.ServerRules.IsAllowedToAttack(Caster, player, true))
+                            {
+                                heal = target.ChangeHealth(target, GameLiving.eHealthChangeType.Spell, healvalue);
+                                if (heal != 0) player.Out.SendMessage(m_caster.Name + " heal you for " + heal + " hit point!", eChatType.CT_YouWereHit, eChatLoc.CL_SystemWindow);
+                            }
                             heal = m_caster.ChangeHealth(Caster, GameLiving.eHealthChangeType.Spell, (int)(-m_caster.Health * 90 / 100));
                             if (heal != 0) MessageToCaster("You lose " + heal + " hit point" + (heal == 1 ? "." : "s."), eChatType.CT_Spell);
 
@@ -120,10 +119,13 @@ namespace DOL.GS.Spells
         // constructor
         public PBAEHealHandler(GameLiving caster, Spell spell, SpellLine line) : base(caster, spell, line) { }
     }
-    #endregion
+
+    #endregion Warlord-2/8
 
     //shared timer 2
+
     #region Warlord-3
+
     [SpellHandlerAttribute("CoweringBellow")]
     public class CoweringBellowSpellHandler : FearSpellHandler
     {
@@ -131,6 +133,7 @@ namespace DOL.GS.Spells
         {
             return 0;
         }
+
         public override IList SelectTargets(GameObject castTarget)
         {
             ArrayList list = new ArrayList();
@@ -145,26 +148,33 @@ namespace DOL.GS.Spells
 
         public CoweringBellowSpellHandler(GameLiving caster, Spell spell, SpellLine line) : base(caster, spell, line) { }
     }
-    #endregion
+
+    #endregion Warlord-3
 
     //ML4~     //shared timer 3
 
     //shared timer 3
+
     #region Warlord-5
+
     [SpellHandlerAttribute("Critical")]
     public class CriticalDamageBuff : MasterlevelDualBuffHandling
     {
         public override eProperty Property1 { get { return eProperty.CriticalSpellHitChance; } }
+
         public override eProperty Property2 { get { return eProperty.CriticalMeleeHitChance; } }
 
         public CriticalDamageBuff(GameLiving caster, Spell spell, SpellLine line) : base(caster, spell, line) { }
     }
-    #endregion  
-       
+
+    #endregion Warlord-5
+
     //ML6~     //shared timer 4
 
     //shared timer 3
+
     #region Warlord-7
+
     [SpellHandlerAttribute("CleansingAura")]
     public class CleansingAurauraSpellHandler : SpellHandler
     {
@@ -175,10 +185,13 @@ namespace DOL.GS.Spells
 
         public CleansingAurauraSpellHandler(GameLiving caster, Spell spell, SpellLine line) : base(caster, spell, line) { }
     }
-    #endregion
+
+    #endregion Warlord-7
 
     //shared timer 5
+
     #region Warlord-9
+
     [SpellHandlerAttribute("EffectivenessBuff")]
     public class EffectivenessBuff : MasterlevelHandling
     {
@@ -233,10 +246,13 @@ namespace DOL.GS.Spells
 
         public EffectivenessBuff(GameLiving caster, Spell spell, SpellLine line) : base(caster, spell, line) { }
     }
-    #endregion
+
+    #endregion Warlord-9
 
     //shared timer 5
+
     #region Warlord-10
+
     [SpellHandlerAttribute("MLABSBuff")]
     public class MLABSBuff : MasterlevelBuffHandling
     {
@@ -244,5 +260,6 @@ namespace DOL.GS.Spells
 
         public MLABSBuff(GameLiving caster, Spell spell, SpellLine line) : base(caster, spell, line) { }
     }
-    #endregion
+
+    #endregion Warlord-10
 }

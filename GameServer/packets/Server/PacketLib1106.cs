@@ -17,13 +17,9 @@
 *
 */
 #define NOENCRYPTION
-using System;
-using System.Reflection;
-using DOL.Database;
-using System.Collections;
-using System.Collections.Generic;
-using log4net;
 
+using System.Reflection;
+using log4net;
 
 namespace DOL.GS.PacketHandler
 {
@@ -34,15 +30,12 @@ namespace DOL.GS.PacketHandler
 
         /// <summary>
         /// Constructs a new PacketLib for Client Version 1.106
-		/// Untested stub to allow connects
+        /// Untested stub to allow connects
         /// </summary>
         /// <param name="client">the gameclient this lib is associated with</param>
         public PacketLib1106(GameClient client)
             : base(client)
         {
-
         }
-
-
     }
 }

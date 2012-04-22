@@ -1,23 +1,22 @@
 /*
  * DAWN OF LIGHT - The first free open source DAoC server emulator
- * 
+ *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
  * as published by the Free Software Foundation; either version 2
  * of the License, or (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
  */
 
-using System;
 using System.Collections.Generic;
 using DOL.Database;
 using DOL.GS.Effects;
@@ -67,7 +66,7 @@ namespace DOL.GS.RealmAbilities
                     player.DisableSkill(this, 3 * 1000);
                     return;
                 }
-                if ( !player.IsWithinRadius( player.TargetObject, SpellRange ) )
+                if (!player.IsWithinRadius(player.TargetObject, SpellRange))
                 {
                     player.Out.SendMessage(player.TargetObject + " is too far away!", eChatType.CT_Spell, eChatLoc.CL_SystemWindow);
                     player.DisableSkill(this, 3 * 1000);
@@ -107,7 +106,7 @@ namespace DOL.GS.RealmAbilities
                 player.DisableSkill(this, 3 * 1000);
                 return;
             }
-            if ( !player.IsWithinRadius( targetPlayer, SpellRange ) )
+            if (!player.IsWithinRadius(targetPlayer, SpellRange))
             {
                 player.Out.SendMessage(targetPlayer + " is too far away.", eChatType.CT_Spell, eChatLoc.CL_SystemWindow);
                 player.DisableSkill(this, 3 * 1000);
@@ -118,7 +117,7 @@ namespace DOL.GS.RealmAbilities
                 if (!GameServer.ServerRules.IsAllowedToAttack(player, radiusPlayer, true))
                     continue;
 
-				SelectiveBlindnessEffect SelectiveBlindness = radiusPlayer.EffectList.GetOfType<SelectiveBlindnessEffect>();
+                SelectiveBlindnessEffect SelectiveBlindness = radiusPlayer.EffectList.GetOfType<SelectiveBlindnessEffect>();
                 if (SelectiveBlindness != null) SelectiveBlindness.Cancel(false);
                 new SelectiveBlindnessEffect(player).Start(radiusPlayer);
             }
@@ -137,6 +136,5 @@ namespace DOL.GS.RealmAbilities
             list.Add("Duration: 20s");
             list.Add("Casting time: Instant");
         }
-
     }
 }

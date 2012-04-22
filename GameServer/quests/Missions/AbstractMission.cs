@@ -29,185 +29,185 @@ using log4net;
 
 namespace DOL.GS.Quests
 {
-	public class AbstractMission
-	{
-		/// <summary>
-		/// Defines a logger for this class.
-		/// </summary>
-		private static readonly ILog log = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
+    public class AbstractMission
+    {
+        /// <summary>
+        /// Defines a logger for this class.
+        /// </summary>
+        private static readonly ILog log = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
 
-		/// <summary>
-		/// The temp property name for next check mission millisecond
-		/// </summary>
-		protected const string CHECK_MISSION_TICK = "checkMissionTick";
+        /// <summary>
+        /// The temp property name for next check mission millisecond
+        /// </summary>
+        protected const string CHECK_MISSION_TICK = "checkMissionTick";
 
-		/// <summary>
-		/// Time player must wait after failed mission check to get new mission, in milliseconds
-		/// "Once a player has a personal mission,
-		/// a new Personal mission cannot be obtained for 30 minutes,
-		/// or until the current Personal mission is complete
-		/// - whichever occurs first."
-		/// </summary>
-		protected const int CHECK_MISSION_DELAY = 30 * 60 * 1000; // 30 minutes
+        /// <summary>
+        /// Time player must wait after failed mission check to get new mission, in milliseconds
+        /// "Once a player has a personal mission,
+        /// a new Personal mission cannot be obtained for 30 minutes,
+        /// or until the current Personal mission is complete
+        /// - whichever occurs first."
+        /// </summary>
+        protected const int CHECK_MISSION_DELAY = 30 * 60 * 1000; // 30 minutes
 
-		/// <summary>
-		/// possible mission types
-		/// </summary>
-		public enum eMissionType : int
-		{ 
-			None = 0,
-			Personal = 1,
-			Group = 2,
-			Realm = 3,
-			Task = 4,
-		}
+        /// <summary>
+        /// possible mission types
+        /// </summary>
+        public enum eMissionType : int
+        {
+            None = 0,
+            Personal = 1,
+            Group = 2,
+            Realm = 3,
+            Task = 4,
+        }
 
-		public eMissionType MissionType
-		{
-			get 
-			{
-				if (m_owner is GamePlayer)
-					return eMissionType.Personal;
-				else if (m_owner is Group)
-					return eMissionType.Group;
-				else if (m_owner is eRealm)
-					return eMissionType.Realm;
-				else return eMissionType.None;
-			}
-		}
+        public eMissionType MissionType
+        {
+            get
+            {
+                if (m_owner is GamePlayer)
+                    return eMissionType.Personal;
+                else if (m_owner is Group)
+                    return eMissionType.Group;
+                else if (m_owner is eRealm)
+                    return eMissionType.Realm;
+                else return eMissionType.None;
+            }
+        }
 
-		/// <summary>
-		/// owner of the mission
-		/// </summary>
-		protected object m_owner = null;
+        /// <summary>
+        /// owner of the mission
+        /// </summary>
+        protected object m_owner = null;
 
-		/// <summary>
-		/// Constructs a new Mission
-		/// </summary>
-		/// <param name="owner">The owner of the mission</param>
-		public AbstractMission(object owner)
-		{
-			m_owner = owner;
-		}
+        /// <summary>
+        /// Constructs a new Mission
+        /// </summary>
+        /// <param name="owner">The owner of the mission</param>
+        public AbstractMission(object owner)
+        {
+            m_owner = owner;
+        }
 
-		public virtual long RewardXP
-		{
-			get { return 0; }
-		}
+        public virtual long RewardXP
+        {
+            get { return 0; }
+        }
 
-		public virtual long RewardMoney
-		{
-			get 
-			{
-				return 50 * 100 * 100;
-			}
-		}
+        public virtual long RewardMoney
+        {
+            get
+            {
+                return 50 * 100 * 100;
+            }
+        }
 
-		public virtual long RewardRealmPoints
-		{
-			get 
-			{
-				return 1500;
-			}
-		}
+        public virtual long RewardRealmPoints
+        {
+            get
+            {
+                return 1500;
+            }
+        }
 
-		/// <summary>
-		/// Retrieves the name of the mission
-		/// </summary>
-		public virtual string Name
-		{
-			get 
-			{
-				switch (MissionType)
-				{
-					case eMissionType.Personal: return "Personal Mission";
-					case eMissionType.Group: return "Group Mission";
-					case eMissionType.Realm: return "Realm Mission";
-					case eMissionType.Task: return "Task";
-					case eMissionType.None: return "Unknown Mission";
-					default: return "MISSION NAME UNDEFINED!";
-				}
-			}
-		}
+        /// <summary>
+        /// Retrieves the name of the mission
+        /// </summary>
+        public virtual string Name
+        {
+            get
+            {
+                switch (MissionType)
+                {
+                    case eMissionType.Personal: return "Personal Mission";
+                    case eMissionType.Group: return "Group Mission";
+                    case eMissionType.Realm: return "Realm Mission";
+                    case eMissionType.Task: return "Task";
+                    case eMissionType.None: return "Unknown Mission";
+                    default: return "MISSION NAME UNDEFINED!";
+                }
+            }
+        }
 
-		/// <summary>
-		/// Retrieves the description for the mission
-		/// </summary>
-		public virtual string Description
-		{
-			get { return "MISSION DESCRIPTION UNDEFINED!"; }
-		}
+        /// <summary>
+        /// Retrieves the description for the mission
+        /// </summary>
+        public virtual string Description
+        {
+            get { return "MISSION DESCRIPTION UNDEFINED!"; }
+        }
 
-		/// <summary>
-		/// This HybridDictionary holds all the custom properties of this quest
-		/// </summary>
-		protected HybridDictionary m_customProperties = new HybridDictionary();
+        /// <summary>
+        /// This HybridDictionary holds all the custom properties of this quest
+        /// </summary>
+        protected HybridDictionary m_customProperties = new HybridDictionary();
 
-		/// <summary>
-		/// This method sets a custom Property to a specific value
-		/// </summary>
-		/// <param name="key">The name of the property</param>
-		/// <param name="value">The value of the property</param>
-		public void SetCustomProperty(string key, string value)
-		{
-			if (key == null)
-				throw new ArgumentNullException("key");
-			if (value == null)
-				throw new ArgumentNullException("value");
+        /// <summary>
+        /// This method sets a custom Property to a specific value
+        /// </summary>
+        /// <param name="key">The name of the property</param>
+        /// <param name="value">The value of the property</param>
+        public void SetCustomProperty(string key, string value)
+        {
+            if (key == null)
+                throw new ArgumentNullException("key");
+            if (value == null)
+                throw new ArgumentNullException("value");
 
-			//Make the string safe
-			key = key.Replace(';', ',');
-			key = key.Replace('=', '-');
-			value = value.Replace(';', ',');
-			value = value.Replace('=', '-');
-			lock (m_customProperties)
-			{
-				m_customProperties[key] = value;
-			}
-		}
+            //Make the string safe
+            key = key.Replace(';', ',');
+            key = key.Replace('=', '-');
+            value = value.Replace(';', ',');
+            value = value.Replace('=', '-');
+            lock (m_customProperties)
+            {
+                m_customProperties[key] = value;
+            }
+        }
 
-		/// <summary>
-		/// Removes a custom property from the database
-		/// </summary>
-		/// <param name="key">The key name of the property</param>
-		public void RemoveCustomProperty(string key)
-		{
-			if (key == null)
-				throw new ArgumentNullException("key");
+        /// <summary>
+        /// Removes a custom property from the database
+        /// </summary>
+        /// <param name="key">The key name of the property</param>
+        public void RemoveCustomProperty(string key)
+        {
+            if (key == null)
+                throw new ArgumentNullException("key");
 
-			lock (m_customProperties)
-			{
-				m_customProperties.Remove(key);
-			}
-		}
+            lock (m_customProperties)
+            {
+                m_customProperties.Remove(key);
+            }
+        }
 
-		/// <summary>
-		/// This method retrieves a custom property from the database
-		/// </summary>
-		/// <param name="key">The property key</param>
-		/// <returns>The property value</returns>
-		public string GetCustomProperty(string key)
-		{
-			if (key == null)
-				throw new ArgumentNullException("key");
+        /// <summary>
+        /// This method retrieves a custom property from the database
+        /// </summary>
+        /// <param name="key">The property key</param>
+        /// <returns>The property value</returns>
+        public string GetCustomProperty(string key)
+        {
+            if (key == null)
+                throw new ArgumentNullException("key");
 
-			return (string)m_customProperties[key];
-		}
+            return (string)m_customProperties[key];
+        }
 
-		/// <summary>
-		/// Called to finish the mission
-		/// </summary>
-		public virtual void FinishMission()
-		{
-			foreach (GamePlayer player in Targets)
-			{
-				if (m_owner is Group)
-				{
-					if (!player.IsWithinRadius((m_owner as Group).Leader, WorldMgr.MAX_EXPFORKILL_DISTANCE))
-						continue;
-				}
-				if (RewardXP > 0)
-					player.GainExperience(GameLiving.eXPSource.Mission, RewardXP);
+        /// <summary>
+        /// Called to finish the mission
+        /// </summary>
+        public virtual void FinishMission()
+        {
+            foreach (GamePlayer player in Targets)
+            {
+                if (m_owner is Group)
+                {
+                    if (!player.IsWithinRadius((m_owner as Group).Leader, WorldMgr.MAX_EXPFORKILL_DISTANCE))
+                        continue;
+                }
+                if (RewardXP > 0)
+                    player.GainExperience(GameLiving.eXPSource.Mission, RewardXP);
 
                 if (RewardMoney > 0)
                 {
@@ -215,86 +215,85 @@ namespace DOL.GS.Quests
                     InventoryLogging.LogInventoryAction("(MISSION;" + MissionType + ")", player, eInventoryActionType.Quest, RewardMoney);
                 }
 
-			    if (RewardRealmPoints > 0)
-					player.GainRealmPoints(RewardRealmPoints);
+                if (RewardRealmPoints > 0)
+                    player.GainRealmPoints(RewardRealmPoints);
 
-				player.Out.SendMessage("You finish the " + Name + "!", eChatType.CT_System, eChatLoc.CL_SystemWindow);
-			}
+                player.Out.SendMessage("You finish the " + Name + "!", eChatType.CT_System, eChatLoc.CL_SystemWindow);
+            }
 
-			switch (MissionType)
-			{
-				case eMissionType.Personal: (m_owner as GamePlayer).Mission = null; break;
-				case eMissionType.Group: (m_owner as Group).Mission = null; break;
-				//case eMissionType.Realm: (m_owner.RealmMission = null; break;
-			}
+            switch (MissionType)
+            {
+                case eMissionType.Personal: (m_owner as GamePlayer).Mission = null; break;
+                case eMissionType.Group: (m_owner as Group).Mission = null; break;
+                //case eMissionType.Realm: (m_owner.RealmMission = null; break;
+            }
 
-			m_customProperties.Clear();
-		}
+            m_customProperties.Clear();
+        }
 
-		private List<GamePlayer> Targets
-		{
-			get
-			{
-				switch (MissionType)
-				{
-					case eMissionType.Personal:
-						{
-							GamePlayer player = m_owner as GamePlayer;
-							List<GamePlayer> list = new List<GamePlayer>();
-							list.Add(player);
-							return list;
-						}
-					case eMissionType.Group:
-						{
-							Group group = m_owner as Group;
-							return group.GetPlayersInTheGroup() as List<GamePlayer>;
-						}
-					case eMissionType.Realm:
-					case eMissionType.None:
-					default: return new List<GamePlayer>();
-				}
-			}
-		}
+        private List<GamePlayer> Targets
+        {
+            get
+            {
+                switch (MissionType)
+                {
+                    case eMissionType.Personal:
+                        {
+                            GamePlayer player = m_owner as GamePlayer;
+                            List<GamePlayer> list = new List<GamePlayer>();
+                            list.Add(player);
+                            return list;
+                        }
+                    case eMissionType.Group:
+                        {
+                            Group group = m_owner as Group;
+                            return group.GetPlayersInTheGroup() as List<GamePlayer>;
+                        }
+                    case eMissionType.Realm:
+                    case eMissionType.None:
+                    default: return new List<GamePlayer>();
+                }
+            }
+        }
 
-		/// <summary>
-		/// A mission runs out of time
-		/// </summary>
-		public virtual void ExpireMission()
-		{
-			foreach (GamePlayer player in Targets)
-			{
-				player.Out.SendMessage("Your " + Name + " has expired!", eChatType.CT_System, eChatLoc.CL_SystemWindow);
-			}
+        /// <summary>
+        /// A mission runs out of time
+        /// </summary>
+        public virtual void ExpireMission()
+        {
+            foreach (GamePlayer player in Targets)
+            {
+                player.Out.SendMessage("Your " + Name + " has expired!", eChatType.CT_System, eChatLoc.CL_SystemWindow);
+            }
 
-			switch (MissionType)
-			{
-				case eMissionType.Personal: (m_owner as GamePlayer).Mission = null; break;
-				case eMissionType.Group: (m_owner as Group).Mission = null; break;
-				//case eMissionType.Realm: m_owner.RealmMission = null; break;
-			}
-			m_customProperties.Clear();
-		}
+            switch (MissionType)
+            {
+                case eMissionType.Personal: (m_owner as GamePlayer).Mission = null; break;
+                case eMissionType.Group: (m_owner as Group).Mission = null; break;
+                //case eMissionType.Realm: m_owner.RealmMission = null; break;
+            }
+            m_customProperties.Clear();
+        }
 
-		public virtual void UpdateMission()
-		{
-			foreach (GamePlayer player in Targets)
-			{
-				player.Out.SendQuestListUpdate();
-			}
-		}
+        public virtual void UpdateMission()
+        {
+            foreach (GamePlayer player in Targets)
+            {
+                player.Out.SendQuestListUpdate();
+            }
+        }
 
-		/// <summary>
-		/// This method needs to be implemented in each quest.
-		/// It is the core of the quest. The global event hook of the GamePlayer.
-		/// This method will be called whenever a GamePlayer with this quest
-		/// fires ANY event!
-		/// </summary>
-		/// <param name="e">The event type</param>
-		/// <param name="sender">The sender of the event</param>
-		/// <param name="args">The event arguments</param>
-		public virtual void Notify(DOLEvent e, object sender, EventArgs args)
-		{
-
-		}
-	}
+        /// <summary>
+        /// This method needs to be implemented in each quest.
+        /// It is the core of the quest. The global event hook of the GamePlayer.
+        /// This method will be called whenever a GamePlayer with this quest
+        /// fires ANY event!
+        /// </summary>
+        /// <param name="e">The event type</param>
+        /// <param name="sender">The sender of the event</param>
+        /// <param name="args">The event arguments</param>
+        public virtual void Notify(DOLEvent e, object sender, EventArgs args)
+        {
+        }
+    }
 }

@@ -1,38 +1,36 @@
 /*
  * DAWN OF LIGHT - The first free open source DAoC server emulator
- * 
+ *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
  * as published by the Free Software Foundation; either version 2
  * of the License, or (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
  */
- 
+
 using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Reflection;
 using DOL.Database;
-using DOL.GS;
-using DOL.GS.PacketHandler;
 using DOL.Events;
-using DOL.GS.Spells;
+using DOL.GS.PacketHandler;
 using log4net;
 
 namespace DOL.GS
 {
-	public class PlayerStatistics : IPlayerStatistics
-	{
-		private static readonly ILog log = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
+    public class PlayerStatistics : IPlayerStatistics
+    {
+        private static readonly ILog log = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
 
         private const int TIME_BETWEEN_UPDATES = 60000; // 1 minute
 
@@ -61,99 +59,99 @@ namespace DOL.GS
             }
         }
 
-		protected GamePlayer m_player = null;
-		protected uint m_TotalRP = 0;
-		protected uint m_RealmPointsEarnedFromKills = 0;
-		protected ushort m_KillsThatHaveEarnedRPs = 0;
-		protected ushort m_Deathblows = 0;
-		protected ushort m_Deaths = 0;
-		protected uint m_HitpointsHealed = 0;
-		protected ushort m_RessurectionsPerformed = 0;
-		protected DateTime m_LoginTime;
+        protected GamePlayer m_player = null;
+        protected uint m_TotalRP = 0;
+        protected uint m_RealmPointsEarnedFromKills = 0;
+        protected ushort m_KillsThatHaveEarnedRPs = 0;
+        protected ushort m_Deathblows = 0;
+        protected ushort m_Deaths = 0;
+        protected uint m_HitpointsHealed = 0;
+        protected ushort m_RessurectionsPerformed = 0;
+        protected DateTime m_LoginTime;
 
-		#region accessors
+        #region accessors
 
-		public GamePlayer Player
-		{
-			get { return m_player; }
-		}
+        public GamePlayer Player
+        {
+            get { return m_player; }
+        }
 
-		public uint TotalRP
-		{
-			get { return m_TotalRP; }
-			set
-			{
-				m_TotalRP = value;
-			}
-		}
+        public uint TotalRP
+        {
+            get { return m_TotalRP; }
+            set
+            {
+                m_TotalRP = value;
+            }
+        }
 
-		public uint RealmPointsEarnedFromKills
-		{
-			get { return m_RealmPointsEarnedFromKills; }
-			set
-			{
-				m_RealmPointsEarnedFromKills = value;
-			}
-		}
+        public uint RealmPointsEarnedFromKills
+        {
+            get { return m_RealmPointsEarnedFromKills; }
+            set
+            {
+                m_RealmPointsEarnedFromKills = value;
+            }
+        }
 
-		public ushort KillsThatHaveEarnedRPs
-		{
-			get { return m_KillsThatHaveEarnedRPs; }
-			set
-			{
-				m_KillsThatHaveEarnedRPs = value;
-			}
-		}
+        public ushort KillsThatHaveEarnedRPs
+        {
+            get { return m_KillsThatHaveEarnedRPs; }
+            set
+            {
+                m_KillsThatHaveEarnedRPs = value;
+            }
+        }
 
-		public ushort Deathblows
-		{
-			get { return m_Deathblows; }
-			set
-			{
-				m_Deathblows = value;
-			}
-		}
+        public ushort Deathblows
+        {
+            get { return m_Deathblows; }
+            set
+            {
+                m_Deathblows = value;
+            }
+        }
 
-		public ushort Deaths
-		{
-			get { return m_Deaths; }
-			set
-			{
-				m_Deaths = value;
-			}
-		}
+        public ushort Deaths
+        {
+            get { return m_Deaths; }
+            set
+            {
+                m_Deaths = value;
+            }
+        }
 
-		public uint HitPointsHealed
-		{
-			get { return m_HitpointsHealed; }
-			set
-			{
-				m_HitpointsHealed = value;
-			}
-		}
+        public uint HitPointsHealed
+        {
+            get { return m_HitpointsHealed; }
+            set
+            {
+                m_HitpointsHealed = value;
+            }
+        }
 
-		public ushort RessurectionsPerformed
-		{
-			get { return m_RessurectionsPerformed; }
-			set
-			{
-				m_RessurectionsPerformed = value;
-			}
-		}
+        public ushort RessurectionsPerformed
+        {
+            get { return m_RessurectionsPerformed; }
+            set
+            {
+                m_RessurectionsPerformed = value;
+            }
+        }
 
-		public DateTime LoginTime
-		{
-			get { return m_LoginTime; }
-		}
-		#endregion
+        public DateTime LoginTime
+        {
+            get { return m_LoginTime; }
+        }
 
-		public PlayerStatistics(GamePlayer player)
-		{
+        #endregion accessors
+
+        public PlayerStatistics(GamePlayer player)
+        {
             DOL.GS.GameEvents.PlayerStatisticsEvent.CheckHandlers();
-			m_player = player;
-			m_LoginTime = DateTime.Now;
-		}
-
+            m_player = player;
+            m_LoginTime = DateTime.Now;
+        }
 
         public static void CreateServerStats(GameClient client)
         {
@@ -172,6 +170,7 @@ namespace DOL.GS
             }
 
             #region /stats top
+
             var chars = GameServer.Database.SelectObjects<DOLCharacters>("RealmPoints > 213881 ORDER BY RealmPoints DESC LIMIT 100"); // assuming we can get at least 20 players
             if (toplist.Count > 0)
             {
@@ -197,6 +196,7 @@ namespace DOL.GS
             {
                 toplist.Add("None found!");
             }
+
             #endregion /stats top
 
             List<StatToCount> allstatsrp = new List<StatToCount>();
@@ -280,7 +280,6 @@ namespace DOL.GS
             return message;
         }
 
-
         /// <summary>
         /// Get serverwide player statistics
         /// </summary>
@@ -338,40 +337,38 @@ namespace DOL.GS
                     client.Player.Out.SendMessage("Options: /stats [ top | rp | kills | deathblows | irs | heal | rez | player <name|target> ]", eChatType.CT_System, eChatLoc.CL_SystemWindow);
                     break;
             }
-
         }
 
+        public static uint Divide(uint dividend, uint divisor)
+        {
+            if (divisor == 0)
+                return dividend;
+            else if (dividend == 0)
+                return 0;
+            else
+                return (dividend / divisor);
+        }
 
-		public static uint Divide(uint dividend, uint divisor)
-		{
-			if (divisor == 0)
-				return dividend;
-			else if (dividend == 0)
-				return 0;
-			else
-				return (dividend / divisor);
-		}
+        public float RPsPerHour(uint realmPoints, TimeSpan time)
+        {
+            if (realmPoints == 0)
+                return 0f;
 
-		public float RPsPerHour(uint realmPoints, TimeSpan time)
-		{
-			if (realmPoints == 0)
-				return 0f;
+            float days = (float)time.Days;
+            float hours = (float)time.Hours;
+            float minutes = (float)time.Minutes;
+            float seconds = (float)time.Seconds;
 
-			float days = (float)time.Days;
-			float hours = (float)time.Hours;
-			float minutes = (float)time.Minutes;
-			float seconds = (float)time.Seconds;
-
-			return (float)realmPoints / (days * 24 + hours + minutes / 60 + seconds / (60 * 60));
-		}
-	}
+            return (float)realmPoints / (days * 24 + hours + minutes / 60 + seconds / (60 * 60));
+        }
+    }
 }
 
 namespace DOL.GS.GameEvents
 {
-	public class PlayerStatisticsEvent
-	{
-		private static readonly ILog log = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
+    public class PlayerStatisticsEvent
+    {
+        private static readonly ILog log = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
 
         private static bool m_handlersLoaded = false;
 
@@ -389,45 +386,45 @@ namespace DOL.GS.GameEvents
             }
         }
 
-		public static void GainedRealmPointsCallback(DOLEvent e, object sender, EventArgs args)
-		{
-			GamePlayer player = sender as GamePlayer;
-			GainedRealmPointsEventArgs gargs = args as GainedRealmPointsEventArgs;
+        public static void GainedRealmPointsCallback(DOLEvent e, object sender, EventArgs args)
+        {
+            GamePlayer player = sender as GamePlayer;
+            GainedRealmPointsEventArgs gargs = args as GainedRealmPointsEventArgs;
 
-			if (player == null || gargs == null)
-				return;
+            if (player == null || gargs == null)
+                return;
 
-			PlayerStatistics stats = player.Statistics as PlayerStatistics;
+            PlayerStatistics stats = player.Statistics as PlayerStatistics;
 
-			if (stats == null)
-				return;
+            if (stats == null)
+                return;
 
-			stats.TotalRP += (uint)gargs.RealmPoints;
-		}
+            stats.TotalRP += (uint)gargs.RealmPoints;
+        }
 
-		public static void DyingCallback(DOLEvent e, object sender, EventArgs args)
-		{
-			GamePlayer dyingPlayer = sender as GamePlayer;
-			DyingEventArgs dargs = args as DyingEventArgs;
+        public static void DyingCallback(DOLEvent e, object sender, EventArgs args)
+        {
+            GamePlayer dyingPlayer = sender as GamePlayer;
+            DyingEventArgs dargs = args as DyingEventArgs;
 
-			if (dyingPlayer == null || dargs == null)
-				return;
+            if (dyingPlayer == null || dargs == null)
+                return;
 
-			GamePlayer killer = dargs.Killer as GamePlayer;
-			if (killer == null)
-				return;
+            GamePlayer killer = dargs.Killer as GamePlayer;
+            if (killer == null)
+                return;
 
             PlayerStatistics killerStats = killer.Statistics as PlayerStatistics;
             PlayerStatistics dyingPlayerStats = dyingPlayer.Statistics as PlayerStatistics;
 
-			if (killerStats == null || dyingPlayerStats == null)
-				return;
+            if (killerStats == null || dyingPlayerStats == null)
+                return;
 
-			killerStats.Deathblows++;
-			if (dyingPlayer.RealmPointsValue > 0)
-			{
-				killerStats.KillsThatHaveEarnedRPs++;
-				killerStats.RealmPointsEarnedFromKills += RPsEarnedFromKill(killer, dyingPlayer);
+            killerStats.Deathblows++;
+            if (dyingPlayer.RealmPointsValue > 0)
+            {
+                killerStats.KillsThatHaveEarnedRPs++;
+                killerStats.RealmPointsEarnedFromKills += RPsEarnedFromKill(killer, dyingPlayer);
 
                 if (killer.Group != null)
                 {
@@ -444,37 +441,37 @@ namespace DOL.GS.GameEvents
                         }
                     }
                 }
-			}
+            }
 
-			dyingPlayerStats.Deaths++;
-		}
+            dyingPlayerStats.Deaths++;
+        }
 
-		public static void FinishCastSpellCallback(DOLEvent e, object sender, EventArgs args)
-		{
-			GamePlayer caster = sender as GamePlayer;
-			CastingEventArgs fargs = args as CastingEventArgs;
+        public static void FinishCastSpellCallback(DOLEvent e, object sender, EventArgs args)
+        {
+            GamePlayer caster = sender as GamePlayer;
+            CastingEventArgs fargs = args as CastingEventArgs;
 
-			if (caster == null || fargs == null)
-				return;
+            if (caster == null || fargs == null)
+                return;
 
-			if (fargs.SpellHandler.Spell.SpellType == "Resurrect")
-			{
-				PlayerStatistics stats = caster.Statistics as PlayerStatistics;
+            if (fargs.SpellHandler.Spell.SpellType == "Resurrect")
+            {
+                PlayerStatistics stats = caster.Statistics as PlayerStatistics;
                 if (stats != null)
                 {
                     stats.RessurectionsPerformed++;
                 }
-			}
-		}
+            }
+        }
 
-		public static void HealthChangedCallback(DOLEvent e, object sender, EventArgs args)
-		{
-			HealthChangedEventArgs hargs = args as HealthChangedEventArgs;
-			if (hargs.ChangeType == GameLiving.eHealthChangeType.Spell)
-			{
-				GamePlayer player = hargs.ChangeSource as GamePlayer;
-				if (player == null)
-					return;
+        public static void HealthChangedCallback(DOLEvent e, object sender, EventArgs args)
+        {
+            HealthChangedEventArgs hargs = args as HealthChangedEventArgs;
+            if (hargs.ChangeType == GameLiving.eHealthChangeType.Spell)
+            {
+                GamePlayer player = hargs.ChangeSource as GamePlayer;
+                if (player == null)
+                    return;
 
                 PlayerStatistics stats = player.Statistics as PlayerStatistics;
 
@@ -482,59 +479,59 @@ namespace DOL.GS.GameEvents
                 {
                     stats.HitPointsHealed += (uint)hargs.ChangeAmount;
                 }
-			}
-		}
+            }
+        }
 
-		public static uint RPsEarnedFromKill(GamePlayer killer, GamePlayer killedPlayer)
-		{
-			long noExpSeconds = ServerProperties.Properties.RP_WORTH_SECONDS;
-			if (killedPlayer.DBCharacter.DeathTime + noExpSeconds > killedPlayer.PlayedTime)
-				return 0;
+        public static uint RPsEarnedFromKill(GamePlayer killer, GamePlayer killedPlayer)
+        {
+            long noExpSeconds = ServerProperties.Properties.RP_WORTH_SECONDS;
+            if (killedPlayer.DBCharacter.DeathTime + noExpSeconds > killedPlayer.PlayedTime)
+                return 0;
 
-			float totaldmg = 0f;
-			foreach (DictionaryEntry de in killedPlayer.XPGainers)
-			{
-				totaldmg += (float)de.Value;
-			}
+            float totaldmg = 0f;
+            foreach (DictionaryEntry de in killedPlayer.XPGainers)
+            {
+                totaldmg += (float)de.Value;
+            }
 
-			foreach (DictionaryEntry de in killedPlayer.XPGainers)
-			{
-				GamePlayer key = de.Key as GamePlayer;
-				if (killer == key)
-				{
-					if (!killer.IsWithinRadius(killedPlayer, WorldMgr.MAX_EXPFORKILL_DISTANCE))
-						return 0;
+            foreach (DictionaryEntry de in killedPlayer.XPGainers)
+            {
+                GamePlayer key = de.Key as GamePlayer;
+                if (killer == key)
+                {
+                    if (!killer.IsWithinRadius(killedPlayer, WorldMgr.MAX_EXPFORKILL_DISTANCE))
+                        return 0;
 
-					double damagePercent = (float)de.Value / totaldmg;
-					if (!key.IsAlive)//Dead living gets 25% exp only
-						damagePercent *= 0.25;
+                    double damagePercent = (float)de.Value / totaldmg;
+                    if (!key.IsAlive)//Dead living gets 25% exp only
+                        damagePercent *= 0.25;
 
-					int rpCap = key.RealmPointsValue * 2;
-					uint realmPoints = (uint)(killedPlayer.RealmPointsValue * damagePercent);
+                    int rpCap = key.RealmPointsValue * 2;
+                    uint realmPoints = (uint)(killedPlayer.RealmPointsValue * damagePercent);
 
-					realmPoints = (uint)(realmPoints * (1.0 + 2.0 * (killedPlayer.RealmLevel - killer.RealmLevel) / 900.0));
+                    realmPoints = (uint)(realmPoints * (1.0 + 2.0 * (killedPlayer.RealmLevel - killer.RealmLevel) / 900.0));
 
-					if (killer.Group != null && killer.Group.MemberCount > 1)
-					{
-						int count = 0;
-						foreach (GamePlayer player in killer.Group.GetPlayersInTheGroup())
-						{
-							if (!player.IsWithinRadius(killedPlayer, WorldMgr.MAX_EXPFORKILL_DISTANCE)) continue;
-							count++;
-						}
-						realmPoints = (uint)(realmPoints * (1.0 + count * 0.125));
-					}
-					if (realmPoints > rpCap)
-						realmPoints = (uint)rpCap;
+                    if (killer.Group != null && killer.Group.MemberCount > 1)
+                    {
+                        int count = 0;
+                        foreach (GamePlayer player in killer.Group.GetPlayersInTheGroup())
+                        {
+                            if (!player.IsWithinRadius(killedPlayer, WorldMgr.MAX_EXPFORKILL_DISTANCE)) continue;
+                            count++;
+                        }
+                        realmPoints = (uint)(realmPoints * (1.0 + count * 0.125));
+                    }
+                    if (realmPoints > rpCap)
+                        realmPoints = (uint)rpCap;
 
-					return realmPoints;
-				}
-				else
-					continue;
-			}
+                    return realmPoints;
+                }
+                else
+                    continue;
+            }
 
-			return 0;
-		}
-	}
+            return 0;
+        }
+    }
 }
 

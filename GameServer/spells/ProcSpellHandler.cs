@@ -16,17 +16,15 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
  */
+
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.Reflection;
-using DOL.AI.Brain;
 using DOL.Database;
 using DOL.Events;
 using DOL.GS.Effects;
 using DOL.GS.PacketHandler;
 using DOL.Language;
-using log4net;
 
 namespace DOL.GS.Spells
 {
@@ -35,9 +33,9 @@ namespace DOL.GS.Spells
     /// </summary>
     public abstract class BaseProcSpellHandler : SpellHandler
     {
-		private static readonly log4net.ILog log = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
+        private static readonly log4net.ILog log = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
 
-		//VaNaTiC->
+        //VaNaTiC->
         /*
         /// <summary>
         /// Defines a logger for this class.
@@ -162,6 +160,7 @@ namespace DOL.GS.Spells
 
             return true;
         }
+
         public override bool IsOverwritable(GameSpellEffect compare)
         {
             if (Spell.Group != 0)
@@ -186,17 +185,17 @@ namespace DOL.GS.Spells
             {
                 var list = new List<string>();
 
-//                list.Add("Function: " + (string)(Spell.SpellType == "" ? "(not implemented)" : Spell.SpellType));
+                //                list.Add("Function: " + (string)(Spell.SpellType == "" ? "(not implemented)" : Spell.SpellType));
                 list.Add(LanguageMgr.GetTranslation(ServerProperties.Properties.SERV_LANGUAGE, "ProcSpellHandler.DelveInfo.Function", (string)(Spell.SpellType == "" ? "(not implemented)" : Spell.SpellType)));
 
-//                list.Add("Target: " + Spell.Target);
+                //                list.Add("Target: " + Spell.Target);
                 list.Add(LanguageMgr.GetTranslation(ServerProperties.Properties.SERV_LANGUAGE, "DelveInfo.Target", Spell.Target));
 
-//                if (Spell.Range != 0) list.Add("Range: " + Spell.Range);
+                //                if (Spell.Range != 0) list.Add("Range: " + Spell.Range);
                 if (Spell.Range != 0)
                     list.Add(LanguageMgr.GetTranslation(ServerProperties.Properties.SERV_LANGUAGE, "DelveInfo.Range", Spell.Range));
 
-//                if (Spell.Duration >= ushort.MaxValue * 1000) list.Add("Duration: Permanent.");
+                //                if (Spell.Duration >= ushort.MaxValue * 1000) list.Add("Duration: Permanent.");
                 if (Spell.Duration >= ushort.MaxValue * 1000)
                     list.Add(LanguageMgr.GetTranslation(ServerProperties.Properties.SERV_LANGUAGE, "DelveInfo.Duration") + " Permanent.");
 
@@ -252,9 +251,9 @@ namespace DOL.GS.Spells
     [SpellHandler("OffensiveProc")]
     public class OffensiveProcSpellHandler : BaseProcSpellHandler
     {
-		private static readonly log4net.ILog log = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
+        private static readonly log4net.ILog log = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
 
-		/// <summary>
+        /// <summary>
         /// The event type to hook on
         /// </summary>
         protected override DOLEvent EventType
@@ -312,53 +311,53 @@ namespace DOL.GS.Spells
                 ISpellHandler handler = ScriptMgr.CreateSpellHandler((GameLiving)sender, m_procSpell, m_procSpellLine);
                 if (handler != null)
                 {
-					if (m_procSpell.Target.ToLower() == "enemy")
-					{
-						handler.StartSpell(ad.Target);
-					}
-					else if (m_procSpell.Target.ToLower() == "self")
-					{
-						handler.StartSpell(ad.Attacker);
-					}
-					else if (m_procSpell.Target.ToLower() == "group")
-					{
-						GamePlayer player = Caster as GamePlayer;
-						if (Caster is GamePlayer)
-						{
-							if (player.Group != null)
-							{
-								foreach (GameLiving groupPlayer in player.Group.GetMembersInTheGroup())
-								{
-									if (player.IsWithinRadius(groupPlayer, m_procSpell.Range))
-									{
-										handler.StartSpell(groupPlayer);
-									}
-								}
-							}
-							else
-							{
-								handler.StartSpell(player);
-							}
-						}
-					}
-					else if (m_procSpell.Target.ToLower() == "realm")
-					{
-						GamePlayer player = Caster as GamePlayer;
-						if (player != null)
-						{
-							foreach (GameLiving realmPlayer in player.GetPlayersInRadius((ushort)m_procSpell.Radius))
-							{
-								if (GameServer.ServerRules.IsAllowedToAttack(player, realmPlayer, true) == false)
-								{
-									handler.StartSpell(realmPlayer);
-								}
-							}
-						}
-					}
-					else
-					{
-						log.Warn("Unknown spell target; skipping " + m_procSpell.Target + " proc " + m_procSpell.Name + " on " + ad.Target.Name + "; Realm = " + ad.Target.Realm);
-					}
+                    if (m_procSpell.Target.ToLower() == "enemy")
+                    {
+                        handler.StartSpell(ad.Target);
+                    }
+                    else if (m_procSpell.Target.ToLower() == "self")
+                    {
+                        handler.StartSpell(ad.Attacker);
+                    }
+                    else if (m_procSpell.Target.ToLower() == "group")
+                    {
+                        GamePlayer player = Caster as GamePlayer;
+                        if (Caster is GamePlayer)
+                        {
+                            if (player.Group != null)
+                            {
+                                foreach (GameLiving groupPlayer in player.Group.GetMembersInTheGroup())
+                                {
+                                    if (player.IsWithinRadius(groupPlayer, m_procSpell.Range))
+                                    {
+                                        handler.StartSpell(groupPlayer);
+                                    }
+                                }
+                            }
+                            else
+                            {
+                                handler.StartSpell(player);
+                            }
+                        }
+                    }
+                    else if (m_procSpell.Target.ToLower() == "realm")
+                    {
+                        GamePlayer player = Caster as GamePlayer;
+                        if (player != null)
+                        {
+                            foreach (GameLiving realmPlayer in player.GetPlayersInRadius((ushort)m_procSpell.Radius))
+                            {
+                                if (GameServer.ServerRules.IsAllowedToAttack(player, realmPlayer, true) == false)
+                                {
+                                    handler.StartSpell(realmPlayer);
+                                }
+                            }
+                        }
+                    }
+                    else
+                    {
+                        log.Warn("Unknown spell target; skipping " + m_procSpell.Target + " proc " + m_procSpell.Name + " on " + ad.Target.Name + "; Realm = " + ad.Target.Realm);
+                    }
                 }
             }
         }
@@ -421,37 +420,36 @@ namespace DOL.GS.Spells
         // constructor
         public DefensiveProcSpellHandler(GameLiving caster, Spell spell, SpellLine line) : base(caster, spell, line) { }
     }
-    
-       [SpellHandler( "OffensiveProcPvE" )]
-       public class OffensiveProcPvESpellHandler : OffensiveProcSpellHandler
-       {
-          /// <summary>
-          /// The event type to hook on
-          /// </summary>
-          protected override DOLEvent EventType
-          {
-             get { return GameLivingEvent.AttackFinished; }
-          }
 
+    [SpellHandler("OffensiveProcPvE")]
+    public class OffensiveProcPvESpellHandler : OffensiveProcSpellHandler
+    {
+        /// <summary>
+        /// The event type to hook on
+        /// </summary>
+        protected override DOLEvent EventType
+        {
+            get { return GameLivingEvent.AttackFinished; }
+        }
 
-          /// <summary>
-          /// Handler fired whenever effect target is attacked
-          /// </summary>
-          /// <param name="e"></param>
-          /// <param name="sender"></param>
-          /// <param name="arguments"></param>
-          protected override void EventHandler( DOLEvent e, object sender, EventArgs arguments )
-          {
-             AttackFinishedEventArgs args = arguments as AttackFinishedEventArgs;
-             if ( args == null || args.AttackData == null )
-             {
+        /// <summary>
+        /// Handler fired whenever effect target is attacked
+        /// </summary>
+        /// <param name="e"></param>
+        /// <param name="sender"></param>
+        /// <param name="arguments"></param>
+        protected override void EventHandler(DOLEvent e, object sender, EventArgs arguments)
+        {
+            AttackFinishedEventArgs args = arguments as AttackFinishedEventArgs;
+            if (args == null || args.AttackData == null)
+            {
                 return;
-             }
+            }
 
-             if( args.AttackData.Target.Realm == eRealm.None )
-                base.EventHandler( e, sender, arguments );
-          }
+            if (args.AttackData.Target.Realm == eRealm.None)
+                base.EventHandler(e, sender, arguments);
+        }
 
-          public OffensiveProcPvESpellHandler( GameLiving caster, Spell spell, SpellLine line ) : base( caster, spell, line ) { }
-       }
+        public OffensiveProcPvESpellHandler(GameLiving caster, Spell spell, SpellLine line) : base(caster, spell, line) { }
+    }
 }

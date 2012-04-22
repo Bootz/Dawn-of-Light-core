@@ -1,44 +1,41 @@
-using System.Reflection;
-using DOL.GS;
 using DOL.GS.Quests;
-using log4net;
 
 namespace DOL.GS
 {
-	public class TaskMaster : GameNPC
-	{
-		private static readonly log4net.ILog log = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
+    public class TaskMaster : GameNPC
+    {
+        private static readonly log4net.ILog log = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
 
-		public override bool Interact(GamePlayer player)
-		{
-			if (!base.Interact(player))
-				return false;
+        public override bool Interact(GamePlayer player)
+        {
+            if (!base.Interact(player))
+                return false;
 
-			//we need to disable them for players for now
-			if (player.Client.Account.PrivLevel == 1)
-			{
-				SayTo(player, "I'm sorry, Task Dungeons are currently disabled!");
-				return true;
-			}
+            //we need to disable them for players for now
+            if (player.Client.Account.PrivLevel == 1)
+            {
+                SayTo(player, "I'm sorry, Task Dungeons are currently disabled!");
+                return true;
+            }
 
-			if (player.Mission == null)
-				SayTo(player, "I'm sure you're already aware that the guards protecting our towns often pay bounties to young adventurers willing to help them deal with threats in the area. We've decided to expand upon this idea and begin what we call the Taskmaster program. Voulenteers such as myself have been authorized to reward those willing to confront the dangers lurking within our dungeons. If you would like to assist I can give you such an [assignment] right now, and you will be rewarded as soon as you complete it.");
-			else SayTo(player, "You already have a task that requires competion.");
+            if (player.Mission == null)
+                SayTo(player, "I'm sure you're already aware that the guards protecting our towns often pay bounties to young adventurers willing to help them deal with threats in the area. We've decided to expand upon this idea and begin what we call the Taskmaster program. Voulenteers such as myself have been authorized to reward those willing to confront the dangers lurking within our dungeons. If you would like to assist I can give you such an [assignment] right now, and you will be rewarded as soon as you complete it.");
+            else SayTo(player, "You already have a task that requires competion.");
 
-			return true;
-		}
+            return true;
+        }
 
-		public override bool WhisperReceive(GameLiving source, string str)
-		{
-			if (!base.WhisperReceive(source, str))
-				return false;
+        public override bool WhisperReceive(GameLiving source, string str)
+        {
+            if (!base.WhisperReceive(source, str))
+                return false;
 
-			GamePlayer player = source as GamePlayer;
-			if (player == null)
-				return false;
+            GamePlayer player = source as GamePlayer;
+            if (player == null)
+                return false;
 
-			if (player.Mission != null)
-				return false;
+            if (player.Mission != null)
+                return false;
 
             switch (str.ToLower())
             {
@@ -93,7 +90,7 @@ namespace DOL.GS
                         break;
                     }
             }
-			return true;
-		}
-	}
+            return true;
+        }
+    }
 }

@@ -17,24 +17,19 @@
  *
  */
 
-using System;
 using System.Collections.Generic;
 using DOL.Database;
 using DOL.GS.Effects;
 
 namespace DOL.GS.RealmAbilities
 {
-
     public class FungalUnionAbility : RR5RealmAbility
     {
         public FungalUnionAbility(DBAbility dba, int level) : base(dba, level) { }
 
-
         public override void Execute(GameLiving living)
         {
             if (CheckPreconditions(living, DEAD | SITTING | MEZZED | STUNNED)) return;
-
-
 
             GamePlayer player = living as GamePlayer;
             if (player != null)
@@ -59,6 +54,5 @@ namespace DOL.GS.RealmAbilities
             list.Add("Duration: 60 seconds");
             list.Add("Casting time: instant");
         }
-
     }
 }
