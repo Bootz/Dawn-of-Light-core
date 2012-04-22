@@ -68,7 +68,7 @@ namespace DOL.GS.PacketHandler
             {
                 //Enable encryption
 #if !NOENCRYPTION
-				pak.WriteByte(0x01);
+                pak.WriteByte(0x01);
 #else
                 pak.WriteByte(0x00);
 #endif
@@ -83,12 +83,12 @@ namespace DOL.GS.PacketHandler
                 pak.WriteByte(0x00);
 
 #if !NOENCRYPTION
-				byte[] publicKey = new byte[500];
-				UInt32 keyLen = CryptLib168.ExportRSAKey(publicKey, (UInt32) 500, false);
-				pak.WriteShort((ushort) keyLen);
-				pak.Write(publicKey, 0, (int) keyLen);
-				//From now on we expect RSA!
-				((PacketEncoding168) m_gameClient.PacketProcessor.Encoding).EncryptionState = PacketEncoding168.eEncryptionState.RSAEncrypted;
+                byte[] publicKey = new byte[500];
+                UInt32 keyLen = CryptLib168.ExportRSAKey(publicKey, (UInt32) 500, false);
+                pak.WriteShort((ushort) keyLen);
+                pak.Write(publicKey, 0, (int) keyLen);
+                //From now on we expect RSA!
+                ((PacketEncoding168) m_gameClient.PacketProcessor.Encoding).EncryptionState = PacketEncoding168.eEncryptionState.RSAEncrypted;
 #endif
 
                 SendTCP(pak);
@@ -3424,13 +3424,13 @@ namespace DOL.GS.PacketHandler
         {
         }
 
-        public virtual void SendRegionColorSheme(byte color)
+        public virtual void SendRegionColorScheme(byte color)
         {
         }
 
-        public virtual void SendRegionColorSheme()
+        public virtual void SendRegionColorScheme()
         {
-            SendRegionColorSheme(GameServer.ServerRules.GetColorHandling(m_gameClient));
+            SendRegionColorScheme(GameServer.ServerRules.GetColorHandling(m_gameClient));
         }
 
         public virtual void SendVampireEffect(GameLiving living, bool show)

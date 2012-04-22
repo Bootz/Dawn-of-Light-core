@@ -832,9 +832,9 @@ namespace DOL.GS.PacketHandler
 
         void SendCrash(string str);
 
-        void SendRegionColorSheme();
+        void SendRegionColorScheme();
 
-        void SendRegionColorSheme(byte color);
+        void SendRegionColorScheme(byte color);
 
         void SendVampireEffect(GameLiving living, bool show);
 

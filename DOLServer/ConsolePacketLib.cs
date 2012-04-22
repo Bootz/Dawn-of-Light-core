@@ -378,9 +378,9 @@ namespace DOLGameServerConsole
 
         public void SendPlayerFreeLevelUpdate() { }
 
-        public void SendRegionColorSheme() { }
+        public void SendRegionColorScheme() { }
 
-        public void SendRegionColorSheme(byte color) { }
+        public void SendRegionColorScheme(byte color) { }
 
         public void SendStarterHelp() { }
 
