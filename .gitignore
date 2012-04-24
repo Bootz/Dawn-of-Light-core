@@ -1,11 +1,27 @@
-*.suo
-/release
+/*.suo
+/Ankh.Load
+/Dawn of Light.resharper.user
+/Ophyr.sln
+/Storm.sln
+/_ReSharper.Dawn of Light
+/auto_version
 /debug
-/obj/Release
-/DOLBase/obj
-/DOLConfig/obj
-/DOLDatabase/obj
-/DOLServer/obj
-/GameServer/obj
-/GameServerScripts/obj
+/no_versionning
+/obj
+/release
+/Dawn of Light - Working.sln
+/Dawn of Light.sln.cache
+/desktop.ini
+/_patches
+/.sonar
+/DOLBase/.sonar
+/DOLConfig/.sonar
+/DOLDatabase/.sonar
+/DOLServer/.sonar
+/GameServer/.sonar
+/sonar-project.properties
+/sonar-runner.bat
+/sys$command
+/UnitTests/.sonar
 /UnitTests/obj
+/GameServerScripts/.sonar
