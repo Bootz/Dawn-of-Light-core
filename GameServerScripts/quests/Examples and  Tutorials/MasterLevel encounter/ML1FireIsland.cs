@@ -492,6 +492,9 @@ namespace DOL.GS
         [ScriptLoadedEvent]
         public static void ScriptLoaded(DOLEvent e, object sender, EventArgs args)
         {
+            if (!ServerProperties.Properties.LOAD_QUESTS)
+                return;
+
             SpawnIanetor1(albregion);
             SpawnIanetor2(albregion);
             SpawnIanetor1(midregion);

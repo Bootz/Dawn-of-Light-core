@@ -1,3 +1,5 @@
+using System.Collections.Generic;
+
 /*
  * DAWN OF LIGHT - The first free open source DAoC server emulator
  *
@@ -18,7 +20,6 @@
  */
 
 using DOL.Database;
-using System.Collections.Generic;
 
 namespace DOL.GS.Effects
 {

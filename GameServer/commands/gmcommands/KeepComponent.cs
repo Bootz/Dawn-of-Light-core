@@ -18,6 +18,7 @@
  */
 
 using System;
+using DOL.Database;
 using DOL.GS.Keeps;
 using DOL.GS.PacketHandler;
 using DOL.Language;
@@ -31,6 +32,7 @@ namespace DOL.GS.Commands
          "GMCommands.KeepComponents.Usage.Create.TID",
          "GMCommands.KeepComponents.Usage.Create.T",
          "GMCommands.KeepComponents.Usage.Skin",
+         "'/keepcomponent save' to save the component in the DB",
          "GMCommands.KeepComponents.Usage.Delete")]
     public class KeepComponentCommandHandler : AbstractCommandHandler, ICommandHandler
     {
@@ -44,7 +46,13 @@ namespace DOL.GS.Commands
                 return;
             }
 
-            AbstractGameKeep myKeep = KeepMgr.getKeepCloseToSpot(client.Player.CurrentRegionID, client.Player, WorldMgr.OBJ_UPDATE_DISTANCE);
+            AbstractGameKeep myKeep = GameServer.KeepManager.GetKeepCloseToSpot(client.Player.CurrentRegionID, client.Player, WorldMgr.OBJ_UPDATE_DISTANCE);
+
+            if (myKeep == null)
+            {
+                DisplayMessage(client, "You are not near a keep.");
+            }
+
             switch (args[1])
             {
                 #region Create
@@ -92,7 +100,7 @@ namespace DOL.GS.Commands
                             try
                             {
                                 keepid = Convert.ToInt32(args[3]);
-                                myKeep = KeepMgr.getKeepByID(keepid);
+                                myKeep = GameServer.KeepManager.GetKeepByID(keepid);
                             }
                             catch
                             {
@@ -174,10 +182,10 @@ namespace DOL.GS.Commands
                         component.ComponentX = CalcCX(client.Player, myKeep, angle);
                         component.ComponentY = CalcCY(client.Player, myKeep, angle);
 
-                        component.SaveIntoDatabase();
                         client.Out.SendKeepInfo(myKeep);
                         client.Out.SendKeepComponentInfo(component);
-                        client.Out.SendMessage("Component moved.", eChatType.CT_System, eChatLoc.CL_SystemWindow);
+                        client.Out.SendKeepComponentDetailUpdate(component);
+                        client.Out.SendMessage("Component moved.  Use /keepcomponent save to save, or reload to reload the original position.", eChatType.CT_System, eChatLoc.CL_SystemWindow);
                     } break;
 
                 #endregion Move
@@ -218,9 +226,10 @@ namespace DOL.GS.Commands
                         foreach (GameClient cli in WorldMgr.GetClientsOfRegion(client.Player.CurrentRegionID))
                         {
                             cli.Out.SendKeepComponentInfo(component);
+                            cli.Out.SendKeepComponentDetailUpdate(component);
                         }
-                        component.SaveInDB = true;
-                        client.Out.SendMessage(LanguageMgr.GetTranslation(client, "GMCommands.KeepComponents.Skin.YChangeSkin"), eChatType.CT_System, eChatLoc.CL_SystemWindow);
+                        //client.Out.SendMessage(LanguageMgr.GetTranslation(client, "GMCommands.KeepComponents.Skin.YChangeSkin"), eChatType.CT_System, eChatLoc.CL_SystemWindow);
+                        client.Out.SendMessage("Component skin updated.  Use /keepcomponent save to save, or reload to reload the original skin.", eChatType.CT_System, eChatLoc.CL_SystemWindow);
                     } break;
 
                 #endregion Skin
@@ -242,6 +251,55 @@ namespace DOL.GS.Commands
                     } break;
 
                 #endregion Delete
+
+                #region Save
+
+                case "save":
+                    {
+                        GameKeepComponent component = client.Player.TargetObject as GameKeepComponent;
+                        if (component == null)
+                        {
+                            DisplaySyntax(client);
+                            return;
+                        }
+                        component.SaveIntoDatabase();
+                        client.Out.SendMessage(string.Format("Saved ComponentID: {0}, KeepID: {1}, Skin: {2}, Health: {3}%",
+                                                            component.ID,
+                                                            (component.Keep == null ? "0" : component.Keep.KeepID.ToString()),
+                                                            component.Skin,
+                                                            component.HealthPercent), eChatType.CT_System, eChatLoc.CL_SystemWindow);
+                    } break;
+
+                #endregion Save
+
+                #region Reload
+
+                case "reload":
+                    {
+                        GameKeepComponent component = client.Player.TargetObject as GameKeepComponent;
+                        if (component == null)
+                        {
+                            DisplaySyntax(client);
+                            return;
+                        }
+
+                        DBKeepComponent dbcomponent = GameServer.Database.SelectObject<DBKeepComponent>("`KeepID` = '" + component.Keep.KeepID + "' AND `ID` = '" + component.ID + "'");
+                        component.ComponentX = dbcomponent.X;
+                        component.ComponentY = dbcomponent.Y;
+                        component.ComponentHeading = dbcomponent.Heading;
+                        component.Skin = dbcomponent.Skin;
+
+                        foreach (GameClient cli in WorldMgr.GetClientsOfRegion(client.Player.CurrentRegionID))
+                        {
+                            cli.Out.SendKeepComponentInfo(component);
+                            cli.Out.SendKeepComponentDetailUpdate(component);
+                        }
+
+                        client.Out.SendMessage("Component Reloaded", eChatType.CT_System, eChatLoc.CL_SystemWindow);
+                        break;
+                    }
+
+                #endregion Reload
 
                 #region Default
 

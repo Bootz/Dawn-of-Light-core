@@ -24,6 +24,7 @@ using DOL.AI.Brain;
 using DOL.Database;
 using DOL.GS.Keeps;
 using DOL.GS.Quests;
+using DOL.Language;
 using log4net;
 
 namespace DOL.GS.PacketHandler
@@ -105,7 +106,28 @@ namespace DOL.GS.PacketHandler
                 flag |= 0x04;
             pak.WriteShort((ushort)flag);
             pak.WriteInt(0x0); //TODO: unknown, new in 1.71
-            pak.WritePascalString(obj.Name);
+
+            string name = obj.Name;
+            DataObject translation = null;
+            if (obj is GameStaticItem)
+            {
+                translation = LanguageMgr.GetTranslation(m_gameClient, (GameStaticItem)obj);
+                if (translation != null)
+                {
+                    if (obj is WorldInventoryItem)
+                    {
+                        //if (!Util.IsEmpty(((DBLanguageItem)translation).Name))
+                        //    name = ((DBLanguageItem)translation).Name;
+                    }
+                    else
+                    {
+                        if (!Util.IsEmpty(((DBLanguageGameObject)translation).Name))
+                            name = ((DBLanguageGameObject)translation).Name;
+                    }
+                }
+            }
+            pak.WritePascalString(name);
+
             if (obj is IDoor)
             {
                 pak.WriteByte(4);
@@ -191,16 +213,39 @@ namespace DOL.GS.PacketHandler
             if ((npc.Flags & GameNPC.eFlags.STEALTH) > 0)
                 flags2 |= 0x04;
 
-            if (npc.ShowQuestIndicator(m_gameClient.Player))
-                flags2 |= 0x08;
+            eQuestIndicator questIndicator = npc.GetQuestIndicator(m_gameClient.Player);
 
-            pak.WriteByte(flags2); // 4 high bits seems unused (new in 1.71)
-            pak.WriteShort(0x00); // new in 1.71
-            pak.WriteByte(0x00); // new in 1.71 (region instance ID from StoC_0x20)
+            if (questIndicator == eQuestIndicator.Available)
+                flags2 |= 0x08;//hex 8 - quest available
+            if (questIndicator == eQuestIndicator.Finish)
+                flags2 |= 0x10;//hex 16 - quest finish
+            //flags2 |= 0x20;//hex 32 - water mob?
+            //flags2 |= 0x40;//hex 64 - unknown
+            //flags2 |= 0x80;//hex 128 - has owner
 
-            DBLanguageNPC translation = npc.GetTranslation(m_gameClient);
+            pak.WriteByte(flags2); // flags 2
 
-            string name = translation.Name;/*GameServer.ServerRules.GetNPCName(m_gameClient.Player, npc);*/
+            byte flags3 = 0x00;
+            if (questIndicator == eQuestIndicator.Lesson)
+                flags3 |= 0x01;
+            if (questIndicator == eQuestIndicator.Lore)
+                flags3 |= 0x02;
+            pak.WriteByte(flags3); // new in 1.71 (region instance ID from StoC_0x20) OR flags 3?
+            pak.WriteShort(0x00); // new in 1.71 unknown
+
+            string name = npc.Name;
+            string guildName = npc.GuildName;
+
+            DataObject translation = LanguageMgr.GetTranslation(m_gameClient, npc);
+            if (translation != null)
+            {
+                if (!Util.IsEmpty(((DBLanguageNPC)translation).Name))
+                    name = ((DBLanguageNPC)translation).Name;
+
+                if (!Util.IsEmpty(((DBLanguageNPC)translation).GuildName))
+                    guildName = ((DBLanguageNPC)translation).GuildName;
+            }
+
             if (name.Length + add.Length + 2 > 47) // clients crash with too long names
                 name = name.Substring(0, 47 - add.Length - 2);
             if (add.Length > 0)
@@ -208,10 +253,9 @@ namespace DOL.GS.PacketHandler
 
             pak.WritePascalString(name);
 
-            string l_npcGuildname = translation.GuildName;/*GameServer.ServerRules.GetNPCGuildName(m_gameClient.Player, npc);;*/
-            if (l_npcGuildname.Length > 47)
-                pak.WritePascalString(l_npcGuildname.Substring(0, 47));
-            else pak.WritePascalString(l_npcGuildname);
+            if (guildName.Length > 47)
+                pak.WritePascalString(guildName.Substring(0, 47));
+            else pak.WritePascalString(guildName);
 
             pak.WriteByte(0x00);
             SendTCP(pak);

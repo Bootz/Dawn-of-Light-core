@@ -430,11 +430,14 @@ namespace DOL.GS.Spells
             ItemTemplate template = GameServer.Database.FindObjectByKey<ItemTemplate>("Meschgift");
             if (template != null)
             {
-                item = GameInventoryItem.Create<ItemTemplate>(template);
-                if (item.IsStackable)
+                items.Add(GameInventoryItem.Create<ItemTemplate>(template));
+                foreach (InventoryItem item in items)
                 {
-                    item.Count = 1;
-                    item.Weight = item.Count * item.Weight;
+                    if (item.IsStackable)
+                    {
+                        item.Count = 1;
+                        item.Weight = item.Count * item.Weight;
+                    }
                 }
             }
         }
@@ -559,3 +562,4 @@ namespace DOL.GS.Effects
         }
     }
 }
+

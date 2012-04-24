@@ -244,7 +244,7 @@ namespace DOL.GS.Commands
                             guard.Y = client.Player.Y;
                             guard.Z = client.Player.Z;
                             guard.Heading = client.Player.Heading;
-                            guard.Realm = guard.CurrentZone.GetRealm();
+                            guard.Realm = guard.CurrentZone.Realm;
                             guard.LoadedFromScript = false;
                             guard.SaveIntoDatabase();
 
@@ -262,7 +262,7 @@ namespace DOL.GS.Commands
                             TemplateMgr.RefreshTemplate(guard);
                             guard.AddToWorld();
 
-                            if (guard.Component.Keep != null)
+                            if (guard.Component != null && guard.Component.Keep != null)
                                 guard.Component.Keep.Guards.Add(DOL.Database.UniqueID.IDGenerator.GenerateID(), guard);
                         }
 

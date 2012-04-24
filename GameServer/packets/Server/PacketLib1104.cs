@@ -24,6 +24,7 @@ using System.Collections.Generic;
 using System.Reflection;
 
 using DOL.Database;
+using DOL.Language;
 using log4net;
 
 namespace DOL.GS.PacketHandler
@@ -152,12 +153,26 @@ namespace DOL.GS.PacketHandler
                                         continue;
 
                                     locationDescription = area.Description;
+
+                                    DataObject translation = LanguageMgr.GetTranslation(m_gameClient, area);
+                                    if (translation != null)
+                                    {
+                                        if (!Util.IsEmpty(((DBLanguageArea)translation).ScreenDescription)) // Thats correct!
+                                            locationDescription = ((DBLanguageArea)translation).ScreenDescription;
+                                    }
                                     break;
                                 }
 
                                 if (locationDescription == "")
                                 {
                                     locationDescription = zone.Description;
+
+                                    DataObject translation = LanguageMgr.GetTranslation(m_gameClient, zone);
+                                    if (translation != null)
+                                    {
+                                        if (!Util.IsEmpty(((DBLanguageZone)translation).ScreenDescription)) // Thats correct!
+                                            locationDescription = ((DBLanguageZone)translation).ScreenDescription;
+                                    }
                                 }
                             }
                         }

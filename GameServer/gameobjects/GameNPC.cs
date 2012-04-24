@@ -43,7 +43,7 @@ namespace DOL.GS
     /// This class is the baseclass for all Non Player Characters like
     /// Monsters, Merchants, Guards, Steeds ...
     /// </summary>
-    public class GameNPC : GameLiving
+    public class GameNPC : GameLiving, ITranslatableObject
     {
         private static readonly log4net.ILog log = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
 
@@ -55,242 +55,6 @@ namespace DOL.GS
         /// Tested - min distance for mob sticking within combat range to player is 25
         /// </remarks>
         public const int CONST_WALKTOTOLERANCE = 25;
-
-        #region Multi-Language support
-
-        /// <summary>
-        /// Holds the translation id.
-        /// </summary>
-        protected string m_translationId = string.Empty;
-
-        /// <summary>
-        /// Holds the name (name, suffix, guild, examine article and message article) translations of ALL npcs.
-        /// </summary>
-        protected static readonly Dictionary<string, Dictionary<string, DBLanguageNPC>> m_nameTranslations = new Dictionary<string, Dictionary<string, DBLanguageNPC>>();
-
-        /// <summary>
-        /// Gets or sets the translation id.
-        /// </summary>
-        public string TranslationId
-        {
-            get { return m_translationId; }
-            set
-            {
-                if (value == null)
-                    m_translationId = string.Empty;
-                else
-                {
-                    if (value == m_translationId)
-                        return;
-                    else
-                        m_translationId = value;
-                }
-            }
-        }
-
-        #region RefreshTranslation
-
-        public static void RefreshTranslation(string lang, string id)
-        {
-            if (!Util.IsEmpty(lang) && lang.ToLower().Equals(ServerProperties.Properties.SERV_LANGUAGE.ToLower()))
-                return;
-
-            lock (m_nameTranslations)
-            {
-                if (!Util.IsEmpty(lang) && !Util.IsEmpty(id)) // Refresh the given id within the given language.
-                {
-                    log.Info("entering block #1");
-                    var result = GameServer.Database.SelectObject<DBLanguageNPC>("TranslationId = '" + GameServer.Database.Escape(id) +
-                                                                                 "' and Language = '" + lang + "'");
-                    if (result != null)
-                    {
-                        log.Info("block #1 result was not null");
-                        if (!m_nameTranslations.ContainsKey(result.Language))
-                            m_nameTranslations.Add(lang, new Dictionary<string, DBLanguageNPC>());
-
-                        if (m_nameTranslations[lang].ContainsKey(result.TranslationId))
-                            m_nameTranslations[lang].Remove(result.TranslationId);
-
-                        m_nameTranslations[lang].Add(result.TranslationId, result);
-                    }
-                    else
-                        log.Info("block #1 result was null");
-                }
-                else if (Util.IsEmpty(lang) && !Util.IsEmpty(id)) // Refresh the given id within all known languages.
-                {
-                    log.Info("entering block #2");
-                    var result = GameServer.Database.SelectObjects<DBLanguageNPC>("TranslationId = '" + GameServer.Database.Escape(id) + "'");
-                    if (result.Count > 0)
-                    {
-                        log.Info("block #2 result was not null");
-                        List<string> updated = new List<string>();
-
-                        foreach (DBLanguageNPC entry in result)
-                        {
-                            if (!m_nameTranslations.ContainsKey(entry.Language))
-                                m_nameTranslations.Add(entry.Language, new Dictionary<string, DBLanguageNPC>());
-
-                            if (m_nameTranslations[entry.Language].ContainsKey(entry.TranslationId))
-                                m_nameTranslations[entry.Language].Remove(entry.TranslationId);
-
-                            m_nameTranslations[entry.Language].Add(entry.TranslationId, entry);
-
-                            if (!updated.Contains(entry.Language))
-                                updated.Add(entry.Language);
-                        }
-
-                        // Remove all unused entries
-                        foreach (string language in m_nameTranslations.Keys)
-                        {
-                            if (updated.Contains(language))
-                                continue;
-
-                            if (m_nameTranslations[language].ContainsKey(id))
-                                m_nameTranslations[language].Remove(id);
-                        }
-                    }
-                    else
-                        log.Info("block #2 result was null");
-                }
-                else if (!Util.IsEmpty(lang) && Util.IsEmpty(id)) // Refresh all entrys within the given language.
-                {
-                    log.Info("entering block #3");
-                    if (!m_nameTranslations.ContainsKey(lang))
-                        m_nameTranslations.Add(lang, new Dictionary<string, DBLanguageNPC>());
-
-                    var result = GameServer.Database.SelectObjects<DBLanguageNPC>("Language = '" + lang + "'");
-                    if (result.Count > 0)
-                    {
-                        log.Info("block #3 result was not null");
-                        m_nameTranslations[lang].Clear();
-
-                        foreach (DBLanguageNPC entry in result)
-                        {
-                            if (m_nameTranslations[lang].ContainsKey(entry.TranslationId))
-                                continue;
-
-                            m_nameTranslations[lang].Add(entry.TranslationId, entry);
-                        }
-                    }
-                    else
-                        log.Info("block #3 result was null");
-                }
-                else // Refresh all.
-                {
-                    log.Info("entering block #4");
-                    var result = GameServer.Database.SelectAllObjects<DBLanguageNPC>();
-                    if (result.Count > 0)
-                    {
-                        log.Info("block #4 result was not null");
-                        m_nameTranslations.Clear();
-
-                        foreach (DBLanguageNPC entry in result)
-                        {
-                            if (!m_nameTranslations.ContainsKey(entry.Language))
-                            {
-                                Dictionary<string, DBLanguageNPC> col = new Dictionary<string, DBLanguageNPC>();
-                                col.Add(entry.TranslationId, entry);
-
-                                m_nameTranslations.Add(entry.Language, col);
-                            }
-                            else
-                            {
-                                if (m_nameTranslations[entry.Language].ContainsKey(entry.TranslationId))
-                                    continue;
-
-                                m_nameTranslations[entry.Language].Add(entry.TranslationId, entry);
-                            }
-                        }
-                    }
-                    else
-                        log.Info("block #4 result was null");
-
-                    foreach (string language in m_nameTranslations.Keys)
-                    {
-                        if (m_nameTranslations[language].Count == 0)
-                            m_nameTranslations.Remove(language); // Save memory.
-                    }
-                }
-            }
-        }
-
-        #endregion RefreshTranslation
-
-        #region Translation methods
-
-        public DBLanguageNPC GetTranslation(GameClient client)
-        {
-            if (client == null)
-                return new DBLanguageNPC();
-
-            return GetTranslation(client.Account.Language, this);
-        }
-
-        public DBLanguageNPC GetTranslation(string lang)
-        {
-            return GetTranslation(lang, this);
-        }
-
-        public static DBLanguageNPC GetTranslation(GameClient client, GameNPC npc)
-        {
-            return GetTranslation(client.Account.Language, npc);
-        }
-
-        #region GetTranslation
-
-        public static DBLanguageNPC GetTranslation(string lang, GameNPC npc)
-        {
-            DBLanguageNPC result = null;
-
-            if (npc == null)
-            {
-                result = new DBLanguageNPC();
-                result.Name = "NoTranslation";
-                return result;
-            }
-
-            string id = string.Empty;
-
-            lock (npc.TranslationId)
-                id = npc.TranslationId;
-
-            if (!Util.IsEmpty(id) && !Util.IsEmpty(lang) && !lang.ToLower().Equals(ServerProperties.Properties.SERV_LANGUAGE.ToLower()))
-            {
-                lock (m_nameTranslations)
-                {
-                    if (m_nameTranslations.ContainsKey(lang))
-                    {
-                        if (m_nameTranslations[lang].ContainsKey(id))
-                            result = m_nameTranslations[lang][id];
-                    }
-                }
-            }
-
-            if (result != null)
-            {
-                if (Util.IsEmpty(result.Name))
-                    result.Name = npc.Name; // Get sure we have a name. Doesn't matter when we set it to default because it's not saved.
-            }
-            else
-            {
-                result = new DBLanguageNPC();
-
-                result.TranslationId = npc.TranslationId;
-                result.Name = npc.Name;
-                result.Suffix = npc.Suffix;
-                result.GuildName = npc.GuildName;
-                result.ExamineArticle = npc.ExamineArticle;
-                result.MessageArticle = npc.MessageArticle;
-            }
-
-            return result;
-        }
-
-        #endregion GetTranslation
-
-        #endregion Translation methods
-
-        #endregion Multi-Language support
 
         #region Formations/Spacing
 
@@ -373,6 +137,20 @@ namespace DOL.GS
                     //					BroadcastUpdate();
                 }
             }
+        }
+
+        /// <summary>
+        /// Holds the translation id.
+        /// </summary>
+        protected string m_translationId = "";
+
+        /// <summary>
+        /// Gets or sets the translation id.
+        /// </summary>
+        public string TranslationId
+        {
+            get { return m_translationId; }
+            set { m_translationId = (value == null ? "" : value); }
         }
 
         /// <summary>
@@ -2290,14 +2068,7 @@ namespace DOL.GS
             OwnerID = dbMob.OwnerID;
 
             if (npcTemplate != null && npcTemplate.ReplaceMobValues > 0)
-            {
                 LoadTemplate(npcTemplate);
-            }
-            else
-            {
-                if (!Util.IsEmpty(TranslationId))
-                    RefreshTranslation(null, TranslationId);
-            }
         }
 
         /// <summary>
@@ -2523,7 +2294,7 @@ namespace DOL.GS
                 GameNpcInventoryTemplate equip = new GameNpcInventoryTemplate();
                 //First let's try to reach the npcequipment table and load that!
                 //We use a ';' split to allow npctemplates to support more than one equipmentIDs
-                string[] equipIDs = template.Inventory.SplitCSV().ToArray();
+                var equipIDs = template.Inventory.SplitCSV();
                 if (!template.Inventory.Contains(":"))
                 {
                     foreach (string str in equipIDs)
@@ -2623,9 +2394,6 @@ namespace DOL.GS
                     AggroRange = template.AggroRange
                 };
             this.NPCTemplate = template as NpcTemplate;
-
-            if (!Util.IsEmpty(TranslationId))
-                RefreshTranslation(null, TranslationId);
         }
 
         /// <summary>
@@ -2777,9 +2545,12 @@ namespace DOL.GS
         /// </summary>
         /// <param name="player"></param>
         /// <returns>True if the NPC should show quest indicator, false otherwise</returns>
-        public virtual bool ShowQuestIndicator(GamePlayer player)
+        public virtual eQuestIndicator GetQuestIndicator(GamePlayer player)
         {
-            return CanGiveOneQuest(player);
+            if (CanGiveOneQuest(player))
+                return eQuestIndicator.Available;
+
+            return eQuestIndicator.None;
         }
 
         /// <summary>
@@ -3799,8 +3570,11 @@ namespace DOL.GS
         /// </summary>
         public const int CHARMED_NOEXP_TIMEOUT = 60000;
 
-        public const string Last_LOS_Target_Property = "last_LOS_checkTarget";
-        public const string Last_LOS_Tick_Property = "last_LOS_checkTick";
+        public const string LAST_LOS_TARGET_PROPERTY = "last_LOS_checkTarget";
+        public const string LAST_LOS_TICK_PROPERTY = "last_LOS_checkTick";
+        public const string NUM_LOS_CHECKS_INPROGRESS = "num_LOS_progress";
+
+        protected object LOS_LOCK = new object();
 
         protected GameObject m_targetLOSObject = null;
 
@@ -3815,15 +3589,16 @@ namespace DOL.GS
 
             TargetObject = target;
 
+            long lastTick = this.TempProperties.getProperty<long>(LAST_LOS_TICK_PROPERTY);
+
             if (ServerProperties.Properties.ALWAYS_CHECK_PET_LOS &&
                 Brain != null &&
                 Brain is IControlledBrain &&
                 (target is GamePlayer || (target is GameNPC && (target as GameNPC).Brain != null && (target as GameNPC).Brain is IControlledBrain)))
             {
-                GameObject lastTarget = (GameObject)this.TempProperties.getProperty<object>(Last_LOS_Target_Property, null);
+                GameObject lastTarget = (GameObject)this.TempProperties.getProperty<object>(LAST_LOS_TARGET_PROPERTY, null);
                 if (lastTarget != null && lastTarget == target)
                 {
-                    long lastTick = this.TempProperties.getProperty<long>(Last_LOS_Tick_Property);
                     if (lastTick != 0 && CurrentRegion.Time - lastTick < ServerProperties.Properties.LOS_PLAYER_CHECK_FREQUENCY * 1000)
                         return;
                 }
@@ -3852,15 +3627,33 @@ namespace DOL.GS
                     return;
                 }
 
-                this.TempProperties.setProperty(Last_LOS_Target_Property, target);
-                this.TempProperties.setProperty(Last_LOS_Tick_Property, CurrentRegion.Time);
-                m_targetLOSObject = target;
-                losChecker.Out.SendCheckLOS(this, target, new CheckLOSResponse(this.NPCStartAttackCheckLOS));
-                if (ServerProperties.Properties.ENABLE_DEBUG)
+                lock (LOS_LOCK)
                 {
-                    log.Debug(Name + " sent LOS check to player " + losChecker.Name);
+                    int count = TempProperties.getProperty<int>(NUM_LOS_CHECKS_INPROGRESS, 0);
+
+                    if (count > 10)
+                    {
+                        log.DebugFormat("{0} LOS count check exceeds 10, aborting LOS check!", Name);
+
+                        // Now do a safety check.  If it's been a while since we sent any check we should clear count
+                        if (lastTick == 0 || CurrentRegion.Time - lastTick > ServerProperties.Properties.LOS_PLAYER_CHECK_FREQUENCY * 1000)
+                        {
+                            log.Debug("LOS count reset!");
+                            TempProperties.setProperty(NUM_LOS_CHECKS_INPROGRESS, 0);
+                        }
+
+                        return;
+                    }
+
+                    count++;
+                    TempProperties.setProperty(NUM_LOS_CHECKS_INPROGRESS, count);
+
+                    TempProperties.setProperty(LAST_LOS_TARGET_PROPERTY, target);
+                    TempProperties.setProperty(LAST_LOS_TICK_PROPERTY, CurrentRegion.Time);
+                    m_targetLOSObject = target;
                 }
 
+                losChecker.Out.SendCheckLOS(this, target, new CheckLOSResponse(this.NPCStartAttackCheckLOS));
                 return;
             }
 
@@ -3875,6 +3668,13 @@ namespace DOL.GS
         /// <param name="targetOID"></param>
         public void NPCStartAttackCheckLOS(GamePlayer player, ushort response, ushort targetOID)
         {
+            lock (LOS_LOCK)
+            {
+                int count = TempProperties.getProperty<int>(NUM_LOS_CHECKS_INPROGRESS, 0);
+                count--;
+                TempProperties.setProperty(NUM_LOS_CHECKS_INPROGRESS, Math.Max(0, count));
+            }
+
             if ((response & 0x100) == 0x100)
             {
                 // make sure we didn't switch targets
@@ -3883,11 +3683,6 @@ namespace DOL.GS
             }
             else
             {
-                if (ServerProperties.Properties.ENABLE_DEBUG)
-                {
-                    log.Debug(Name + " FAILED start attack LOS check to player " + player.Name);
-                }
-
                 if (m_targetLOSObject != null && m_targetLOSObject is GameLiving && Brain != null && Brain is IOldAggressiveBrain)
                 {
                     // there will be a think delay before mob attempts to attack next target
@@ -4101,12 +3896,24 @@ namespace DOL.GS
             }
         }
 
+        protected void ControlledNPC_Release()
+        {
+            if (this.ControlledBrain != null)
+            {
+                //log.Info("On tue le pet !");
+                this.Notify(GameLivingEvent.PetReleased, ControlledBrain.Body);
+            }
+        }
+
         /// <summary>
         /// Called when this living dies
         /// </summary>
         public override void Die(GameObject killer)
         {
             FireAmbientSentence(eAmbientTrigger.dieing, killer as GameLiving);
+
+            if (ControlledBrain != null)
+                ControlledNPC_Release();
 
             if (killer != null)
             {
@@ -4133,8 +3940,21 @@ namespace DOL.GS
 
             if ((Faction != null) && (killer is GamePlayer))
             {
-                GamePlayer player = killer as GamePlayer;
-                Faction.KillMember(player);
+                // Tyriada(Carmélide) : il faut donner la faction à tous les membres attaquants ainsi que leur groupe
+
+                foreach (DictionaryEntry de in this.XPGainers)
+                {
+                    GameLiving living = de.Key as GameLiving;
+                    GamePlayer player = living as GamePlayer;
+
+                    if (living is GameNPC && (living as GameNPC).Brain is IControlledBrain) // Tout les pets renvoient sur leurs owners.
+                        player = ((living as GameNPC).Brain as IControlledBrain).GetPlayerOwner();
+
+                    if (player != null && player.ObjectState == GameObject.eObjectState.Active && player.IsAlive && player.IsWithinRadius(this, WorldMgr.MAX_EXPFORKILL_DISTANCE))
+                    {
+                        Faction.KillMember(player);
+                    }
+                }
             }
 
             // remove temp properties
@@ -4563,6 +4383,13 @@ namespace DOL.GS
                         if (ServerProperties.Properties.ENABLE_ZONE_BONUSES)
                         {
                             GamePlayer killerPlayer = killer as GamePlayer;
+
+                            if (killer is GameNPC)
+                            {
+                                if (killer is GameNPC && ((killer as GameNPC).Brain is IControlledBrain))
+                                    killerPlayer = ((killer as GameNPC).Brain as IControlledBrain).GetPlayerOwner();
+                                else return;
+                            }
 
                             int zoneBonus = (((int)value * ZoneBonus.GetCoinBonus(killerPlayer) / 100));
                             if (zoneBonus > 0)
@@ -5142,6 +4969,14 @@ namespace DOL.GS
 
         #region ControlledNPCs
 
+        public override void SetControlledBrain(IControlledBrain controlledBrain)
+        {
+            if (ControlledBrain == null)
+                InitControlledBrainArray(1);
+
+            ControlledBrain = controlledBrain;
+        }
+
         /// <summary>
         /// Gets the controlled object of this NPC
         /// </summary>
@@ -5403,9 +5238,6 @@ namespace DOL.GS
                 m_ownBrain = new StandardMobBrain();
                 m_ownBrain.Body = this;
             }
-
-            if (!Util.IsEmpty(TranslationId))
-                RefreshTranslation(null, TranslationId);
         }
 
         INpcTemplate m_template = null;

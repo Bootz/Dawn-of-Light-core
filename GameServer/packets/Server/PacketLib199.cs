@@ -16,7 +16,6 @@
 * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 *
 */
-
 #define NOENCRYPTION
 
 using System;
@@ -25,6 +24,7 @@ using System.Collections.Generic;
 using System.Reflection;
 
 using DOL.Database;
+using DOL.Language;
 using log4net;
 
 namespace DOL.GS.PacketHandler
@@ -129,11 +129,27 @@ namespace DOL.GS.PacketHandler
                                         continue;
 
                                     description = area.Description;
+
+                                    DataObject translation = LanguageMgr.GetTranslation(m_gameClient, area);
+                                    if (translation != null)
+                                    {
+                                        if (!Util.IsEmpty(((DBLanguageArea)translation).ScreenDescription)) // Thats correct!
+                                            description = ((DBLanguageArea)translation).ScreenDescription;
+                                    }
                                     break;
                                 }
 
                                 if (description == "")
+                                {
                                     description = zon.Description;
+
+                                    DataObject translation = LanguageMgr.GetTranslation(m_gameClient, zon);
+                                    if (translation != null)
+                                    {
+                                        if (!Util.IsEmpty(((DBLanguageZone)translation).ScreenDescription)) // Thats correct!
+                                            description = ((DBLanguageZone)translation).ScreenDescription;
+                                    }
+                                }
 
                                 pak.FillString(description, 24);
                             }

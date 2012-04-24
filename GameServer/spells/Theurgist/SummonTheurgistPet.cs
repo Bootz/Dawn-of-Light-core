@@ -1,3 +1,6 @@
+using DOL.AI.Brain;
+using DOL.GS.Effects;
+
 /*
  * DAWN OF LIGHT - The first free open source DAoC server emulator
  *
@@ -17,8 +20,6 @@
  *
  */
 
-using DOL.AI.Brain;
-using DOL.GS.Effects;
 using DOL.GS.PacketHandler;
 
 namespace DOL.GS.Spells
@@ -57,9 +58,9 @@ namespace DOL.GS.Spells
         {
             base.ApplyEffectOnTarget(target, effectiveness);
 
-            pet.TempProperties.setProperty("target", target);
-            (pet.Brain as IOldAggressiveBrain).AddToAggroList(target, 1);
-            (pet.Brain as TheurgistPetBrain).Think();
+            m_pet.TempProperties.setProperty("target", target);
+            (m_pet.Brain as IOldAggressiveBrain).AddToAggroList(target, 1);
+            (m_pet.Brain as TheurgistPetBrain).Think();
 
             Caster.PetCount++;
         }

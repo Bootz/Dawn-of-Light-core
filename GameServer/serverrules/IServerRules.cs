@@ -424,5 +424,12 @@ namespace DOL.GS.ServerRules
         /// <param name="heading"></param>
         /// <returns></returns>
         GameStaticItem PlaceHousingInteriorItem(DOL.GS.Housing.House house, ItemTemplate item, IPoint3D location, ushort heading);
+
+        /// <summary>
+        /// Create a new consignment merchant for housing
+        /// </summary>
+        /// <param name="house"></param>
+        /// <returns></returns>
+        GameConsignmentMerchant CreateHousingConsignmentMerchant(GS.Housing.House house);
     }
 }

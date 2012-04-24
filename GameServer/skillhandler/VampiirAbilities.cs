@@ -2,7 +2,15 @@ using DOL.Database;
 
 namespace DOL.GS.SkillHandler
 {
-    public class VampiirStrength : StatChangingAbility
+    public class VampiirAbility : StatChangingAbility
+    {
+        public VampiirAbility(DBAbility dba, int level, eProperty property)
+            : base(dba, level, property)
+        {
+        }
+    }
+
+    public class VampiirStrength : VampiirAbility
     {
         public VampiirStrength(DBAbility dba, int level)
             : base(dba, level, eProperty.Strength)
@@ -16,7 +24,7 @@ namespace DOL.GS.SkillHandler
         }
     }
 
-    public class VampiirDexterity : StatChangingAbility
+    public class VampiirDexterity : VampiirAbility
     {
         public VampiirDexterity(DBAbility dba, int level)
             : base(dba, level, eProperty.Dexterity)
@@ -30,7 +38,7 @@ namespace DOL.GS.SkillHandler
         }
     }
 
-    public class VampiirConstitution : StatChangingAbility
+    public class VampiirConstitution : VampiirAbility
     {
         public VampiirConstitution(DBAbility dba, int level)
             : base(dba, level, eProperty.Constitution)
@@ -44,7 +52,7 @@ namespace DOL.GS.SkillHandler
         }
     }
 
-    public class VampiirQuickness : StatChangingAbility
+    public class VampiirQuickness : VampiirAbility
     {
         public VampiirQuickness(DBAbility dba, int level)
             : base(dba, level, eProperty.Quickness)

@@ -86,7 +86,7 @@ namespace DOL.GS
         {
             get
             {
-                return CurrentZone.GetRealm();
+                return CurrentZone.Realm;
             }
         }
 

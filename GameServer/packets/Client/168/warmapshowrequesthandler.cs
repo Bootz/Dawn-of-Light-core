@@ -55,14 +55,14 @@ namespace DOL.GS.PacketHandler.Client.v168
                     }
                 case 1:
                     {
-                        client.Out.SendWarmapUpdate(KeepMgr.getKeepsByRealmMap(client.Player.WarMapPage));
+                        client.Out.SendWarmapUpdate(GameServer.KeepManager.GetKeepsByRealmMap(client.Player.WarMapPage));
                         WarMapMgr.SendFightInfo(client);
                         break;
                     }
                 //teleport
                 case 2:
                     {
-                        client.Out.SendWarmapUpdate(KeepMgr.getKeepsByRealmMap(client.Player.WarMapPage));
+                        client.Out.SendWarmapUpdate(GameServer.KeepManager.GetKeepsByRealmMap(client.Player.WarMapPage));
                         WarMapMgr.SendFightInfo(client);
 
                         if (client.Account.PrivLevel == (int)ePrivLevel.Player &&
@@ -75,7 +75,7 @@ namespace DOL.GS.PacketHandler.Client.v168
 
                         if (keepId > 6)
                         {
-                            keep = KeepMgr.getKeepByID(keepId);
+                            keep = GameServer.KeepManager.GetKeepByID(keepId);
                         }
 
                         if (keep == null && keepId > 6)
@@ -145,7 +145,7 @@ namespace DOL.GS.PacketHandler.Client.v168
                             //cain
                             case 6:
                                 {
-                                    KeepMgr.GetBorderKeepLocation(keepId, out x, out y, out z, out heading);
+                                    GameServer.KeepManager.GetBorderKeepLocation(keepId, out x, out y, out z, out heading);
                                     break;
                                 }
                             default:

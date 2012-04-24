@@ -48,8 +48,6 @@ namespace DOL.GS.Commands
             this.automated = automated;
         }
 
-        #region ICommandHandler Members
-
         public void OnCommand(GameClient client, string[] args)
         {
             if (!automated && IsSpammingCommand(client.Player, "train"))
@@ -199,7 +197,5 @@ namespace DOL.GS.Commands
                 }
             }
         }
-
-        #endregion ICommandHandler Members
     }
 }

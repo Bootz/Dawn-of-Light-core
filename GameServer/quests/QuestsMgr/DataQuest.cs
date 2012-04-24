@@ -80,6 +80,12 @@ namespace DOL.GS.Quests
     ///
     /// RewardXP - Serialized list of XP rewarded each step.  All steps must have a value, 0 is ok.
     ///
+    /// RewardCLXP - Serialized list of CLXP rewarded each step.  All steps must have a value, 0 is ok.
+    ///
+    /// RewardRP - Serialized list of RP rewarded each step.  All steps must have a value, 0 is ok.
+    ///
+    /// RewardBP - Serialized list of XP rewarded each step.  All steps must have a value, 0 is ok.
+    ///
     /// OptionalRewardItemTemplates - A serialized list of optional rewards to be presented to the player at the end of a Reward quest.
     /// The first value must be a number from 0 to 8 followed by the item list.  ex: 2id_nb|id_nb  For quests without optional rewards
     /// this field can be null.
@@ -162,6 +168,12 @@ namespace DOL.GS.Quests
         protected List<string> m_advanceTexts = new List<string>();
         protected List<string> m_collectItems = new List<string>();
         protected List<long> m_rewardXPs = new List<long>();
+        // CLXP added
+        protected List<long> m_rewardCLXPs = new List<long>();
+        // RP added
+        protected List<long> m_rewardRPs = new List<long>();
+        // BP added
+        protected List<long> m_rewardBPs = new List<long>();
         protected List<long> m_rewardMoneys = new List<long>();
         byte m_numOptionalRewardsChoice = 0;
         protected List<ItemTemplate> m_optionalRewards = new List<ItemTemplate>();
@@ -367,6 +379,36 @@ namespace DOL.GS.Quests
                     foreach (string str in parse1)
                     {
                         m_rewardXPs.Add(Convert.ToInt64(str));
+                    }
+                }
+
+                lastParse = m_dataQuest.RewardCLXP;
+                if (string.IsNullOrEmpty(lastParse) == false)
+                {
+                    parse1 = lastParse.Split('|');
+                    foreach (string str in parse1)
+                    {
+                        m_rewardCLXPs.Add(Convert.ToInt64(str));
+                    }
+                }
+
+                lastParse = m_dataQuest.RewardRP;
+                if (string.IsNullOrEmpty(lastParse) == false)
+                {
+                    parse1 = lastParse.Split('|');
+                    foreach (string str in parse1)
+                    {
+                        m_rewardRPs.Add(Convert.ToInt64(str));
+                    }
+                }
+
+                lastParse = m_dataQuest.RewardBP;
+                if (string.IsNullOrEmpty(lastParse) == false)
+                {
+                    parse1 = lastParse.Split('|');
+                    foreach (string str in parse1)
+                    {
+                        m_rewardBPs.Add(Convert.ToInt64(str));
                     }
                 }
 
@@ -832,11 +874,7 @@ namespace DOL.GS.Quests
         /// <param name="player"></param>
         public virtual void UpdateQuestIndicator(GameNPC npc, GamePlayer player)
         {
-            eQuestIndicator indicator = eQuestIndicator.None;
-            if (npc.ShowQuestIndicator(player))
-                indicator = eQuestIndicator.Available;
-
-            player.Out.SendNPCsQuestEffect(npc, indicator);
+            player.Out.SendNPCsQuestEffect(npc, npc.GetQuestIndicator(player));
         }
 
         /// <summary>
@@ -1129,6 +1167,72 @@ namespace DOL.GS.Quests
             }
         }
 
+        protected long RewardCLXP
+        {
+            get
+            {
+                try
+                {
+                    if (m_rewardCLXPs.Count == 0)
+                    {
+                        return 0;
+                    }
+
+                    return m_rewardCLXPs[Step - 1];
+                }
+                catch (Exception ex)
+                {
+                    log.Error("DataQuest [" + ID + "] RewardCLXP error for Step " + Step, ex);
+                }
+
+                return 0;
+            }
+        }
+
+        protected long RewardRP
+        {
+            get
+            {
+                try
+                {
+                    if (m_rewardRPs.Count == 0)
+                    {
+                        return 0;
+                    }
+
+                    return m_rewardRPs[Step - 1];
+                }
+                catch (Exception ex)
+                {
+                    log.Error("DataQuest [" + ID + "] RewardRP error for Step " + Step, ex);
+                }
+
+                return 0;
+            }
+        }
+
+        protected long RewardBP
+        {
+            get
+            {
+                try
+                {
+                    if (m_rewardBPs.Count == 0)
+                    {
+                        return 0;
+                    }
+
+                    return m_rewardBPs[Step - 1];
+                }
+                catch (Exception ex)
+                {
+                    log.Error("DataQuest [" + ID + "] RewardBP error for Step " + Step, ex);
+                }
+
+                return 0;
+            }
+        }
+
         protected virtual bool ExecuteCustomQuestStep(GamePlayer player, int step, eStepCheckType stepCheckType)
         {
             bool canContinue = true;
@@ -1201,6 +1305,18 @@ namespace DOL.GS.Quests
 
                 if (ExecuteCustomQuestStep(QuestPlayer, Step, eStepCheckType.Step))
                 {
+                    if (RewardXP > 0 && m_questPlayer.GainXP == false)
+                    {
+                        QuestPlayer.Out.SendMessage("Your XP is turned off, you must turn it on to complete this quest step!", eChatType.CT_Staff, eChatLoc.CL_SystemWindow);
+                        return false;
+                    }
+
+                    if (RewardRP > 0 && m_questPlayer.GainRP == false)
+                    {
+                        QuestPlayer.Out.SendMessage("Your RP is turned off, you must turn it on to complete this quest step!", eChatType.CT_Staff, eChatLoc.CL_SystemWindow);
+                        return false;
+                    }
+
                     advance = true;
                     List<string> stepTemplates = new List<string>();
 
@@ -1263,15 +1379,30 @@ namespace DOL.GS.Quests
                 {
                     // Since we can advance first give any rewards for the current step
 
+                    if (RewardXP > 0)
+                    {
+                        m_questPlayer.GainExperience(GameLiving.eXPSource.Quest, RewardXP);
+                    }
+
+                    if (RewardRP > 0)
+                    {
+                        m_questPlayer.GainRealmPoints(RewardRP);
+                    }
+
                     if (RewardMoney > 0)
                     {
                         m_questPlayer.AddMoney(RewardMoney, "You are awarded {0}!");
                         InventoryLogging.LogInventoryAction("(QUEST;" + Name + ")", m_questPlayer, eInventoryActionType.Quest, RewardMoney);
                     }
 
-                    if (RewardXP > 0)
+                    if (RewardCLXP > 0)
                     {
-                        m_questPlayer.GainExperience(GameLiving.eXPSource.Quest, RewardXP);
+                        m_questPlayer.GainChampionExperience(RewardCLXP, GameLiving.eXPSource.Quest);
+                    }
+
+                    if (RewardBP > 0)
+                    {
+                        m_questPlayer.GainBountyPoints(RewardBP);
                     }
 
                     // Then advance step
@@ -1283,6 +1414,8 @@ namespace DOL.GS.Quests
 
                     if (string.IsNullOrEmpty(SourceText) == false)
                     {
+                        TryTurnTo(obj, m_questPlayer);
+
                         if (obj.Realm == eRealm.None)
                         {
                             SendMessage(m_questPlayer, SourceText, 0, eChatType.CT_Say, eChatLoc.CL_ChatWindow);
@@ -1489,10 +1622,8 @@ namespace DOL.GS.Quests
                         player.AddQuest(dq);
                         if (giver is GameNPC)
                         {
-                            eQuestIndicator indicator = eQuestIndicator.None;
-                            if ((giver as GameNPC).ShowQuestIndicator(player))
-                                indicator = eQuestIndicator.Available;
-                            player.Out.SendNPCsQuestEffect(giver as GameNPC, indicator);
+                            GameNPC npc = giver as GameNPC;
+                            player.Out.SendNPCsQuestEffect(npc, npc.GetQuestIndicator(player));
                         }
                         player.Out.SendSoundEffect(7, 0, 0, 0, 0, 0);
                         break;
@@ -1526,6 +1657,8 @@ namespace DOL.GS.Quests
 
                     if (charQuest.Count < MaxQuestCount)
                     {
+                        TryTurnTo(obj, player);
+
                         if (ExecuteCustomQuestStep(player, 0, eStepCheckType.Finish))
                         {
                             if (Description.Trim() != "")
@@ -1558,6 +1691,21 @@ namespace DOL.GS.Quests
                             if (m_rewardXPs.Count > 0 && m_rewardXPs[0] > 0)
                             {
                                 player.GainExperience(GameLiving.eXPSource.Quest, m_rewardXPs[0]);
+                            }
+
+                            if (m_rewardCLXPs.Count > 0 && m_rewardCLXPs[0] > 0)
+                            {
+                                player.GainChampionExperience(m_rewardCLXPs[0], GameLiving.eXPSource.Quest);
+                            }
+
+                            if (m_rewardRPs.Count > 0 && m_rewardRPs[0] > 0)
+                            {
+                                player.GainRealmPoints(m_rewardRPs[0]);
+                            }
+
+                            if (m_rewardBPs.Count > 0 && m_rewardBPs[0] > 0)
+                            {
+                                player.GainBountyPoints(m_rewardBPs[0]);
                             }
 
                             if (m_rewardMoneys.Count > 0 && m_rewardMoneys[0] > 0)
@@ -1606,6 +1754,7 @@ namespace DOL.GS.Quests
                     {
                         if (string.IsNullOrEmpty(m_sourceTexts[0]) == false)
                         {
+                            TryTurnTo(obj, player);
                             SendMessage(player, m_sourceTexts[0], 0, eChatType.CT_System, eChatLoc.CL_PopupWindow);
                         }
                     }
@@ -1627,6 +1776,8 @@ namespace DOL.GS.Quests
                     GameNPC offerNPC = obj as GameNPC;
                     if (offerNPC != null)
                     {
+                        TryTurnTo(obj, player);
+
                         // Note: If the offer is handled by the custom step then it should return false to prevent a double offer
                         if (ExecuteCustomQuestStep(player, 0, eStepCheckType.Offer))
                         {
@@ -1636,8 +1787,19 @@ namespace DOL.GS.Quests
                 }
                 else if (string.IsNullOrEmpty(Description) == false)
                 {
+                    TryTurnTo(obj, player);
                     SendMessage(player, Description, 0, eChatType.CT_System, eChatLoc.CL_PopupWindow);
                 }
+            }
+        }
+
+        protected virtual void TryTurnTo(GameObject obj, GamePlayer player)
+        {
+            GameNPC npc = obj as GameNPC;
+
+            if (npc != null)
+            {
+                npc.TurnTo(player, 10000);
             }
         }
 
@@ -1661,6 +1823,8 @@ namespace DOL.GS.Quests
 
                 if (charQuest.Count < MaxQuestCount)
                 {
+                    TryTurnTo(obj, player);
+
                     if (item.Count == 1)
                     {
                         RemoveItem(obj, player, item, false);
@@ -1701,7 +1865,8 @@ namespace DOL.GS.Quests
 
             if (CheckQuestQualification(player) && DBDataQuest.StartType == (byte)eStartType.Standard && DBDataQuest.AcceptText == text)
             {
-                //log.DebugFormat("Adding quest {0} to player {1}", Name, player.Name);
+                TryTurnTo(living, player);
+
                 CharacterXDataQuest charQuest = GetCharacterQuest(player, ID, true);
                 DataQuest dq = new DataQuest(player, living, DBDataQuest, charQuest);
                 dq.Step = 1;
@@ -1735,6 +1900,8 @@ namespace DOL.GS.Quests
                 {
                     case eStepType.Interact:
                         {
+                            TryTurnTo(obj, player);
+
                             if (string.IsNullOrEmpty(TargetText) == false)
                             {
                                 SendMessage(m_questPlayer, TargetText, 0, eChatType.CT_System, eChatLoc.CL_PopupWindow);
@@ -1751,6 +1918,8 @@ namespace DOL.GS.Quests
                                 GameNPC finishNPC = obj as GameNPC;
                                 if (finishNPC != null)
                                 {
+                                    TryTurnTo(obj, player);
+
                                     // Custom step can modify rewards here.  Should return false if it sends the reward window
                                     if (ExecuteCustomQuestStep(player, 0, eStepCheckType.Finish))
                                     {
@@ -1773,6 +1942,7 @@ namespace DOL.GS.Quests
                         {
                             if (string.IsNullOrEmpty(TargetText) == false)
                             {
+                                TryTurnTo(obj, player);
                                 SendMessage(m_questPlayer, TargetText, 0, eChatType.CT_System, eChatLoc.CL_PopupWindow);
                             }
                         }
@@ -1804,6 +1974,8 @@ namespace DOL.GS.Quests
                         case eStepType.Deliver:
                         case eStepType.Collect:
                             {
+                                TryTurnTo(obj, player);
+
                                 if (string.IsNullOrEmpty(TargetText) == false)
                                 {
                                     if (obj.Realm == eRealm.None)
@@ -1843,6 +2015,8 @@ namespace DOL.GS.Quests
                     // Current step must be a delivery so take the item and advance the quest
                     if (StepType == eStepType.Deliver)
                     {
+                        TryTurnTo(obj, player);
+
                         if (string.IsNullOrEmpty(TargetText) == false)
                         {
                             if (obj.Realm == eRealm.None)
@@ -2026,6 +2200,21 @@ namespace DOL.GS.Quests
                                     player.GainExperience(GameLiving.eXPSource.Quest, m_rewardXPs[0]);
                                 }
 
+                                if (m_rewardCLXPs.Count > 0 && m_rewardCLXPs[0] > 0)
+                                {
+                                    player.GainChampionExperience(m_rewardCLXPs[0], GameLiving.eXPSource.Quest);
+                                }
+
+                                if (m_rewardRPs.Count > 0 && m_rewardRPs[0] > 0)
+                                {
+                                    player.GainRealmPoints(m_rewardRPs[0]);
+                                }
+
+                                if (m_rewardBPs.Count > 0 && m_rewardBPs[0] > 0)
+                                {
+                                    player.GainBountyPoints(m_rewardBPs[0]);
+                                }
+
                                 if (m_rewardMoneys.Count > 0 && m_rewardMoneys[0] > 0)
                                 {
                                     player.AddMoney(m_rewardMoneys[0], "You are awarded {0}!");
@@ -2119,6 +2308,8 @@ namespace DOL.GS.Quests
 
             int lastStep = Step;
 
+            TryTurnTo(obj, m_questPlayer);
+
             if (checkCustomStep && ExecuteCustomQuestStep(QuestPlayer, Step, eStepCheckType.Finish) == false)
                 return false;
 
@@ -2128,6 +2319,49 @@ namespace DOL.GS.Quests
             {
                 if (m_questPlayer.Inventory.IsSlotsFree(m_finalRewards.Count + m_optionalRewardChoice.Count, eInventorySlot.FirstBackpack, eInventorySlot.LastBackpack))
                 {
+                    long rewardXP = 0;
+                    long rewardRP = 0;
+
+                    if (m_rewardXPs.Count > 0)
+                    {
+                        rewardXP = m_rewardXPs[lastStep - 1];
+                    }
+
+                    if (m_rewardRPs.Count > 0)
+                    {
+                        rewardRP = m_rewardRPs[lastStep - 1];
+                    }
+
+                    string xpError = "Your XP is turned off, you must turn it on to complete this quest!";
+                    string rpError = "Your RP is turned off, you must turn it on to complete this quest!";
+
+                    if (rewardXP > 0)
+                    {
+                        if (m_questPlayer.GainXP == false)
+                        {
+                            QuestPlayer.Out.SendMessage(xpError, eChatType.CT_Staff, eChatLoc.CL_SystemWindow);
+                            return false;
+                        }
+                        else if (rewardRP > 0 && m_questPlayer.GainRP == false)
+                        {
+                            QuestPlayer.Out.SendMessage(rpError, eChatType.CT_Staff, eChatLoc.CL_SystemWindow);
+                            return false;
+                        }
+
+                        m_questPlayer.GainExperience(GameLiving.eXPSource.Quest, rewardXP);
+                    }
+
+                    if (rewardRP > 0)
+                    {
+                        if (m_questPlayer.GainRP == false)
+                        {
+                            QuestPlayer.Out.SendMessage(rpError, eChatType.CT_Staff, eChatLoc.CL_SystemWindow);
+                            return false;
+                        }
+
+                        m_questPlayer.GainRealmPoints(rewardRP);
+                    }
+
                     foreach (ItemTemplate item in m_finalRewards)
                     {
                         if (item != null)
@@ -2144,12 +2378,21 @@ namespace DOL.GS.Quests
                         }
                     }
 
-                    if (m_rewardXPs.Count > 0)
+                    if (m_rewardCLXPs.Count > 0)
                     {
-                        long rewardXP = m_rewardXPs[lastStep - 1];
-                        if (rewardXP > 0)
+                        long rewardCLXP = m_rewardCLXPs[lastStep - 1];
+                        if (rewardCLXP > 0)
                         {
-                            m_questPlayer.GainExperience(GameLiving.eXPSource.Quest, rewardXP);
+                            m_questPlayer.GainChampionExperience(rewardCLXP, GameLiving.eXPSource.Quest);
+                        }
+                    }
+
+                    if (m_rewardBPs.Count > 0)
+                    {
+                        long rewardBP = m_rewardBPs[lastStep - 1];
+                        if (rewardBP > 0)
+                        {
+                            m_questPlayer.GainBountyPoints(rewardBP);
                         }
                     }
 

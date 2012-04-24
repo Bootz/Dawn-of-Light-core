@@ -36,55 +36,79 @@ namespace DOL.GS.Commands
 
         private static void SendSystemMessageBase(GameClient client)
         {
-            client.Out.SendMessage("\n  ===== [[[ Command Reload ]]] ===== \n", eChatType.CT_System, eChatLoc.CL_SystemWindow);
-            client.Out.SendMessage(" Reload given element.", eChatType.CT_System, eChatLoc.CL_SystemWindow);
+            if (client.Player != null)
+            {
+                client.Out.SendMessage("\n  ===== [[[ Command Reload ]]] ===== \n", eChatType.CT_System, eChatLoc.CL_SystemWindow);
+                client.Out.SendMessage(" Reload given element.", eChatType.CT_System, eChatLoc.CL_SystemWindow);
+            }
         }
 
         private static void SendSystemMessageMob(GameClient client)
         {
-            client.Out.SendMessage(" /reload mob ' reload all mob in region.", eChatType.CT_System, eChatLoc.CL_SystemWindow);
-            client.Out.SendMessage(" /reload mob ' realm <0/1/2/3>' reload all mob with specifique realm in region.", eChatType.CT_System, eChatLoc.CL_SystemWindow);
-            client.Out.SendMessage(" /reload mob ' name <name_you_want>' reload all mob with specifique name in region.", eChatType.CT_System, eChatLoc.CL_SystemWindow);
-            client.Out.SendMessage(" /reload mob ' model <model_ID>' reload all mob with specifique model in region.", eChatType.CT_System, eChatLoc.CL_SystemWindow);
+            if (client.Player != null)
+            {
+                client.Out.SendMessage(" /reload mob ' reload all mob in region.", eChatType.CT_System, eChatLoc.CL_SystemWindow);
+                client.Out.SendMessage(" /reload mob ' realm <0/1/2/3>' reload all mob with specifique realm in region.", eChatType.CT_System, eChatLoc.CL_SystemWindow);
+                client.Out.SendMessage(" /reload mob ' name <name_you_want>' reload all mob with specifique name in region.", eChatType.CT_System, eChatLoc.CL_SystemWindow);
+                client.Out.SendMessage(" /reload mob ' model <model_ID>' reload all mob with specifique model in region.", eChatType.CT_System, eChatLoc.CL_SystemWindow);
+            }
         }
 
         private static void SendSystemMessageObject(GameClient client)
         {
-            client.Out.SendMessage(" /reload object ' reload all static object in region.", eChatType.CT_System, eChatLoc.CL_SystemWindow);
-            client.Out.SendMessage(" /reload object ' realm <0/1/2/3>' reload all static object with specifique realm in region.", eChatType.CT_System, eChatLoc.CL_SystemWindow);
-            client.Out.SendMessage(" /reload object ' name <name_you_want>' reload all static object with specifique name in region.", eChatType.CT_System, eChatLoc.CL_SystemWindow);
-            client.Out.SendMessage(" /reload object ' model <model_ID>' reload all static object with specifique model in region.", eChatType.CT_System, eChatLoc.CL_SystemWindow);
+            if (client.Player != null)
+            {
+                client.Out.SendMessage(" /reload object ' reload all static object in region.", eChatType.CT_System, eChatLoc.CL_SystemWindow);
+                client.Out.SendMessage(" /reload object ' realm <0/1/2/3>' reload all static object with specifique realm in region.", eChatType.CT_System, eChatLoc.CL_SystemWindow);
+                client.Out.SendMessage(" /reload object ' name <name_you_want>' reload all static object with specifique name in region.", eChatType.CT_System, eChatLoc.CL_SystemWindow);
+                client.Out.SendMessage(" /reload object ' model <model_ID>' reload all static object with specifique model in region.", eChatType.CT_System, eChatLoc.CL_SystemWindow);
+            }
         }
 
         private static void SendSystemMessageRealm(GameClient client)
         {
-            client.Out.SendMessage("\n /reload <object/mob> realm <0/1/2/3>' reload all element with specifique realm in region.", eChatType.CT_System, eChatLoc.CL_SystemWindow);
-            client.Out.SendMessage(" can use 0/1/2/3 or n/a/m/h or no/alb/mid/hib....", eChatType.CT_System, eChatLoc.CL_SystemWindow);
+            if (client.Player != null)
+            {
+                client.Out.SendMessage("\n /reload <object/mob> realm <0/1/2/3>' reload all element with specifique realm in region.", eChatType.CT_System, eChatLoc.CL_SystemWindow);
+                client.Out.SendMessage(" can use 0/1/2/3 or n/a/m/h or no/alb/mid/hib....", eChatType.CT_System, eChatLoc.CL_SystemWindow);
+            }
         }
 
         private static void SendSystemMessageName(GameClient client)
         {
-            client.Out.SendMessage("\n /reload <object/mob>  name <name_you_want>' reload all element with specified name in region.", eChatType.CT_System, eChatLoc.CL_SystemWindow);
+            if (client.Player != null)
+            {
+                client.Out.SendMessage("\n /reload <object/mob>  name <name_you_want>' reload all element with specified name in region.", eChatType.CT_System, eChatLoc.CL_SystemWindow);
+            }
         }
 
         private static void SendSystemMessageModel(GameClient client)
         {
-            client.Out.SendMessage("\n /reload <object/mob>  model <model_ID>' reload all element with specified model_ID in region.", eChatType.CT_System, eChatLoc.CL_SystemWindow);
+            if (client.Player != null)
+            {
+                client.Out.SendMessage("\n /reload <object/mob>  model <model_ID>' reload all element with specified model_ID in region.", eChatType.CT_System, eChatLoc.CL_SystemWindow);
+            }
         }
 
         public void OnCommand(GameClient client, string[] args)
         {
-            ushort region = client.Player.CurrentRegionID;
+            ushort region = 0;
+            if (client.Player != null)
+                region = client.Player.CurrentRegionID;
             string arg = "";
             int argLength = args.Length - 1;
 
             if (argLength < 1)
             {
-                SendSystemMessageBase(client);
-                SendSystemMessageMob(client);
-                SendSystemMessageObject(client);
-                client.Out.SendMessage(" /reload CL ' reload all champion levels.", eChatType.CT_System, eChatLoc.CL_SystemWindow);
-                client.Out.SendMessage(" /reload specs ' reload all specializations.", eChatType.CT_System, eChatLoc.CL_SystemWindow);
+                if (client.Player != null)
+                {
+                    SendSystemMessageBase(client);
+                    SendSystemMessageMob(client);
+                    SendSystemMessageObject(client);
+                    client.Out.SendMessage(" /reload CL ' reload all champion levels.", eChatType.CT_System, eChatLoc.CL_SystemWindow);
+                    client.Out.SendMessage(" /reload specs ' reload all specializations.", eChatType.CT_System, eChatLoc.CL_SystemWindow);
+                }
+                log.Info("/reload command failed, review parameters.");
                 return;
             }
             else if (argLength > 1)
@@ -136,12 +160,12 @@ namespace DOL.GS.Commands
                 if (argLength == 1)
                 {
                     arg = "all";
-                    ReloadNPC(region, arg, arg);
+                    ReloadMobs(client.Player, region, arg, arg);
                 }
 
                 if (argLength > 1)
                 {
-                    ReloadNPC(region, args[2], arg);
+                    ReloadMobs(client.Player, region, args[2], arg);
                 }
             }
 
@@ -169,14 +193,16 @@ namespace DOL.GS.Commands
             {
                 SkillBase.LoadProcs();
                 int count = SkillBase.LoadSpecializations();
-                client.Out.SendMessage(count + " specializations loaded.", eChatType.CT_Important, eChatLoc.CL_SystemWindow);
+                if (client != null) client.Out.SendMessage(count + " specializations loaded.", eChatType.CT_Important, eChatLoc.CL_SystemWindow);
+                log.Info(count + " specializations loaded.");
                 return;
             }
             if (args[1].ToLower() == "spells")
             {
                 SkillBase.LoadSpells();
                 SkillBase.LoadSpellLines();
-                ChatUtil.SendSystemMessage(client, "Reloaded all spells and spell lines!");
+                if (client != null) ChatUtil.SendSystemMessage(client, "Reloaded all spells and spell lines!");
+                log.Info("Reloaded all spells and spell lines!");
             }
             return;
         }
@@ -191,11 +217,22 @@ namespace DOL.GS.Commands
             int numSpells = SkillBase.ReloadSpellLine(GlobalSpellsLines.Champion_Spells);
             DOL.GS.ChampSpecMgr.LoadChampionSpecs();
 
-            client.Out.SendMessage(numSpells + " loaded in " + GlobalSpellsLines.Champion_Spells, eChatType.CT_Important, eChatLoc.CL_SystemWindow);
+            if (client.Player != null) client.Out.SendMessage(numSpells + " loaded in " + GlobalSpellsLines.Champion_Spells, eChatType.CT_Important, eChatLoc.CL_SystemWindow);
+            log.Info(numSpells + " loaded in " + GlobalSpellsLines.Champion_Spells);
         }
 
-        private void ReloadNPC(ushort region, string arg1, string arg2)
+        private void ReloadMobs(GamePlayer player, ushort region, string arg1, string arg2)
         {
+            if (region == 0)
+            {
+                log.Info("Region reload not supported from console.");
+                return;
+            }
+
+            ChatUtil.SendSystemMessage(player, "Reloading Mobs:  " + arg1 + ", " + arg2 + " ...");
+
+            int count = 0;
+
             foreach (GameNPC mob in WorldMgr.GetNPCsFromRegion(region))
             {
                 if (!mob.LoadedFromScript)
@@ -209,6 +246,7 @@ namespace DOL.GS.Commands
                         {
                             mob.LoadFromDatabase(mobs);
                             mob.AddToWorld();
+                            count++;
                         }
                     }
 
@@ -229,6 +267,7 @@ namespace DOL.GS.Commands
                             {
                                 mob.LoadFromDatabase(mobs);
                                 mob.AddToWorld();
+                                count++;
                             }
                         }
                     }
@@ -244,6 +283,7 @@ namespace DOL.GS.Commands
                             {
                                 mob.LoadFromDatabase(mobs);
                                 mob.AddToWorld();
+                                count++;
                             }
                         }
                     }
@@ -259,28 +299,37 @@ namespace DOL.GS.Commands
                             {
                                 mob.LoadFromDatabase(mobs);
                                 mob.AddToWorld();
+                                count++;
                             }
                         }
                     }
                 }
             }
+
+            ChatUtil.SendSystemMessage(player, count + " mobs reloaded!");
         }
 
         private void ReloadStaticItem(ushort region, string arg1, string arg2)
         {
-            foreach (GameStaticItem objet in WorldMgr.GetStaticItemFromRegion(region))
+            if (region == 0)
             {
-                if (!objet.LoadedFromScript)
+                log.Info("Region reload not supported from console.");
+                return;
+            }
+
+            foreach (GameStaticItem staticItem in WorldMgr.GetStaticItemFromRegion(region))
+            {
+                if (!staticItem.LoadedFromScript)
                 {
                     if (arg1 == "all")
                     {
-                        objet.RemoveFromWorld();
+                        staticItem.RemoveFromWorld();
 
-                        WorldObject obj = GameServer.Database.FindObjectByKey<WorldObject>(objet.InternalID);
+                        WorldObject obj = GameServer.Database.FindObjectByKey<WorldObject>(staticItem.InternalID);
                         if (obj != null)
                         {
-                            objet.LoadFromDatabase(obj);
-                            objet.AddToWorld();
+                            staticItem.LoadFromDatabase(obj);
+                            staticItem.AddToWorld();
                         }
                     }
 
@@ -292,45 +341,45 @@ namespace DOL.GS.Commands
                         if (arg2 == "Midgard") realm = eRealm.Midgard;
                         if (arg2 == "Hibernia") realm = eRealm.Hibernia;
 
-                        if (objet.Realm == realm)
+                        if (staticItem.Realm == realm)
                         {
-                            objet.RemoveFromWorld();
+                            staticItem.RemoveFromWorld();
 
-                            WorldObject obj = GameServer.Database.FindObjectByKey<WorldObject>(objet.InternalID);
+                            WorldObject obj = GameServer.Database.FindObjectByKey<WorldObject>(staticItem.InternalID);
                             if (obj != null)
                             {
-                                objet.LoadFromDatabase(obj);
-                                objet.AddToWorld();
+                                staticItem.LoadFromDatabase(obj);
+                                staticItem.AddToWorld();
                             }
                         }
                     }
 
                     if (arg1 == "name")
                     {
-                        if (objet.Name == arg2)
+                        if (staticItem.Name == arg2)
                         {
-                            objet.RemoveFromWorld();
+                            staticItem.RemoveFromWorld();
 
-                            WorldObject obj = GameServer.Database.FindObjectByKey<WorldObject>(objet.InternalID);
+                            WorldObject obj = GameServer.Database.FindObjectByKey<WorldObject>(staticItem.InternalID);
                             if (obj != null)
                             {
-                                objet.LoadFromDatabase(obj);
-                                objet.AddToWorld();
+                                staticItem.LoadFromDatabase(obj);
+                                staticItem.AddToWorld();
                             }
                         }
                     }
 
                     if (arg1 == "model")
                     {
-                        if (objet.Model == Convert.ToUInt16(arg2))
+                        if (staticItem.Model == Convert.ToUInt16(arg2))
                         {
-                            objet.RemoveFromWorld();
+                            staticItem.RemoveFromWorld();
 
-                            WorldObject obj = GameServer.Database.FindObjectByKey<WorldObject>(objet.InternalID);
+                            WorldObject obj = GameServer.Database.FindObjectByKey<WorldObject>(staticItem.InternalID);
                             if (obj != null)
                             {
-                                objet.LoadFromDatabase(obj);
-                                objet.AddToWorld();
+                                staticItem.LoadFromDatabase(obj);
+                                staticItem.AddToWorld();
                             }
                         }
                     }

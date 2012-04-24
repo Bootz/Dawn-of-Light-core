@@ -315,7 +315,7 @@ namespace DOL.GS
         /// <param name="regionsData">The loaded regions data</param>
         public static bool EarlyInit(out RegionData[] regionsData)
         {
-            log.Debug(GC.GetTotalMemory(true) / 1000 + "kb - w1");
+            log.Debug(GC.GetTotalMemory(true) / 1024 / 1024 + "MB - World Manager: EarlyInit");
 
             lock (m_regions.SyncRoot)
                 m_regions.Clear();
@@ -408,6 +408,8 @@ namespace DOL.GS
                 }
             }
 
+            bool hasFrontierRegion = false;
+
             var regions = new List<RegionData>(512);
             foreach (DBRegions dbRegion in GameServer.Database.SelectAllObjects<DBRegions>())
             {
@@ -422,6 +424,13 @@ namespace DOL.GS
                 data.HousingEnabled = dbRegion.HousingEnabled;
                 data.DivingEnabled = dbRegion.DivingEnabled;
                 data.WaterLevel = dbRegion.WaterLevel;
+                data.ClassType = dbRegion.ClassType;
+                data.IsFrontier = dbRegion.IsFrontier;
+
+                if (data.IsFrontier)
+                {
+                    hasFrontierRegion = true;
+                }
 
                 List<Mob> mobs;
 
@@ -441,7 +450,7 @@ namespace DOL.GS
 
             regions.Sort();
 
-            log.Debug(GC.GetTotalMemory(true) / 1000 + "kb - w2");
+            log.Debug(GC.GetTotalMemory(true) / 1024 / 1024 + "MB - Region Data Loaded");
 
             int cpuCount = GameServer.Instance.Configuration.CpuCount;
             if (cpuCount < 1)
@@ -461,7 +470,20 @@ namespace DOL.GS
                 RegisterRegion(timers[FastMath.Abs(i % (cpuCount * 2) - cpuCount) % cpuCount], region);
             }
 
-            log.Debug(GC.GetTotalMemory(true) / 1000 + "kb - w3");
+            log.Debug(GC.GetTotalMemory(true) / 1024 / 1024 + "MB - " + m_regions.Count + " Regions Loaded");
+
+            // if we don't have at least one frontier region add the default
+            if (hasFrontierRegion == false)
+            {
+                if (m_regions.ContainsKey((ushort)Keeps.DefaultKeepManager.DEFAULT_FRONTIERS_REGION))
+                {
+                    ((Region)m_regions[(ushort)Keeps.DefaultKeepManager.DEFAULT_FRONTIERS_REGION]).IsFrontier = true;
+                }
+                else
+                {
+                    log.ErrorFormat("Can't find default Frontier region {0}!", Keeps.DefaultKeepManager.DEFAULT_FRONTIERS_REGION);
+                }
+            }
 
             //stephenxpimentel - changed to SQL.
             if (GameServer.Database.GetObjectCount<Zones>() < zoneCfg.Children.Count)
@@ -514,7 +536,7 @@ namespace DOL.GS
                 zoneData.DivingFlag = dbZone.DivingFlag;
                 zoneData.IsLava = dbZone.IsLava;
                 RegisterZone(zoneData, zoneData.ZoneID, zoneData.RegionID, zoneData.Description,
-                             dbZone.Experience, dbZone.Realmpoints, dbZone.Bountypoints, dbZone.Coin);
+                             dbZone.Experience, dbZone.Realmpoints, dbZone.Bountypoints, dbZone.Coin, dbZone.Realm);
 
                 //Save the zonedata.
                 if (!m_zonesData.ContainsKey(zoneData.RegionID))
@@ -523,7 +545,7 @@ namespace DOL.GS
                 m_zonesData[zoneData.RegionID].Add(zoneData);
             }
 
-            log.Debug(GC.GetTotalMemory(true) / 1000 + "kb - w4");
+            log.Debug(GC.GetTotalMemory(true) / 1024 / 1024 + "MB - Zones Loaded for All Regions");
 
             regionsData = regions.ToArray();
             return true;
@@ -705,7 +727,7 @@ namespace DOL.GS
 
                     foreach (Region region in regionsClone.Values)
                     {
-                        if (region.NumPlayers > 0 && (region.LastRelocation + Zone.MAX_REFRESH_INTERVAL) * 10 * 1000 < DateTime.Now.Ticks)
+                        if (region.NumPlayers > 0 && (region.LastRelocationTime + Zone.MAX_REFRESH_INTERVAL) * 10 * 1000 < DateTime.Now.Ticks)
                         {
                             region.Relocate();
                         }
@@ -892,7 +914,7 @@ namespace DOL.GS
                                     {
                                         if (npc == null) continue;
                                         narray[npc.ObjectID - 1] = true;
-                                        if ((uint)Environment.TickCount - npc.LastUpdateTickCount > (ServerProperties.Properties.WORLD_NPC_UPDATE_INTERVAL >= 1000 ? ServerProperties.Properties.WORLD_NPC_UPDATE_INTERVAL : 1000))
+                                        if ((uint)Environment.TickCount - npc.LastUpdateTickCount > 15000) // 1.10+ change, always 15 seconds
                                         {
                                             npc.BroadcastUpdate();
                                             npcsUpdated++;
@@ -1050,7 +1072,7 @@ namespace DOL.GS
         /// <returns>Registered region</returns>
         public static Region RegisterRegion(GameTimer.TimeManager time, RegionData data)
         {
-            Region region = new Region(time, data);
+            Region region = Region.Create(time, data);
             lock (m_regions.SyncRoot)
             {
                 m_regions.Add(data.Id, region);
@@ -1107,7 +1129,7 @@ namespace DOL.GS
         /// <summary>
         /// Registers a Zone into a Region
         /// </summary>
-        public static void RegisterZone(ZoneData zoneData, ushort zoneID, ushort regionID, string zoneName, int xpBonus, int rpBonus, int bpBonus, int coinBonus)
+        public static void RegisterZone(ZoneData zoneData, ushort zoneID, ushort regionID, string zoneName, int xpBonus, int rpBonus, int bpBonus, int coinBonus, byte realm)
         {
             Region region = GetRegion(regionID);
             if (region == null)
@@ -1146,7 +1168,8 @@ namespace DOL.GS
                                  xpBonus,
                                  rpBonus,
                                  bpBonus,
-                                 coinBonus);
+                                 coinBonus,
+                                 realm);
 
             //Dinberg:Instances
             //ZoneID will always be constant as last parameter, because ZoneSkinID will effectively be a bluff, to remember
@@ -2387,7 +2410,7 @@ namespace DOL.GS
                         log.Error("Zone limit reached in instance creation!");
 
                     //create a zone of this ID.
-                    RegisterZone(dat, zoneID, ID, dat.Description + " (Instance)", 0, 0, 0, 0);
+                    RegisterZone(dat, zoneID, ID, dat.Description + " (Instance)", 0, 0, 0, 0, 0);
                 }
             }
 

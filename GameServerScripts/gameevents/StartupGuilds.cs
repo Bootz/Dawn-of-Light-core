@@ -44,6 +44,9 @@ namespace DOL.GS.GameEvents
         [ScriptLoadedEvent]
         public static void OnScriptCompiled(DOLEvent e, object sender, EventArgs args)
         {
+            if (!ServerProperties.Properties.STARTING_GUILD)
+                return;
+
             foreach (eRealm currentRealm in Enum.GetValues(typeof(eRealm)))
             {
                 if (currentRealm == eRealm.None || currentRealm == eRealm.Door)

@@ -87,7 +87,7 @@ namespace DOL.GS.Spells
         {
             //Set pet infos & Brain
             base.ApplyEffectOnTarget(target, effectiveness);
-            ProcPetBrain petBrain = (ProcPetBrain)pet.Brain;
+            ProcPetBrain petBrain = (ProcPetBrain)m_pet.Brain;
             petBrain.AddToAggroList(target, 1);
             petBrain.Think();
         }
@@ -98,7 +98,7 @@ namespace DOL.GS.Spells
 
         protected override void SetBrainToOwner(IControlledBrain brain) { }
 
-        protected override void AddHandlers() { GameEventMgr.AddHandler(pet, GameLivingEvent.AttackFinished, EventHandler); }
+        protected override void AddHandlers() { GameEventMgr.AddHandler(m_pet, GameLivingEvent.AttackFinished, EventHandler); }
 
         protected void EventHandler(DOLEvent e, object sender, EventArgs arguments)
         {
@@ -138,7 +138,7 @@ namespace DOL.GS.Spells
             dbs.Range = 350;
             Spell s = new Spell(dbs, 50);
             SpellLine sl = SkillBase.GetSpellLine(GlobalSpellsLines.Reserved_Spells);
-            return ScriptMgr.CreateSpellHandler(pet, s, sl);
+            return ScriptMgr.CreateSpellHandler(m_pet, s, sl);
         }
 
         public TraitorsDaggerSummon(GameLiving caster, Spell spell, SpellLine line)

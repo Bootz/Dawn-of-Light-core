@@ -34,9 +34,12 @@ namespace DOL.GS
         {
         }
 
+        // 11111111111
+        // 550000000   // 11111111111
+
         public static int GetMithril(long money)
         {
-            return (int)(money / 100L / 100L / 1000L / 1000L);
+            return (int)(money / 100L / 100L / 1000L / 1000L % 1000L);
         }
 
         public static int GetPlatinum(long money)

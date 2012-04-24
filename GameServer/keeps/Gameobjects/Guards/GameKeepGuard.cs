@@ -314,11 +314,13 @@ namespace DOL.GS.Keeps
             if (!GameServer.ServerRules.IsAllowedToAttack(this, target, true))
                 return;
 
-            //Prevent spam for LOS checks multiple times..
-            GameObject lastTarget = (GameObject)this.TempProperties.getProperty<object>(Last_LOS_Target_Property, null);
+            //Prevent spam for LOS to same target multiple times
+
+            GameObject lastTarget = (GameObject)this.TempProperties.getProperty<object>(LAST_LOS_TARGET_PROPERTY, null);
+            long lastTick = this.TempProperties.getProperty<long>(LAST_LOS_TICK_PROPERTY);
+
             if (lastTarget != null && lastTarget == attackTarget)
             {
-                long lastTick = this.TempProperties.getProperty<long>(Last_LOS_Tick_Property);
                 if (lastTick != 0 && CurrentRegion.Time - lastTick < ServerProperties.Properties.KEEP_GUARD_LOS_CHECK_TIME * 1000)
                     return;
             }
@@ -347,9 +349,32 @@ namespace DOL.GS.Keeps
                 return;
             }
 
-            this.TempProperties.setProperty(Last_LOS_Target_Property, attackTarget);
-            this.TempProperties.setProperty(Last_LOS_Tick_Property, CurrentRegion.Time);
-            TargetObject = attackTarget;
+            lock (LOS_LOCK)
+            {
+                int count = TempProperties.getProperty<int>(NUM_LOS_CHECKS_INPROGRESS, 0);
+
+                if (count > 10)
+                {
+                    log.DebugFormat("{0} LOS count check exceeds 10, aborting LOS check!", Name);
+
+                    // Now do a safety check.  If it's been a while since we sent any check we should clear count
+                    if (lastTick == 0 || CurrentRegion.Time - lastTick > ServerProperties.Properties.LOS_PLAYER_CHECK_FREQUENCY * 1000)
+                    {
+                        log.Debug("LOS count reset!");
+                        TempProperties.setProperty(NUM_LOS_CHECKS_INPROGRESS, 0);
+                    }
+
+                    return;
+                }
+
+                count++;
+                TempProperties.setProperty(NUM_LOS_CHECKS_INPROGRESS, count);
+
+                TempProperties.setProperty(LAST_LOS_TARGET_PROPERTY, attackTarget);
+                TempProperties.setProperty(LAST_LOS_TICK_PROPERTY, CurrentRegion.Time);
+                TargetObject = attackTarget;
+            }
+
             LOSChecker.Out.SendCheckLOS(this, attackTarget, new CheckLOSResponse(this.GuardStartAttackCheckLOS));
         }
 
@@ -361,6 +386,13 @@ namespace DOL.GS.Keeps
         /// <param name="targetOID"></param>
         public void GuardStartAttackCheckLOS(GamePlayer player, ushort response, ushort targetOID)
         {
+            lock (LOS_LOCK)
+            {
+                int count = TempProperties.getProperty<int>(NUM_LOS_CHECKS_INPROGRESS, 0);
+                count--;
+                TempProperties.setProperty(NUM_LOS_CHECKS_INPROGRESS, Math.Max(0, count));
+            }
+
             if ((response & 0x100) == 0x100)
             {
                 if (this is GuardArcher || this is GuardLord)
@@ -374,7 +406,7 @@ namespace DOL.GS.Keeps
 
                 base.StartAttack(TargetObject);
             }
-            else if (TargetObject != null && TargetPosition is GameLiving)
+            else if (TargetObject != null && TargetObject is GameLiving)
             {
                 (this.Brain as KeepGuardBrain).RemoveFromAggroList(TargetObject as GameLiving);
             }
@@ -520,7 +552,7 @@ namespace DOL.GS.Keeps
             {
                 if (this.Component != null)
                 {
-                    if (KeepMgr.IsEnemy(this.Component.Keep, NearbyPlayers))
+                    if (GameServer.KeepManager.IsEnemy(this.Component.Keep, NearbyPlayers))
                         inArea++;
                 }
                 else
@@ -730,7 +762,11 @@ namespace DOL.GS.Keeps
                     Component = new GameKeepComponent();
                     Component.Keep = keep;
                     m_dataObjectID = mobobject.ObjectId;
-                    Component.Keep.Guards.Add(m_dataObjectID, this);
+                    // mob reload command might be reloading guard, so check to make sure it isn't already added
+                    if (Component.Keep.Guards.ContainsKey(m_dataObjectID) == false)
+                    {
+                        Component.Keep.Guards.Add(m_dataObjectID, this);
+                    }
                     break;
                 }
             }

@@ -104,7 +104,14 @@ namespace DOL.GS
         /// </summary>
         public override double Effectiveness
         {
-            get { return (Brain as IControlledBrain).GetPlayerOwner().Effectiveness; }
+            get
+            {
+                GameLiving gl = (Brain as IControlledBrain).GetLivingOwner();
+                if (gl != null)
+                    return gl.Effectiveness;
+
+                return 1.0;
+            }
         }
 
         /// <summary>
@@ -123,7 +130,7 @@ namespace DOL.GS
                 case Specs.Critical_Strike:
                 case Specs.Large_Weapons:
                     return Level;
-                default: return (Brain as IControlledBrain).GetPlayerOwner().GetModifiedSpecLevel(keyName);
+                default: return (Brain as IControlledBrain).GetLivingOwner().GetModifiedSpecLevel(keyName);
             }
         }
 
@@ -146,7 +153,7 @@ namespace DOL.GS
         /// </summary>
         public override int SpellCriticalChance
         {
-            get { return (Brain as IControlledBrain).GetPlayerOwner().GetModified(eProperty.CriticalSpellHitChance); }
+            get { return (Brain as IControlledBrain).GetLivingOwner().GetModified(eProperty.CriticalSpellHitChance); }
             set { }
         }
 
@@ -162,7 +169,7 @@ namespace DOL.GS
         {
             get
             {
-                short str = (short)(20 + Level * 6);
+                short str = (short)(Properties.PET_AUTOSET_STR_BASE + Level * 10 * Properties.PET_AUTOSET_STR_MULTIPLIER);
                 if (base.Strength > 0)
                 {
                     str = (short)(str * base.Strength * .01);
@@ -173,7 +180,7 @@ namespace DOL.GS
         }
 
         /// <summary>
-        /// Base constitution.
+        /// Pet Base constitution.
         /// </summary>
         public override short Constitution
         {
@@ -182,12 +189,12 @@ namespace DOL.GS
                 if (base.Constitution == 0)
                     return 30;
                 else
-                    return base.Constitution;
+                    return (short)(Properties.PET_AUTOSET_CON_BASE + Level * Properties.PET_AUTOSET_CON_MULTIPLIER);
             }
         }
 
         /// <summary>
-        /// Base dexterity.
+        /// Pet Base dexterity.
         /// </summary>
         public override short Dexterity
         {
@@ -196,12 +203,12 @@ namespace DOL.GS
                 if (base.Dexterity == 0)
                     return 30;
                 else
-                    return base.Dexterity;
+                    return (short)(Properties.PET_AUTOSET_DEX_BASE + Level * Properties.PET_AUTOSET_DEX_MULTIPLIER);
             }
         }
 
         /// <summary>
-        /// Base quickness.
+        /// Pet Base quickness.
         /// </summary>
         public override short Quickness
         {
@@ -210,7 +217,7 @@ namespace DOL.GS
                 if (base.Quickness == 0)
                     return 30;
                 else
-                    return base.Quickness;
+                    return (short)(Properties.PET_AUTOSET_QUI_BASE + Level * Properties.PET_AUTOSET_QUI_MULTIPLIER);
             }
         }
 
@@ -266,12 +273,17 @@ namespace DOL.GS
             if (weapons != null)
             {
                 foreach (InventoryItem item in weapons)
+                {
                     if (item != null)
+                    {
                         weaponSpeed += item.SPD_ABS;
+                    }
                     else
                     {
                         weaponSpeed += 34;
                     }
+                }
+
                 weaponSpeed = (weapons.Length > 0) ? weaponSpeed / weapons.Length : 34.0;
             }
             else
@@ -280,7 +292,26 @@ namespace DOL.GS
             }
 
             double speed = 100 * weaponSpeed * (1.0 - (GetModified(eProperty.Quickness) - 60) / 500.0);
-            return (int)(speed * GetModified(eProperty.MeleeSpeed) * 0.01);
+            return (int)Math.Max(500.0, (speed * (double)GetModified(eProperty.MeleeSpeed) * 0.01)); // no bonus is 100%, opposite how players work
+        }
+
+        /// <summary>
+        /// Calculate how fast this pet can cast a given spell
+        /// </summary>
+        /// <param name="spell"></param>
+        /// <returns></returns>
+        public override int CalculateCastingTime(SpellLine line, Spell spell)
+        {
+            int ticks = spell.CastTime;
+
+            double percent = DexterityCastTimeReduction;
+            percent -= GetModified(eProperty.CastingSpeed) * .01;
+
+            ticks = (int)(ticks * Math.Max(CastingSpeedReductionCap, percent));
+            if (ticks < MinimumCastingSpeed)
+                ticks = MinimumCastingSpeed;
+
+            return ticks;
         }
 
         /// <summary>
@@ -371,7 +402,7 @@ namespace DOL.GS
             GameObject tempobj = obj;
             if (Brain is IControlledBrain)
             {
-                GamePlayer player = (Brain as IControlledBrain).GetPlayerOwner();
+                GameLiving player = (Brain as IControlledBrain).GetLivingOwner();
                 if (player != null)
                     tempobj = player;
             }

@@ -28,7 +28,7 @@ namespace DOL.GS.Commands
         ePrivLevel.Player,
         "Show various housing information"
         )]
-    public class HouseCommanHandler : AbstractCommandHandler, ICommandHandler
+    public class HouseCommandHandler : AbstractCommandHandler, ICommandHandler
     {
         private static readonly log4net.ILog log = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
 
@@ -59,13 +59,69 @@ namespace DOL.GS.Commands
                 }
 
                 House house = HouseMgr.GetHouseByPlayer(client.Player);
-                if (house == null)
+
+                if (house != null)
+                {
+                    if (client.Player.Guild != null)
+                    {
+                        // check to see if guild emblem is current
+                        if (house.Emblem != client.Player.Guild.Emblem)
+                        {
+                            house.Emblem = client.Player.Guild.Emblem;
+                            house.SaveIntoDatabase();
+                        }
+                    }
+
+                    if (house.RegionID == client.Player.CurrentRegionID && client.Player.InHouse == false)
+                    {
+                        // let's force update their house to make sure they can see it
+
+                        client.Out.SendHouse(house);
+                        client.Out.SendGarden(house);
+
+                        if (house.IsOccupied)
+                        {
+                            client.Out.SendHouseOccupied(house, true);
+                        }
+
+                        try
+                        {
+                            client.Player.HousingUpdateArray[house.UniqueID] = true;
+                        }
+                        catch (Exception ex)
+                        {
+                            log.Error("Error in /house trying to update player housing array.", ex);
+                        }
+                    }
+
+                    // Send the house info dialog
+                    house.SendHouseInfo(client.Player);
+                }
+                else
                 {
                     DisplayMessage(client, "You do not own a house.");
-                    return;
                 }
 
-                house.SendHouseInfo(client.Player);
+                // now check for a guild house and update emblem if needed, then force update
+
+                if (client.Player.Guild != null && client.Player.Guild.GuildOwnsHouse && client.Player.Guild.GuildHouseNumber > 0)
+                {
+                    House guildHouse = HouseMgr.GetHouse(client.Player.Guild.GuildHouseNumber);
+
+                    if (guildHouse != null)
+                    {
+                        if (guildHouse.Emblem != client.Player.Guild.Emblem)
+                        {
+                            guildHouse.Emblem = client.Player.Guild.Emblem;
+                            guildHouse.SaveIntoDatabase();
+                            guildHouse.SendUpdate(); // forces refresh
+                        }
+                        else if (guildHouse.RegionID == client.Player.CurrentRegionID)
+                        {
+                            guildHouse.SendUpdate(); // forces refresh
+                        }
+                    }
+                }
             }
             catch
             {

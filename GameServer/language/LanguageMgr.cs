@@ -41,6 +41,29 @@ namespace DOL.Language
         /// </summary>
         public static Dictionary<string, Dictionary<string, string>> IDSentences;
 
+        // All the sentence ID's found in any language files
+        private static IList<string> m_listSentenceIDsFromFiles;
+
+        private enum eObjColKey
+        {
+            eNULL,
+            eArea,
+            eDoor,
+            eItem,
+            eMission,
+            eNPC,
+            eQuest,
+            eStaticObject,
+            eTask,
+            eZone
+        }
+
+        /// <summary>
+        /// Holds all object translations.
+        /// </summary>
+        private static Dictionary<eObjColKey, Dictionary<string, Dictionary<string, DataObject>>> m_objectTranslations;
+        //                                              language      translation id, translation
+
         /// <summary>
         /// Give a way to change or relocate the lang files
         /// </summary>
@@ -116,6 +139,10 @@ namespace DOL.Language
                 }
             }
 
+            // dual usage for the same dictionary makes ones head hurt!
+            // In this case we have entries for all the language short and long names
+            // [SHORT_NAME or LONG_NAME] [Language Key] = [Short or Long name]
+
             if (!IDSentences.ContainsKey("SHORT_NAME"))
             {
                 IDSentences.Add("SHORT_NAME", new Dictionary<string, string>());
@@ -136,15 +163,17 @@ namespace DOL.Language
                 IDSentences["LONG_NAME"].Add("CU", "Custom");
             }
 
-            m_refreshFromFiles = new List<string>();
-            foreach (string abrev in IDSentences["SHORT_NAME"].Keys)
-                CheckFromFiles(abrev);
+            m_listSentenceIDsFromFiles = new List<string>();
+            foreach (string langShortName in IDSentences["SHORT_NAME"].Keys)
+            {
+                CheckFromFiles(langShortName);
+            }
 
             if (DOL.GS.ServerProperties.Properties.USE_DBLANGUAGE)
             {
-                if (m_refreshFromFiles.Count > 0)
+                if (m_listSentenceIDsFromFiles.Count > 0)
                 {
-                    foreach (string id in m_refreshFromFiles)
+                    foreach (string id in m_listSentenceIDsFromFiles)
                     {
                         bool create = false;
                         if (IDSentences.ContainsKey(id))
@@ -170,10 +199,10 @@ namespace DOL.Language
                     }
 
                     if (log.IsWarnEnabled)
-                        log.Warn("[LanguageMgr] Loaded " + m_refreshFromFiles.Count + " translations ID from files to database!");
+                        log.Warn("[LanguageMgr] Loaded " + m_listSentenceIDsFromFiles.Count + " translations ID from files to database!");
                 }
             }
-            m_refreshFromFiles.Clear();
+            m_listSentenceIDsFromFiles.Clear();
 
             if (log.IsInfoEnabled)
                 log.Info("[LanguageMgr] Translations ID loaded.");
@@ -181,64 +210,159 @@ namespace DOL.Language
             return true;
         }
 
-        private static IList<string> m_refreshFromFiles;
+        #region AddObjectTranslation
 
-        private static void CheckFromFiles(string abrev)
+        private static void AddObjectTranslation(eObjColKey key, ILanguageTable dbo)
         {
-            if (CountLanguageFiles(abrev) == 0)
-            {
-                log.Error(abrev + " language not found!");
+            if (dbo == null || key == eObjColKey.eNULL || Util.IsEmpty(dbo.Language) || Util.IsEmpty(dbo.TranslationId) || !(dbo is DataObject))
+                return;
 
-                if (DOL.GS.ServerProperties.Properties.SERV_LANGUAGE == abrev)
+            if (!m_objectTranslations.ContainsKey(key))
+            {
+                Dictionary<string, Dictionary<string, DataObject>> lngCol = new Dictionary<string, Dictionary<string, DataObject>>();
+                Dictionary<string, DataObject> objCol = new Dictionary<string, DataObject>();
+                objCol.Add(dbo.TranslationId, (DataObject)dbo);
+                lngCol.Add(dbo.Language.ToUpper(), objCol);
+                m_objectTranslations.Add(key, lngCol);
+                return;
+            }
+
+            if (!m_objectTranslations[key].ContainsKey(dbo.Language.ToUpper()))
+            {
+                Dictionary<string, DataObject> objCol = new Dictionary<string, DataObject>();
+                objCol.Add(dbo.TranslationId, (DataObject)dbo);
+                m_objectTranslations[key].Add(dbo.Language.ToUpper(), objCol);
+                return;
+            }
+
+            if (!m_objectTranslations[key][dbo.Language.ToUpper()].ContainsKey(dbo.TranslationId))
+            {
+                m_objectTranslations[key][dbo.Language.ToUpper()].Add(dbo.TranslationId, (DataObject)dbo);
+                return;
+            }
+        }
+
+        private static void AddObjectTranslation(eObjColKey key, IList<DataObject> dbos)
+        {
+            if (dbos == null || dbos.Count < 1 || key == eObjColKey.eNULL)
+                return;
+
+            foreach (DataObject obj in dbos)
+            {
+                if (obj.GetType().GetInterface(typeof(ILanguageTable).Name, false) == null)
+                    continue;
+
+                AddObjectTranslation(key, (ILanguageTable)obj);
+            }
+        }
+
+        #endregion AddObjectTranslation
+
+        private static void LoadObjectTranslations()
+        {
+            List<DataObject> dbos = new List<DataObject>();
+            dbos.AddRange(GameServer.Database.SelectAllObjects<DBLanguageArea>());
+            AddObjectTranslation(eObjColKey.eArea, dbos);
+
+            dbos.Clear();
+            dbos.AddRange(GameServer.Database.SelectAllObjects<DBLanguageGameObject>());
+            AddObjectTranslation(eObjColKey.eStaticObject, dbos);
+
+            dbos.Clear();
+            dbos.AddRange(GameServer.Database.SelectAllObjects<DBLanguageNPC>());
+            AddObjectTranslation(eObjColKey.eNPC, dbos);
+
+            dbos.Clear();
+            dbos.AddRange(GameServer.Database.SelectAllObjects<DBLanguageZone>());
+            AddObjectTranslation(eObjColKey.eZone, dbos);
+        }
+
+        /// <summary>
+        /// Translation ID for the sentence, array position 0
+        /// </summary>
+        private const int ID = 0;
+
+        /// <summary>
+        /// The translated sentence, array position 1
+        /// </summary>
+        private const int TEXT = 1;
+
+        private static void CheckFromFiles(string languageShortName)
+        {
+            if (CountLanguageFiles(languageShortName) == 0)
+            {
+                log.Error(languageShortName + " language not found!");
+
+                if (DOL.GS.ServerProperties.Properties.SERV_LANGUAGE == languageShortName)
                 {
-                    log.Error("Default " + abrev + " language files missing!! Server can't start without!");
+                    log.Error("Default " + languageShortName + " language files missing!! Server can't start without!");
                     if (GameServer.Instance != null)
                         GameServer.Instance.Stop();
                     return;
                 }
             }
 
-            string langPath = Path.Combine(LangPath, abrev);
-            foreach (string FilePath in Directory.GetFiles(langPath, "*", SearchOption.AllDirectories))
+            string langPath = Path.Combine(LangPath, languageShortName);
+            foreach (string languageFile in Directory.GetFiles(langPath, "*", SearchOption.AllDirectories))
             {
-                if (!FilePath.EndsWith(".txt"))
+                if (!languageFile.EndsWith(".txt"))
                     continue;
 
-                string[] lines = File.ReadAllLines(FilePath, Encoding.GetEncoding("utf-8"));
+                string[] lines = File.ReadAllLines(languageFile, Encoding.GetEncoding("utf-8"));
                 IList textList = new ArrayList(lines);
 
                 foreach (string line in textList)
                 {
+                    // do not read comments
                     if (line.StartsWith("#"))
                         continue;
 
+                    // ignore any line that is not formatted  'identifier: sentence'
                     if (line.IndexOf(':') == -1)
                         continue;
 
-                    string[] splitted = new string[2];
+                    string[] sentence = new string[2];
 
-                    splitted[0] = line.Substring(0, line.IndexOf(':'));
-                    splitted[1] = line.Substring(line.IndexOf(':') + 1);
+                    // 0 is the identifier for the sentence
+                    sentence[ID] = line.Substring(0, line.IndexOf(':'));
+                    sentence[TEXT] = line.Substring(line.IndexOf(':') + 1);
 
-                    splitted[1] = splitted[1].Replace("\t", " ");
-                    splitted[1] = splitted[1].Trim();
+                    // 1 is the sentence with any tabs (used for readability in language file) removed
+                    sentence[TEXT] = sentence[TEXT].Replace("\t", " ");
+                    sentence[TEXT] = sentence[TEXT].Trim();
 
-                    if (!IDSentences.ContainsKey(splitted[0]))
+                    // Makes no sense if DB languages are on.  We read from files anyway, add any new
+                    // sentences, but never check for changes. New ID's are added to DB but for what reason
+                    // if everything continues to be based off of files and only files are maintained
+                    // I recommend leaving DB support off for now  -- tolakram
+
+                    if (IDSentences.ContainsKey(sentence[ID]) == false)
                     {
-                        IDSentences.Add(splitted[0], new Dictionary<string, string>());
-                        IDSentences[splitted[0]].Add("EN", splitted[1]);
-                        IDSentences[splitted[0]].Add("DE", "");
-                        IDSentences[splitted[0]].Add("FR", "");
-                        IDSentences[splitted[0]].Add("IT", "");
-                        IDSentences[splitted[0]].Add("CU", "");
-                        if (!m_refreshFromFiles.Contains(splitted[0]))
-                            m_refreshFromFiles.Add(splitted[0]);
+                        // This assumes English is first language checked
+                        IDSentences.Add(sentence[ID], new Dictionary<string, string>());
+                        IDSentences[sentence[ID]].Add("EN", sentence[TEXT]);
+                        IDSentences[sentence[ID]].Add("DE", "");
+                        IDSentences[sentence[ID]].Add("FR", "");
+                        IDSentences[sentence[ID]].Add("IT", "");
+                        IDSentences[sentence[ID]].Add("CU", "");
+
+                        // make sure this ID is in our list of all ID's from the language files
+                        if (!m_listSentenceIDsFromFiles.Contains(sentence[ID]))
+                        {
+                            m_listSentenceIDsFromFiles.Add(sentence[ID]);
+                        }
                     }
-                    else if (m_refreshFromFiles.Contains(splitted[0]))
+                    else if (m_listSentenceIDsFromFiles.Contains(sentence[ID]))
                     {
-                        if (!IDSentences[splitted[0]].ContainsKey(abrev))
-                            IDSentences[splitted[0]].Add(abrev, "");
-                        IDSentences[splitted[0]][abrev] = splitted[1];
+                        // else clause with a different check might not be working as intended
+
+                        if (!IDSentences[sentence[ID]].ContainsKey(languageShortName))
+                        {
+                            // make sure then translation ID exists for the language we are checking
+                            IDSentences[sentence[ID]].Add(languageShortName, "");
+                        }
+
+                        IDSentences[sentence[ID]][languageShortName] = sentence[TEXT];
                     }
                 }
             }
@@ -251,8 +375,10 @@ namespace DOL.Language
         public static bool Init()
         {
             IDSentences = new Dictionary<string, Dictionary<string, string>>();
+            m_objectTranslations = new Dictionary<eObjColKey, Dictionary<string, Dictionary<string, DataObject>>>();
 
             LoadLanguages();
+            LoadObjectTranslations();
 
             return true;
         }
@@ -327,6 +453,49 @@ namespace DOL.Language
         }
 
         /// <summary>
+        /// Returns a translation for the given client of the given translatable object.
+        /// </summary>
+        /// <param name="obj">The object you request a translation for.</param>
+        /// <param name="client">The client you want the translation for.</param>
+        /// <returns>DataObject or 'null' if nothing was found.</returns>
+        public static DataObject GetTranslation(GameClient client, ITranslatableObject obj)
+        {
+            if (client == null || obj == null)
+                return null;
+
+            DataObject result = null;
+            if (!Util.IsEmpty(obj.TranslationId))
+            {
+                eObjColKey key = eObjColKey.eNULL;
+
+                if (obj is AbstractArea)
+                    key = eObjColKey.eArea;
+                else if (obj is GameStaticItem)
+                {
+                    if (obj is WorldInventoryItem)
+                        return result; // Not supported yet
+                    else
+                        key = eObjColKey.eStaticObject;
+                }
+                else if (obj is GameNPC)
+                    key = eObjColKey.eNPC;
+                else if (obj is Zone)
+                    key = eObjColKey.eZone;
+
+                // No more checks, get the result as quick as possible - if exist
+                // and all parameters / variables are valid!
+                try
+                {
+                    result = m_objectTranslations[key][client.Account.Language.ToUpper()][obj.TranslationId];
+                }
+                catch
+                {
+                }
+            }
+            return result;
+        }
+
+        /// <summary>
         /// Translate the sentence
         /// </summary>
         /// <param name="lang"></param>
@@ -376,7 +545,7 @@ namespace DOL.Language
             }
             catch
             {
-                log.ErrorFormat("LanguageMGR: Parameter number incorrect: {0} for language {1}, Arg count = {2}", TranslationID, lang, args.Length);
+                log.ErrorFormat("LanguageMGR: Parameter number incorrect: {0} for language {1}, Arg count = {2}, sentence = '{3}', args[0] = '{4}'", TranslationID, lang, args.Length, translated, args.Length > 0 ? args[0] : "null");
             }
 
             return translated;

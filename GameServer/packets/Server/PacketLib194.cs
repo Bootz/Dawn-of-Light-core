@@ -72,15 +72,31 @@ namespace DOL.GS.PacketHandler
 
             if (offer)
             {
-                //String personalizedStory = BehaviourUtils.GetPersonalizedMessage(quest.Story, player);
-                pak.WriteShort((ushort)quest.Story.Length);
-                pak.WriteStringBytes(quest.Story);
+                if (quest.Story.Length > (ushort)ServerProperties.Properties.MAX_REWARDQUEST_DESCRIPTION_LENGTH)
+                {
+                    pak.WriteShort((ushort)ServerProperties.Properties.MAX_REWARDQUEST_DESCRIPTION_LENGTH);
+                    pak.WriteStringBytes(quest.Story.Substring(0, (ushort)ServerProperties.Properties.MAX_REWARDQUEST_DESCRIPTION_LENGTH));
+                }
+                else
+                {
+                    pak.WriteShort((ushort)quest.Story.Length);
+                    pak.WriteStringBytes(quest.Story);
+                }
             }
             else
             {
-                pak.WriteShort((ushort)quest.FinishText.Length);
-                pak.WriteStringBytes(quest.FinishText);
+                if (quest.FinishText.Length > (ushort)ServerProperties.Properties.MAX_REWARDQUEST_DESCRIPTION_LENGTH)
+                {
+                    pak.WriteShort((ushort)ServerProperties.Properties.MAX_REWARDQUEST_DESCRIPTION_LENGTH);
+                    pak.WriteStringBytes(quest.FinishText.Substring(0, (ushort)ServerProperties.Properties.MAX_REWARDQUEST_DESCRIPTION_LENGTH));
+                }
+                else
+                {
+                    pak.WriteShort((ushort)quest.FinishText.Length);
+                    pak.WriteStringBytes(quest.FinishText);
+                }
             }
+
             pak.WriteShort(QuestID);
             pak.WriteByte((byte)quest.StepTexts.Count); // #goals count
             foreach (string text in quest.StepTexts)
@@ -123,17 +139,36 @@ namespace DOL.GS.PacketHandler
                 pak.WritePascalString(personalizedSummary.Substring(0, 255)); // Summary is max 255 bytes !
             else
                 pak.WritePascalString(personalizedSummary);
+
             if (offer)
             {
                 String personalizedStory = BehaviourUtils.GetPersonalizedMessage(quest.Story, player);
-                pak.WriteShort((ushort)personalizedStory.Length);
-                pak.WriteStringBytes(personalizedStory);
+
+                if (personalizedStory.Length > ServerProperties.Properties.MAX_REWARDQUEST_DESCRIPTION_LENGTH)
+                {
+                    pak.WriteShort((ushort)ServerProperties.Properties.MAX_REWARDQUEST_DESCRIPTION_LENGTH);
+                    pak.WriteStringBytes(personalizedStory.Substring(0, ServerProperties.Properties.MAX_REWARDQUEST_DESCRIPTION_LENGTH));
+                }
+                else
+                {
+                    pak.WriteShort((ushort)personalizedStory.Length);
+                    pak.WriteStringBytes(personalizedStory);
+                }
             }
             else
             {
-                pak.WriteShort((ushort)quest.Conclusion.Length);
-                pak.WriteStringBytes(quest.Conclusion);
+                if (quest.Conclusion.Length > (ushort)ServerProperties.Properties.MAX_REWARDQUEST_DESCRIPTION_LENGTH)
+                {
+                    pak.WriteShort((ushort)ServerProperties.Properties.MAX_REWARDQUEST_DESCRIPTION_LENGTH);
+                    pak.WriteStringBytes(quest.Conclusion.Substring(0, (ushort)ServerProperties.Properties.MAX_REWARDQUEST_DESCRIPTION_LENGTH));
+                }
+                else
+                {
+                    pak.WriteShort((ushort)quest.Conclusion.Length);
+                    pak.WriteStringBytes(quest.Conclusion);
+                }
             }
+
             pak.WriteShort(QuestID);
             pak.WriteByte((byte)quest.Goals.Count); // #goals count
             foreach (RewardQuest.QuestGoal goal in quest.Goals)

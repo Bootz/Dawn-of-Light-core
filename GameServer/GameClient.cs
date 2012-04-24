@@ -140,7 +140,9 @@ namespace DOL.GS
             Version1107 = 1107,
             Version1108 = 1108,
             Version1109 = 1109,
-            _LastVersion = 1109,
+            Version1110 = 1110,
+            Version1111 = 1111,
+            _LastVersion = 1111,
         }
 
         #endregion eClientVersion enum

@@ -7,8 +7,6 @@
     <ProjectGuid>{43BFC675-13B7-4AA8-97F6-6109948849CC}</ProjectGuid>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ApplicationIcon>
-    </ApplicationIcon>
     <AssemblyKeyContainerName>
     </AssemblyKeyContainerName>
     <AssemblyName>DOLDatabase</AssemblyName>
@@ -21,8 +19,6 @@
     <OutputType>Library</OutputType>
     <RootNamespace>DOLDatabase</RootNamespace>
     <RunPostBuildEvent>OnBuildSuccess</RunPostBuildEvent>
-    <StartupObject>
-    </StartupObject>
     <FileUpgradeFlags>
     </FileUpgradeFlags>
     <UpgradeBackupLocation>
@@ -62,20 +58,17 @@
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Platform)' == 'AnyCPU' ">
     <GenerateSerializationAssemblies>Auto</GenerateSerializationAssemblies>
-    <PlatformTarget>AnyCPU</PlatformTarget>
+    <PlatformTarget>x86</PlatformTarget>
     <RegisterForComInterop>false</RegisterForComInterop>
     <BaseAddress>285212672</BaseAddress>
     <FileAlignment>4096</FileAlignment>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="log4net">
-      <Name>log4net</Name>
       <HintPath>..\sharedModules\log4net\log4net.dll</HintPath>
-      <Private>True</Private>
     </Reference>
     <Reference Include="MySql.Data">
       <HintPath>..\sharedModules\MySQL\MySql.Data.dll</HintPath>
-      <Private>True</Private>
     </Reference>
     <Reference Include="System">
       <Name>System</Name>
@@ -134,7 +127,12 @@
     <Compile Include="Handlers\XMLObjectDatabase.cs">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="ILanguageTable.cs" />
     <Compile Include="Tables\CharacterXDataQuest.cs" />
+    <Compile Include="Tables\HousingConsignmentMerchant.cs" />
+    <Compile Include="Tables\LanguageDoor.cs" />
+    <Compile Include="Tables\LanguageGameObject.cs" />
+    <Compile Include="Tables\LanguageItem.cs" />
     <Compile Include="Tables\LanguageNPC.cs" />
     <Compile Include="Tables\Regions.cs" />
     <Compile Include="Tables\SalvageYield.cs" />
@@ -182,7 +180,6 @@
     <Compile Include="Tables\Language.cs" />
     <Compile Include="Tables\PvPKillsLog.cs" />
     <Compile Include="Tables\HouseHookpointOffset.cs" />
-    <Compile Include="Tables\DBHouseMerchant.cs" />
     <Compile Include="Tables\InstanceXElement.cs" />
     <Compile Include="Tables\MinotaurRelic.cs" />
     <Compile Include="Tables\KeepCaptureLog.cs" />
@@ -340,12 +337,6 @@
     </Compile>
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
-  <PropertyGroup>
-    <PreBuildEvent>
-    </PreBuildEvent>
-    <PostBuildEvent>
-    </PostBuildEvent>
-  </PropertyGroup>
   <!-- Graveen: the following is replacing the rev number in the asembly.info file by the SVN rev number of the current project. -->
   <!-- You must work on project under SVN version control, have msbuild community tasks assemblies installed and subversion client -->
   <!-- The path of the tools should either be corrected below, or matched. In case you lack one of theses prereqs, rev number 'll not be changed. -->

@@ -104,13 +104,13 @@ namespace DOL.GS.PacketHandler
             SendObjectGuildID(playerToCreate, playerToCreate.Guild); //used for nearest friendly/enemy object buttons and name colors on PvP server
         }
 
-        protected override void SendInventorySlotsUpdateRange(ICollection<int> slots, byte preAction)
+        protected override void SendInventorySlotsUpdateRange(ICollection<int> slots, eInventoryWindowType windowType)
         {
             GSTCPPacketOut pak = new GSTCPPacketOut(GetPacketCode(eServerPackets.InventoryUpdate));
             pak.WriteByte((byte)(slots == null ? 0 : slots.Count));
             pak.WriteByte((byte)((m_gameClient.Player.IsCloakHoodUp ? 0x01 : 0x00) | (int)m_gameClient.Player.ActiveQuiverSlot)); //bit0 is hood up bit4 to 7 is active quiver
             pak.WriteByte((byte)m_gameClient.Player.VisibleActiveWeaponSlots);
-            pak.WriteByte(preAction); //preAction (0x00 - Do nothing)
+            pak.WriteByte((byte)windowType);
             if (slots != null)
             {
                 foreach (int updatedSlot in slots)
@@ -202,7 +202,7 @@ namespace DOL.GS.PacketHandler
                         name = item.Count + " " + name;
                     if (item.SellPrice > 0)
                     {
-                        if (ConsignmentMoney.UseBP)
+                        if (ServerProperties.Properties.CONSIGNMENT_USE_BP)
                             name += "[" + item.SellPrice.ToString() + " BP]";
                         else
                             name += "[" + Money.GetString(item.SellPrice) + "]";

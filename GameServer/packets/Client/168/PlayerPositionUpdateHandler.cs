@@ -18,7 +18,6 @@
  */
 
 //#define OUTPUT_DEBUG_INFO
-
 using System;
 using System.Collections;
 using System.Reflection;
@@ -147,7 +146,7 @@ namespace DOL.GS.PacketHandler.Client.v168
                     client.Player.DBCharacter.BindYpos,
                     (ushort)client.Player.DBCharacter.BindZpos,
                     (ushort)client.Player.DBCharacter.BindHeading
-                    );
+                );
                 return;
             }
 
@@ -171,9 +170,23 @@ namespace DOL.GS.PacketHandler.Client.v168
                  * "Current area is adjusted for one level 1 player."
                  * "Current area has a 50% instance bonus."
                  */
-                client.Out.SendMessage(LanguageMgr.GetTranslation(client, "PlayerPositionUpdateHandler.Entered", newZone.Description),
-                    eChatType.CT_System, eChatLoc.CL_SystemWindow);
-                client.Out.SendMessage(newZone.Description, eChatType.CT_ScreenCenterSmaller, eChatLoc.CL_SystemWindow);
+
+                string description = newZone.Description;
+                string screenDescription = description;
+
+                DataObject translation = LanguageMgr.GetTranslation(client, newZone);
+                if (translation != null)
+                {
+                    if (!Util.IsEmpty(((DBLanguageZone)translation).Description))
+                        description = ((DBLanguageZone)translation).Description;
+
+                    if (!Util.IsEmpty(((DBLanguageZone)translation).ScreenDescription))
+                        screenDescription = ((DBLanguageZone)translation).ScreenDescription;
+                }
+
+                client.Out.SendMessage(LanguageMgr.GetTranslation(client, "PlayerPositionUpdateHandler.Entered", description),
+                                       eChatType.CT_System, eChatLoc.CL_SystemWindow);
+                client.Out.SendMessage(screenDescription, eChatType.CT_ScreenCenterSmaller, eChatLoc.CL_SystemWindow);
 
                 client.Player.LastPositionUpdateZone = newZone;
             }
@@ -579,7 +592,7 @@ namespace DOL.GS.PacketHandler.Client.v168
                     if (fallSpeed > fallMinSpeed)
                     {
                         client.Out.SendMessage(LanguageMgr.GetTranslation(client, "PlayerPositionUpdateHandler.FallingDamage"),
-                                eChatType.CT_Damaged, eChatLoc.CL_SystemWindow);
+                                               eChatType.CT_Damaged, eChatLoc.CL_SystemWindow);
 
                         int fallPercent = Math.Min(99, (fallSpeed - (fallMinSpeed + 1)) / fallDivide);
                         if (fallPercent > 0)
@@ -588,7 +601,7 @@ namespace DOL.GS.PacketHandler.Client.v168
                                 client.Out.SendMessage(LanguageMgr.GetTranslation(client, "PlayerPositionUpdateHandler.SafeFall"), eChatType.CT_Damaged, eChatLoc.CL_SystemWindow);
 
                             client.Out.SendMessage(LanguageMgr.GetTranslation(client, "PlayerPositionUpdateHandler.FallPercent", fallPercent),
-                                    eChatType.CT_Damaged, eChatLoc.CL_SystemWindow);
+                                                   eChatType.CT_Damaged, eChatLoc.CL_SystemWindow);
 
                             client.Player.Endurance -= client.Player.MaxEndurance * fallPercent / 100;
                             double damage = (0.01 * fallPercent * (client.Player.MaxHealth - 1));
@@ -606,7 +619,7 @@ namespace DOL.GS.PacketHandler.Client.v168
                         }
 
                         client.Out.SendMessage(LanguageMgr.GetTranslation(client, "PlayerPositionUpdateHandler.Endurance"),
-                                eChatType.CT_Damaged, eChatLoc.CL_SystemWindow);
+                                               eChatType.CT_Damaged, eChatLoc.CL_SystemWindow);
                     }
                     client.Player.MaxLastZ = client.Player.Z;
                 }

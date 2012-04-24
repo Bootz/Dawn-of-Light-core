@@ -70,6 +70,12 @@ namespace DOL.GS.ServerProperties
         public static bool IGNORE_TOO_LONG_OUTCOMING_PACKET;
 
         /// <summary>
+        /// Maximum length for reward quest description text to prevent client crashes
+        /// </summary>
+        [ServerProperty("system", "max_rewardquest_description_length", "Maximum length for reward quest description text to prevent client crashes.", 255)]
+        public static int MAX_REWARDQUEST_DESCRIPTION_LENGTH;
+
+        /// <summary>
         /// If the server should only accept connections from staff
         /// </summary>
         [ServerProperty("system", "staff_login", "Staff Login Only - Edit this to set weather you wish staff to be the only ones allowed to Log in values True,False", false)]
@@ -98,6 +104,30 @@ namespace DOL.GS.ServerProperties
         /// </summary>
         [ServerProperty("system", "load_quests", "Should the server load quests, values True,False", true)]
         public static readonly bool LOAD_QUESTS;
+
+        /// <summary>
+        /// Should the server load Buff Tokens
+        /// </summary>
+        [ServerProperty("system", "load_buff_tokens", "Should the server load buff tokens (npc and items), values True,False", true)]
+        public static readonly bool LOAD_BUFF_TOKENS;
+
+        /// <summary>
+        /// Should the server load Arrow Summoning items
+        /// </summary>
+        [ServerProperty("system", "load_arrow_summoning", "Should the server load Arrow Summoning items, values True,False", true)]
+        public static readonly bool LOAD_ARROW_SUMMONING;
+
+        /// <summary>
+        /// Should the server load Housing items
+        /// </summary>
+        [ServerProperty("system", "load_housing_items", "Should the server load Housing items, values True,False", true)]
+        public static readonly bool LOAD_HOUSING_ITEMS;
+
+        /// <summary>
+        /// Should the server load Housing NPC
+        /// </summary>
+        [ServerProperty("system", "load_housing_npc", "Should the server load Housing npc, values True,False", true)]
+        public static readonly bool LOAD_HOUSING_NPC;
 
         /// <summary>
         /// Disable Bug Reports
@@ -649,6 +679,12 @@ namespace DOL.GS.ServerProperties
         public static double PVP_SPELL_DAMAGE;
 
         /// <summary>
+        /// The % value of gainrps when heal a players recently damaged in rvr.
+        /// </summary>
+        [ServerProperty("rates", "heal_pvp_damage_value_rp", "How many % of heal final value is obtained in rps?", 8)]
+        public static int HEAL_PVP_DAMAGE_VALUE_RP;
+
+        /// <summary>
         /// The highest possible Block Rate against an Enemy (Hard Cap)
         /// </summary>
         [ServerProperty("rates", "block_cap", "Block Rate Cap Modifier - Edit this to change the highest possible block rate against an enemy (Hard Cap) in game e.g .60 = 60%", 0.60)]
@@ -726,6 +762,10 @@ namespace DOL.GS.ServerProperties
         [ServerProperty("rates", "mount_over_level_35_speed", "What is the speed of player controlled mounts over level 35?", (short)145)]
         public static short MOUNT_OVER_LEVEL_35_SPEED;
 
+        #endregion RATES
+
+        #region NPCs
+
         /// <summary>
         /// Base Value to use when auto-setting STR stat.
         /// </summary>
@@ -774,9 +814,56 @@ namespace DOL.GS.ServerProperties
         [ServerProperty("npc", "mob_autoset_dex_multiplier", "Multiplier to use when auto-setting DEX stat. ", 1.0)]
         public static double MOB_AUTOSET_DEX_MULTIPLIER;
 
-        #endregion RATES
+        /// <summary>
+        /// Base Value to use when auto-setting pet STR stat.
+        /// </summary>
+        [ServerProperty("npc", "pet_autoset_str_base", "Base Value to use when auto-setting Pet STR stat. ", 20.0)]
+        public static double PET_AUTOSET_STR_BASE;
 
-        #region NPCs
+        /// <summary>
+        /// Multiplier to use when auto-setting pet STR stat.
+        /// </summary>
+        [ServerProperty("npc", "pet_autoset_str_multiplier", "Multiplier to use when auto-setting Pet STR stat. ", 6.0)]
+        public static double PET_AUTOSET_STR_MULTIPLIER;
+
+        /// Base Value to use when auto-setting pet CON stat.
+        /// </summary>
+        [ServerProperty("npc", "pet_autoset_con_base", "Base Value to use when auto-setting Pet CON stat. ", 30.0)]
+        public static double PET_AUTOSET_CON_BASE;
+
+        /// <summary>
+        /// Multiplier to use when auto-setting pet CON stat.
+        /// </summary>
+        [ServerProperty("npc", "pet_autoset_con_multiplier", "Multiplier to use when auto-setting Pet CON stat. ", 1.0)]
+        public static double PET_AUTOSET_CON_MULTIPLIER;
+
+        /// Base Value to use when auto-setting Pet DEX stat.
+        /// </summary>
+        [ServerProperty("npc", "pet_autoset_dex_base", "Base Value to use when auto-setting Pet DEX stat. ", 30.0)]
+        public static double PET_AUTOSET_DEX_BASE;
+
+        /// <summary>
+        /// Multiplier to use when auto-setting pet DEX stat.
+        /// </summary>
+        [ServerProperty("npc", "pet_autoset_dex_multiplier", "Multiplier to use when auto-setting Pet DEX stat. ", 1.0)]
+        public static double PET_AUTOSET_DEX_MULTIPLIER;
+
+        /// Base Value to use when auto-setting Pet QUI stat.
+        /// </summary>
+        [ServerProperty("npc", "pet_autoset_qui_base", "Base Value to use when auto-setting Pet QUI stat. ", 30.0)]
+        public static double PET_AUTOSET_QUI_BASE;
+
+        /// <summary>
+        /// Multiplier to use when auto-setting pet QUI stat.
+        /// </summary>
+        [ServerProperty("npc", "pet_autoset_qui_multiplier", "Multiplier to use when auto-setting Pet QUI stat. ", 1.0)]
+        public static double PET_AUTOSET_QUI_MULTIPLIER;
+
+        /// <summary>
+        /// How often should pets think?  Default 1500 or 1.5 seconds
+        /// </summary>
+        [ServerProperty("npc", "pet_think_interval", "How often should pets think?  Default 1500 (1.5 seconds)", 1500)]
+        public static int PET_THINK_INTERVAL;
 
         /// <summary>
         /// What level to start increasing mob damage
@@ -1265,6 +1352,42 @@ namespace DOL.GS.ServerProperties
         [ServerProperty("housing", "rent_bounty_point_to_gold", "The worth of 1 (one) bounty point in gold (e.g. 1 bp = 1g -> 10000, 1bp = 10g -> 100000)", 10000)]
         public static long RENT_BOUNTY_POINT_TO_GOLD;
 
+        /// <summary>
+        /// Do housing consignment merchants use BP instead of money?
+        /// </summary>
+        [ServerProperty("housing", "consignment_use_bp", "If true the housing consignment merchants use BP instead of money.", false)]
+        public static bool CONSIGNMENT_USE_BP;
+
+        /// <summary>
+        /// Enable consignment merchants and market cache
+        /// </summary>
+        [ServerProperty("housing", "market_enabled", "If true the market explorers are enabled and the cache is initialized on server start.", true)]
+        public static bool MARKET_ENABLED;
+
+        /// <summary>
+        /// Enable consignment merchants and market cache
+        /// </summary>
+        [ServerProperty("housing", "market_enable", "If true the market explorers are enabled and the cache is initialized on server start.", true)]
+        public static bool MARKET_ENABLE;
+
+        /// <summary>
+        /// Enable logging of all market activity
+        /// </summary>
+        [ServerProperty("housing", "market_enable_log", "Enable debug logging of all market activity", true)]
+        public static bool MARKET_ENABLE_LOG;
+
+        /// <summary>
+        /// What is the additional fee (%) charged to players using the market explorer?
+        /// </summary>
+        [ServerProperty("housing", "market_fee_percent", "What is the additional fee (%) charged to players using the market explorer?", 20)]
+        public static int MARKET_FEE_PERCENT;
+
+        /// <summary>
+        /// How many items can the market search return?
+        /// </summary>
+        [ServerProperty("housing", "market_search_limit", "How many items can the market search return?", 300)]
+        public static int MARKET_SEARCH_LIMIT;
+
         #endregion HOUSING
 
         #region CLASSES
@@ -1510,6 +1633,12 @@ namespace DOL.GS.ServerProperties
         public static double CAPITAL_CITY_CRAFTING_SPEED_BONUS;
 
         /// <summary>
+        /// Allow any realm to craft items with a realm of 0 (no realm)
+        /// </summary>
+        [ServerProperty("craft", "allow_craft_norealm_items", "Allow any realm to craft items with 0 (no) realm.", false)]
+        public static bool ALLOW_CRAFT_NOREALM_ITEMS;
+
+        /// <summary>
         /// Use salvage per realm and get back material to use in chars realm
         /// </summary>
         [ServerProperty("salvage", "use_salvage_per_realm", "Enable to get back material to use in chars realm. Disable to get back the same material in all realms.", false)]
@@ -1583,7 +1712,7 @@ namespace DOL.GS.ServerProperties
         public static object Load(ServerPropertyAttribute attrib)
         {
             string key = attrib.Key;
-            ServerProperty property = GameServer.Database.SelectObject<ServerProperty>("`Key` = '" + GameServer.Database.Escape(key) + "'") as ServerProperty;
+            ServerProperty property = GameServer.Database.SelectObject<ServerProperty>("`Key` = '" + GameServer.Database.Escape(key) + "'");
             if (property == null)
             {
                 property = new ServerProperty();
@@ -1596,6 +1725,7 @@ namespace DOL.GS.ServerProperties
                 log.Debug("Cannot find server property " + key + " creating it");
             }
             log.Debug("Loading " + key + " Value is " + property.Value);
+
             try
             {
                 //we do this because we need "1.0" to be considered double sometimes its "1,0" in other countries
@@ -1627,6 +1757,17 @@ namespace DOL.GS.ServerProperties
                     continue;
                 ServerPropertyAttribute attrib = (ServerPropertyAttribute)attribs[0];
                 f.SetValue(null, Load(attrib));
+
+#warning Graveen: some databases have bad default values, when culture sets decimal point to ','. Please update yours ! This piece of code will be removed in future releases
+                if (f.FieldType == typeof(System.Double))
+                {
+                    if (attrib.DefaultValue.ToString().Contains(","))
+                    {
+                        ServerProperty property = GameServer.Database.SelectObject<ServerProperty>("`Key` = '" + GameServer.Database.Escape(attrib.Key) + "'");
+                        property.DefaultValue = property.DefaultValue.Replace(',', '.');
+                        GameServer.Database.SaveObject(property);
+                    }
+                }
             }
         }
 

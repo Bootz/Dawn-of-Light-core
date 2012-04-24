@@ -41,6 +41,7 @@ namespace DOL
             private int m_bonusRP;
             private int m_bonusBP;
             private int m_bonusCoin;
+            private byte m_realm;
 
             public Zones()
             {
@@ -59,6 +60,7 @@ namespace DOL
                 m_bonusRP = 0;
                 m_bonusBP = 0;
                 m_bonusCoin = 0;
+                m_realm = 0;
             }
 
             [PrimaryKey]
@@ -257,6 +259,20 @@ namespace DOL
                 {
                     Dirty = true;
                     m_bonusCoin = value;
+                }
+            }
+
+            [DataElement(AllowDbNull = true)]
+            public byte Realm
+            {
+                get
+                {
+                    return m_realm;
+                }
+                set
+                {
+                    Dirty = true;
+                    m_realm = value;
                 }
             }
         }

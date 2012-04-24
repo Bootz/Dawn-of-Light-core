@@ -67,7 +67,7 @@ namespace DOL.GS.Keeps
                 if (m_component != null)
                     return m_component.Keep.Realm;
                 if (m_CurrentRegion.ID == 163)
-                    return CurrentZone.GetRealm();
+                    return CurrentZone.Realm;
                 return base.Realm;
             }
         }
@@ -87,8 +87,8 @@ namespace DOL.GS.Keeps
             if (!base.Interact(player))
                 return false;
 
-            //For players in New Frontiers only
-            if (player.CurrentRegionID == KeepMgr.NEW_FRONTIERS)
+            //For players in frontiers only
+            if (GameServer.KeepManager.FrontierRegionsList.Contains(player.CurrentRegionID))
             {
                 if (player.Client.Account.PrivLevel == (int)ePrivLevel.Player)
                 {
@@ -119,9 +119,9 @@ namespace DOL.GS.Keeps
             }
 
             //if no component assigned, teleport to the border keep
-            if (Component == null && player.CurrentRegionID != KeepMgr.NEW_FRONTIERS)
+            if (Component == null && GameServer.KeepManager.FrontierRegionsList.Contains(player.CurrentRegionID) == false)
             {
-                KeepMgr.ExitBattleground(player);
+                GameServer.KeepManager.ExitBattleground(player);
             }
 
             return true;

@@ -47,7 +47,7 @@ namespace DOL.GS.Commands
             {
                 #region Log
 
-                case "Log":
+                case "log":
                     {
                         foreach (GameClient clients in WorldMgr.GetAllPlayingClients())
                             if (clients != null)

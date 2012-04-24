@@ -21,7 +21,6 @@ using System;
 using System.Collections;
 using System.Reflection;
 using DOL.Database;
-using DOL.GS.Keeps;
 using DOL.GS.Quests;
 using DOL.GS.ServerRules;
 using log4net;
@@ -49,10 +48,11 @@ namespace DOL.GS.PacketHandler.Client.v168
 
             eRealm targetRealm = client.Player.Realm;
 
-            if (client.Player.CurrentRegion.Expansion == (int)eClientExpansion.TrialsOfAtlantis)
+            if (client.Player.CurrentRegion.Expansion == (int)eClientExpansion.TrialsOfAtlantis && client.Player.CurrentZone.Realm != eRealm.None)
             {
                 // if we are in TrialsOfAtlantis then base the target jump on the current region realm instead of the players realm
-                targetRealm = client.Player.CurrentZone.GetRealm();
+                // this is only used if zone table has the proper realms defined, otherwise it reverts to old behavior - Tolakram
+                targetRealm = client.Player.CurrentZone.Realm;
             }
 
             var zonePoint = GameServer.Database.SelectObject<ZonePoint>("`Id` = '" + jumpSpotID + "' AND (`Realm` = '" + (byte)targetRealm +
@@ -123,7 +123,7 @@ namespace DOL.GS.PacketHandler.Client.v168
             }
 
             //check caps for battleground
-            Battleground bg = KeepMgr.GetBattleground(zonePoint.TargetRegion);
+            Battleground bg = GameServer.KeepManager.GetBattleground(zonePoint.TargetRegion);
             if (bg != null)
             {
                 if (client.Player.Level < bg.MinLevel && client.Player.Level > bg.MaxLevel &&
@@ -235,14 +235,21 @@ namespace DOL.GS.PacketHandler.Client.v168
                     return;
                 }
 
-                //check if the zonepoint has source locations set  Check prior to any zonepoint modification by handlers
-                if (m_zonePoint.SourceRegion == 0)
+                try
                 {
-                    m_zonePoint.SourceRegion = player.CurrentRegionID;
-                    m_zonePoint.SourceX = player.X;
-                    m_zonePoint.SourceY = player.Y;
-                    m_zonePoint.SourceZ = player.Z;
-                    GameServer.Database.SaveObject(m_zonePoint);
+                    //check if the zonepoint has source locations set  Check prior to any zonepoint modification by handlers
+                    if (m_zonePoint.SourceRegion == 0)
+                    {
+                        m_zonePoint.SourceRegion = player.CurrentRegionID;
+                        m_zonePoint.SourceX = player.X;
+                        m_zonePoint.SourceY = player.Y;
+                        m_zonePoint.SourceZ = player.Z;
+                        GameServer.Database.SaveObject(m_zonePoint);
+                    }
+                }
+                catch (Exception ex)
+                {
+                    Log.Error("Can't save updated ZonePoint with source info.", ex);
                 }
 
                 if (m_checkHandler != null)

@@ -7,8 +7,6 @@
     <ProjectGuid>{ACB92917-3D42-4F40-97F9-EA904A41DE36}</ProjectGuid>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ApplicationIcon>
-    </ApplicationIcon>
     <AssemblyKeyContainerName>
     </AssemblyKeyContainerName>
     <AssemblyName>GameServer</AssemblyName>
@@ -20,9 +18,7 @@
     <DelaySign>false</DelaySign>
     <OutputType>Library</OutputType>
     <RootNamespace>DOL</RootNamespace>
-    <RunPostBuildEvent>OnBuildSuccess</RunPostBuildEvent>
-    <StartupObject>
-    </StartupObject>
+    <RunPostBuildEvent>OnOutputUpdated</RunPostBuildEvent>
     <FileUpgradeFlags>
     </FileUpgradeFlags>
     <UpgradeBackupLocation>
@@ -62,16 +58,14 @@
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Platform)' == 'AnyCPU' ">
     <GenerateSerializationAssemblies>Auto</GenerateSerializationAssemblies>
-    <PlatformTarget>AnyCPU</PlatformTarget>
+    <PlatformTarget>x86</PlatformTarget>
     <RegisterForComInterop>false</RegisterForComInterop>
     <BaseAddress>285212672</BaseAddress>
     <FileAlignment>4096</FileAlignment>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="log4net">
-      <Name>log4net</Name>
       <HintPath>..\sharedModules\log4net\log4net.dll</HintPath>
-      <Private>False</Private>
     </Reference>
     <Reference Include="System">
       <Name>System</Name>
@@ -369,7 +363,12 @@
     <Compile Include="gameobjects\CharacterClasses\ICharacterClass.cs" />
     <Compile Include="gameobjects\CharacterClasses\CharacterClassBase.cs" />
     <Compile Include="gameobjects\CharacterClasses\Midgard\CharacterClassBoneDancer.cs" />
+    <Compile Include="gameobjects\CustomNPC\BuffMerchant.cs" />
+    <Compile Include="gameobjects\GameInventoryObject.cs" />
+    <Compile Include="gameutils\MarketSearch.cs" />
     <Compile Include="gameutils\InventoryLogging.cs" />
+    <Compile Include="gameutils\MarketCache.cs" />
+    <Compile Include="keeps\IKeepManager.cs" />
     <Compile Include="keeps\Relics\GameInventoryRelic.cs" />
     <Compile Include="gameobjects\CustomNPC\RoyalTreasuryClerk.cs" />
     <Compile Include="gameobjects\GuildBannerItem.cs" />
@@ -887,6 +886,7 @@
     <Compile Include="keeps\Managers\Spell Manager.cs" />
     <Compile Include="keeps\Relics\GameRelic.cs" />
     <Compile Include="keeps\Relics\GameRelicPad.cs" />
+    <Compile Include="language\ITranslatableObject.cs" />
     <Compile Include="language\LanguageMgr.cs" />
     <Compile Include="minotaurrelics\MinotaurRelic.cs" />
     <Compile Include="minotaurrelics\MinotaurRelicManager.cs" />
@@ -980,6 +980,8 @@
     <Compile Include="packets\Server\PacketLib1100.cs" />
     <Compile Include="packets\Server\PacketLib1104.cs" />
     <Compile Include="packets\Server\PacketLib1107.cs" />
+    <Compile Include="packets\Server\PacketLib1110.cs" />
+    <Compile Include="packets\Server\PacketLib1111.cs" />
     <Compile Include="packets\Server\PacketLib197.cs" />
     <Compile Include="packets\Server\PacketLib196.cs" />
     <Compile Include="packets\Server\PacketLib188.cs" />
@@ -1981,6 +1983,7 @@
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="skillhandler\Climbing.cs" />
+    <Compile Include="skillhandler\StatChangingAbility.cs" />
     <Compile Include="skillhandler\FuryAbilityHandler.cs" />
     <Compile Include="skillhandler\MemoriesOfWar.cs" />
     <Compile Include="skillhandler\MetalGuardAbilityHandler.cs" />
@@ -2053,7 +2056,10 @@
     <Compile Include="spells\Artifacts\AllStatsPercentDebuff.cs" />
     <Compile Include="spells\Artifacts\AlvarusLeggings.cs" />
     <Compile Include="spells\Artifacts\Arrogance.cs" />
+    <Compile Include="spells\Artifacts\AtensShield.cs" />
     <Compile Include="spells\Artifacts\AtlantisTablet.cs" />
+    <Compile Include="spells\Artifacts\Belt of Moon.cs" />
+    <Compile Include="spells\Artifacts\Belt of Sun.cs" />
     <Compile Include="spells\Artifacts\bracerofzo.cs" />
     <Compile Include="spells\Artifacts\CeremonialBracer.cs" />
     <Compile Include="spells\Artifacts\Cloudsong.cs">
@@ -2076,6 +2082,8 @@
     </Compile>
     <Compile Include="spells\Artifacts\TartarosGift.cs" />
     <Compile Include="spells\Artifacts\TraitorsDagger.cs" />
+    <Compile Include="spells\Artifacts\Traldor.cs" />
+    <Compile Include="spells\AstralPetSummon.cs" />
     <Compile Include="spells\Bainshee\BainsheePulseDmgSpellHandler.cs" />
     <Compile Include="spells\Bainshee\BeFriendSpellHandler.cs" />
     <Compile Include="spells\Bainshee\FearBrain.cs" />
@@ -2748,6 +2756,7 @@
     <Content Include="language\DE\GameObjects\GameGuard.txt" />
     <Content Include="language\DE\PlayerRealmTitles.txt" />
     <Content Include="language\DE\Quests\Hibernia\WingsOfTheIsle.txt" />
+    <Content Include="language\EN\Commands\PlayerCommands.txt" />
     <Content Include="language\EN\GameObjects\GameDoor.txt" />
     <Content Include="language\EN\GameObjects\GameGuard.txt" />
     <Content Include="language\EN\PlayerRealmTitles.txt" />

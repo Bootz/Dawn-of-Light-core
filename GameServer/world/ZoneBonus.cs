@@ -1,4 +1,7 @@
-﻿/*
+﻿using System.Reflection;
+using DOL.Language;
+
+/*
  * DAWN OF LIGHT - The first free open source DAoC server emulator
  *
  * This program is free software; you can redistribute it and/or
@@ -17,8 +20,6 @@
  *
  */
 
-using System.Reflection;
-using DOL.Language; 
 using log4net;
 
 namespace DOL.GS

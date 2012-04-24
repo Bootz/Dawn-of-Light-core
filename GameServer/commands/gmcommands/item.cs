@@ -76,6 +76,7 @@ namespace DOL.GS.Commands
          "/item levelrequired <level> <slot> - Set the required level needed to use spells and procs on this item",
          "/item bonuslevel <level> <slot> - Set the level required for item bonuses to effect player",
          "/item flags <flags> <slot> - Set the flags for this item",
+         "/item classes <csv_allowed_classes> <slot> - Set and replace the Allowed Classes field (0 for everybody)",
          "/item salvageid <SalvageYield ID> <slot> - Set the SalvageYieldID for this item",
          "/item salvageinfo <SalvageYield ID> <slot> - Show the salvage yield for this item",
          "/item update <slot> - Changes to this item will also be made to the ItemTemplate and can be saved in the DB.",
@@ -145,6 +146,31 @@ namespace DOL.GS.Commands
                         }
 
                     #endregion Scroll
+
+                    #region Classes
+
+                    case "classes":
+                        {
+                            int slot = (int)eInventorySlot.LastBackpack;
+
+                            if (args.Length >= 4)
+                            {
+                                slot = Convert.ToInt32(args[3]);
+                            }
+
+                            InventoryItem item = client.Player.Inventory.GetItem((eInventorySlot)slot);
+
+                            if (item == null)
+                            {
+                                client.Out.SendMessage(LanguageMgr.GetTranslation(client, "GMCommands.Item.Count.NoItemInSlot", slot), eChatType.CT_System, eChatLoc.CL_SystemWindow);
+                                return;
+                            }
+
+                            item.AllowedClasses = args[2].Trim();
+                            break;
+                        }
+
+                    #endregion Classes
 
                     #region Create
 
@@ -759,6 +785,8 @@ namespace DOL.GS.Commands
                                 client.Out.SendMessage(LanguageMgr.GetTranslation(client, "GMCommands.Item.Count.NoItemInSlot", slot), eChatType.CT_System, eChatLoc.CL_SystemWindow);
                                 return;
                             }
+
+                            updateAllowed(item, client);
                             int con = Convert.ToInt32(args[2]);
                             int maxcon = Convert.ToInt32(args[3]);
                             item.Condition = con;
@@ -795,6 +823,8 @@ namespace DOL.GS.Commands
                                 client.Out.SendMessage(LanguageMgr.GetTranslation(client, "GMCommands.Item.Count.NoItemInSlot", slot), eChatType.CT_System, eChatLoc.CL_SystemWindow);
                                 return;
                             }
+
+                            updateAllowed(item, client);
                             int Dur = Convert.ToInt32(args[2]);
                             int MaxDur = Convert.ToInt32(args[3]);
                             item.Durability = Dur;
@@ -1786,16 +1816,7 @@ namespace DOL.GS.Commands
                                 return;
                             }
 
-                            if (item.Template is ItemUnique)
-                            {
-                                DisplayMessage(client, "This command is only applicable for items based on an ItemTemplate");
-                            }
-                            else
-                            {
-                                (item.Template as ItemTemplate).AllowUpdate = true;
-                                client.Out.SendMessage("** When this item is saved all changes will also be made to the source ItemTemplate: " + item.Template.Id_nb, eChatType.CT_Staff, eChatLoc.CL_SystemWindow);
-                                DisplayMessage(client, "** When this item is saved all changes will also be made to the source ItemTemplate: " + item.Template.Id_nb);
-                            }
+                            updateAllowed(item, client);
                             break;
                         }
 
@@ -2131,6 +2152,21 @@ namespace DOL.GS.Commands
             catch
             {
                 DisplaySyntax(client);
+            }
+        }
+
+        private void updateAllowed(InventoryItem item, GameClient client)
+        {
+            if (item.Template is ItemUnique)
+            {
+                DisplayMessage(client, "This command is only applicable for items based on an ItemTemplate");
+                return;
+            }
+            else
+            {
+                (item.Template as ItemTemplate).AllowUpdate = true;
+                client.Out.SendMessage("** When this item is saved all changes will also be made to the source ItemTemplate: " + item.Template.Id_nb, eChatType.CT_Staff, eChatLoc.CL_SystemWindow);
+                DisplayMessage(client, "** When this item is saved all changes will also be made to the source ItemTemplate: " + item.Template.Id_nb);
             }
         }
 

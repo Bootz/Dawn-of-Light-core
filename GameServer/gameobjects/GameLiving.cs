@@ -617,6 +617,16 @@ namespace DOL.GS
         }
 
         /// <summary>
+        /// Create a pet for this living
+        /// </summary>
+        /// <param name="template"></param>
+        /// <returns></returns>
+        public virtual GamePet CreateGamePet(INpcTemplate template)
+        {
+            return new GamePet(template);
+        }
+
+        /// <summary>
         /// A new pet has been summoned, do we do anything?
         /// </summary>
         /// <param name="pet"></param>
@@ -769,6 +779,23 @@ namespace DOL.GS
                         ((this as GameNPC).Brain as IControlledBrain).Owner.LastAttackedByEnemyTickPvP = value;
                     }
                 }
+            }
+        }
+
+        /// <summary>
+        /// Total damage RvR Value
+        /// </summary>
+        protected long m_damageRvRMemory;
+
+        /// <summary>
+        /// gets the DamageRvR Memory of this living (always 0 for Gameliving)
+        /// </summary>
+        public virtual long DamageRvRMemory
+        {
+            get { return 0; }
+            set
+            {
+                m_damageRvRMemory = 0;
             }
         }
 
@@ -2017,10 +2044,11 @@ namespace DOL.GS
                 IControlledBrain brain = ((GameNPC)ad.Target).Brain as IControlledBrain;
                 if (brain != null)
                 {
-                    GamePlayer owner = brain.GetPlayerOwner();
-                    excludes.Add(owner);
-                    if (owner != null && owner.ControlledBrain != null && ad.Target == owner.ControlledBrain.Body)
+                    GameLiving owner_living = brain.GetLivingOwner();
+                    excludes.Add(owner_living);
+                    if (owner_living != null && owner_living is GamePlayer && owner_living.ControlledBrain != null && ad.Target == owner_living.ControlledBrain.Body)
                     {
+                        GamePlayer owner = owner_living as GamePlayer;
                         switch (ad.AttackResult)
                         {
                             case eAttackResult.Blocked:
@@ -2851,43 +2879,7 @@ namespace DOL.GS
                             return;
                         }
                     case eAttackResult.OutOfRange:
-                        {
-                            if (owner is GameNPC == false)
-                                break;
-
-                            GameNPC ownerNPC = owner as GameNPC;
-                            StandardMobBrain brain = ownerNPC.Brain as StandardMobBrain;
-
-                            if (brain == null)
-                                break;
-
-                            bool hit = false;
-
-                            foreach (GameNPC npc in owner.GetNPCsInRadius((ushort)owner.AttackRange))
-                            {
-                                if (brain.GetAggroAmountForLiving(npc) > 0)
-                                {
-                                    new WeaponOnTargetAction(owner, npc, mainWeapon, leftWeapon, 1.0, owner.AttackSpeed(mainWeapon, leftWeapon), style);
-                                    hit = true;
-                                    break;
-                                }
-                            }
-
-                            if (hit)
-                                break;
-
-                            foreach (GamePlayer player in owner.GetPlayersInRadius((ushort)owner.AttackRange))
-                            {
-                                if (brain.GetAggroAmountForLiving(player) > 0)
-                                {
-                                    new WeaponOnTargetAction(owner, player, mainWeapon, leftWeapon, 1.0, owner.AttackSpeed(mainWeapon, leftWeapon), style);
-                                    hit = true;
-                                    break;
-                                }
-                            }
-
-                            break;
-                        }
+                        break;
                 }
 
                 // unstealth before attack animation
@@ -3943,11 +3935,32 @@ namespace DOL.GS
 
             double damageDealt = damageAmount + criticalAmount;
 
-            if (source is GameNPC)
+            #region PVP DAMAGE
+
+            // Is this a GamePlayer behind the source?
+            if (source is GamePlayer || (source is GameNPC && (source as GameNPC).Brain is IControlledBrain && ((source as GameNPC).Brain as IControlledBrain).GetPlayerOwner() != null))
+            {
+                // Only apply to necropet.
+                if (this is NecromancerPet)
+                {
+                    //And if a GamePlayer is behind
+                    GamePlayer this_necro_pl = null;
+
+                    if (this is GameNPC && (this as GameNPC).Brain is IControlledBrain)
+                        this_necro_pl = ((this as GameNPC).Brain as IControlledBrain).GetPlayerOwner();
+
+                    if (this_necro_pl != null && this_necro_pl.Realm != source.Realm && source.Realm != 0)
+                        DamageRvRMemory += (long)damageDealt + (long)criticalAmount;
+                }
+            }
+
+            #endregion PVP DAMAGE
+
+            if (source != null && source is GameNPC)
             {
                 IControlledBrain brain = ((GameNPC)source).Brain as IControlledBrain;
                 if (brain != null)
-                    source = brain.GetPlayerOwner();
+                    source = brain.GetLivingOwner();
             }
 
             GamePlayer attackerPlayer = source as GamePlayer;
@@ -4192,7 +4205,8 @@ namespace DOL.GS
                     if (attacker is GameLiving)
                     {
                         (attacker as GameLiving).Notify(GameLivingEvent.EnemyHealed, attacker, args);
-                        (attacker as GameLiving).AddXPGainer(changeSource, healthChanged);
+                        // Desactivate XPGainer, Heal Rps implentation.
+                        //(attacker as GameLiving).AddXPGainer(changeSource, healthChanged);
                     }
                 }
             }
@@ -4387,9 +4401,9 @@ namespace DOL.GS
             Health = 0;
 
             // Remove all last attacked times
+
             LastAttackedByEnemyTickPvE = 0;
             LastAttackedByEnemyTickPvP = 0;
-
             //Let's send the notification at the end
             Notify(GameLivingEvent.Dying, this, new DyingEventArgs(killer));
         }
@@ -5164,9 +5178,37 @@ namespace DOL.GS
                 ChangeHealth(this, eHealthChangeType.Regenerate, GetModified(eProperty.HealthRegenerationRate));
             }
 
+            #region PVP DAMAGE
+
+            if (this is NecromancerPet)
+            {
+                GamePlayer this_necro_pl = null;
+
+                this_necro_pl = ((this as NecromancerPet).Brain as IControlledBrain).GetPlayerOwner();
+
+                if (DamageRvRMemory > 0 && this_necro_pl != null)
+                    DamageRvRMemory -= (long)Math.Max(GetModified(eProperty.HealthRegenerationRate), 0);
+            }
+
+            #endregion PVP DAMAGE
+
             //If we are fully healed, we stop the timer
             if (Health >= MaxHealth)
             {
+                #region PVP DAMAGE
+
+                if (this is NecromancerPet)
+                {
+                    GamePlayer this_necro_pl = null;
+
+                    this_necro_pl = ((this as NecromancerPet).Brain as IControlledBrain).GetPlayerOwner();
+
+                    if (DamageRvRMemory > 0 && this_necro_pl != null)
+                        DamageRvRMemory = 0;
+                }
+
+                #endregion PVP DAMAGE
+
                 //We clean all damagedealers if we are fully healed,
                 //no special XP calculations need to be done
                 lock (m_xpGainers.SyncRoot)
@@ -6239,7 +6281,7 @@ namespace DOL.GS
         /// Table of skills currently disabled
         /// skill => disabletimeout (ticks) or 0 when endless
         /// </summary>
-        protected readonly Hashtable m_disabledSkills = new Hashtable();
+        protected readonly Dictionary<Skill, long> m_disabledSkills = new Dictionary<Skill, long>();
 
         /// <summary>
         /// Gets the time left for disabling this skill in milliseconds
@@ -6248,12 +6290,11 @@ namespace DOL.GS
         /// <returns>milliseconds left for disable</returns>
         public virtual int GetSkillDisabledDuration(Skill skill)
         {
-            lock (m_disabledSkills.SyncRoot)
+            lock ((m_disabledSkills as ICollection).SyncRoot)
             {
-                object time = m_disabledSkills[skill];
-                if (time != null)
+                if (m_disabledSkills.ContainsKey(skill))
                 {
-                    long timeout = (long)time;
+                    long timeout = m_disabledSkills[skill];
                     long left = timeout - CurrentRegion.Time;
                     if (left <= 0)
                     {
@@ -6272,9 +6313,9 @@ namespace DOL.GS
         /// <returns></returns>
         public virtual ICollection GetAllDisabledSkills()
         {
-            lock (m_disabledSkills.SyncRoot)
+            lock ((m_disabledSkills as ICollection).SyncRoot)
             {
-                return ((Hashtable)m_disabledSkills.Clone()).Keys;
+                return new List<Skill>(m_disabledSkills.Keys);
             }
         }
 
@@ -6285,7 +6326,7 @@ namespace DOL.GS
         /// <param name="duration">duration of disable in milliseconds</param>
         public virtual void DisableSkill(Skill skill, int duration)
         {
-            lock (m_disabledSkills.SyncRoot)
+            lock ((m_disabledSkills as ICollection).SyncRoot)
             {
                 if (duration > 0)
                 {

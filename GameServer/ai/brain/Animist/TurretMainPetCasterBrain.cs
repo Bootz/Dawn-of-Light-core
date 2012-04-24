@@ -1,3 +1,6 @@
+using System.Collections;
+using System.Collections.Generic;
+
 /*
  * DAWN OF LIGHT - The first free open source DAoC server emulator
  *
@@ -17,7 +20,6 @@
  *
  */
 
-using System.Collections.Generic;
 using DOL.GS;
 
 namespace DOL.AI.Brain
@@ -62,7 +64,7 @@ namespace DOL.AI.Brain
 
             List<GameLiving> livingList = new List<GameLiving>();
 
-            lock (m_aggroTable.SyncRoot)
+            lock ((m_aggroTable as ICollection).SyncRoot)
             {
                 foreach (GameLiving living in m_aggroTable.Keys)
                 {

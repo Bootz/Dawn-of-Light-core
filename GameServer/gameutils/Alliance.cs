@@ -1,3 +1,5 @@
+using System;
+
 /*
  * DAWN OF LIGHT - The first free open source DAoC server emulator
  *
@@ -19,7 +21,6 @@
 
 using System.Collections;
 using DOL.Database;
-using System;
 
 namespace DOL.GS
 {

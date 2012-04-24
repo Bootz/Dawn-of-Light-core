@@ -46,12 +46,19 @@ namespace DOL.GS.PacketHandler.Client.v168
 
         public void HandlePacket(GameClient client, GSPacketIn packet)
         {
-            if (client == null) return;
-            uint extraID = 0;
+            if (client == null || client.Player == null)
+                return;
+
             ushort objectType = packet.ReadShort();
+
+            uint extraID = 0;
             if (client.Version >= GameClient.eClientVersion.Version186)
+            {
                 extraID = packet.ReadInt();
+            }
+
             ushort objectID = packet.ReadShort();
+
             string caption = "";
             var objectInfo = new List<string>();
 
@@ -84,32 +91,35 @@ namespace DOL.GS.PacketHandler.Client.v168
                     {
                         if (objectType == 1)
                         {
-                            invItem = client.Player.Inventory.GetItem((eInventorySlot)objectID);
+                            IGameInventoryObject invObject = client.Player.TargetObject as IGameInventoryObject;
+
+                            // first try any active inventory object
                             if (invItem == null)
                             {
-                                if (client.Player.ActiveConMerchant != null)
+                                if (client.Player.ActiveInventoryObject != null)
                                 {
-                                    GameConsignmentMerchant con = client.Player.ActiveConMerchant;
-                                    invItem = con.ConInventory[objectID];
-                                    if (invItem == null)
-                                        return;
-                                }
-                                else if (client.Player.ActiveVault != null)
-                                {
-                                    GameVault vault = client.Player.ActiveVault;
-                                    invItem = vault.GetVaultInventory(client.Player)[objectID];
-                                    if (invItem == null)
-                                        return;
-                                }
-                                else
-                                {
-                                    return;
+                                    invObject = client.Player.ActiveInventoryObject;
+
+                                    if (invObject != null || invObject.GetClientInventory(client.Player) != null)
+                                    {
+                                        invObject.GetClientInventory(client.Player).TryGetValue(objectID, out invItem);
+                                    }
                                 }
                             }
+
+                            // finally try direct inventory access
+                            if (invItem == null)
+                            {
+                                invItem = client.Player.Inventory.GetItem((eInventorySlot)objectID);
+                            }
+
+                            // Failed to get any inventory
+                            if (invItem == null)
+                                return;
                         }
                         else if (objectType == 10)
                         {
-                            List<InventoryItem> list = client.Player.TempProperties.getProperty<object>(DOL.GS.PacketHandler.Client.v168.PlayerMarketSearchRequestHandler.EXPLORER_LIST, null) as List<InventoryItem>;
+                            List<InventoryItem> list = client.Player.TempProperties.getProperty<object>(MarketExplorer.EXPLORER_ITEM_LIST, null) as List<InventoryItem>;
                             if (list == null)
                             {
                                 list = client.Player.TempProperties.getProperty<object>("TempSearchKey", null) as List<InventoryItem>;
@@ -1016,8 +1026,22 @@ namespace DOL.GS.PacketHandler.Client.v168
             client.Player.DelveWeaponStyle(objectInfo, style);
         }
 
+        /// <summary>
+        /// Write a formatted description of a spell
+        /// </summary>
+        /// <param name="output"></param>
+        /// <param name="spell"></param>
+        /// <param name="spellLine"></param>
+        /// <param name="client"></param>
         public void WriteSpellInfo(IList<string> output, Spell spell, SpellLine spellLine, GameClient client)
         {
+            if (client == null || client.Player == null)
+                return;
+
+            // check to see if player class handles delve
+            if (client.Player.DelveSpell(output, spell, spellLine))
+                return;
+
             ISpellHandler spellHandler = ScriptMgr.CreateSpellHandler(client.Player, spell, spellLine);
             if (spellHandler == null)
             {
@@ -1043,6 +1067,8 @@ namespace DOL.GS.PacketHandler.Client.v168
                 output.Add("--- Spell Technical Information ---");
                 output.Add(" ");
                 output.Add("Line: " + (spellHandler == null ? spellLine.KeyName : spellHandler.SpellLine.Name));
+                output.Add("Type: " + spell.SpellType);
+                output.Add(" ");
                 output.Add("SpellID: " + spell.ID);
                 output.Add("Icon: " + spell.Icon);
                 output.Add("Type: " + spell.SpellType);

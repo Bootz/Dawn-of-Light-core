@@ -1,3 +1,5 @@
+using System;
+
 /*
  * DAWN OF LIGHT - The first free open source DAoC server emulator
  *
@@ -17,7 +19,6 @@
  *
  */
 
-using System;
 using DOL.GS.Quests;
 
 namespace DOL.GS.Commands

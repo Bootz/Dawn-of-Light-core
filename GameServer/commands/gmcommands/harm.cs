@@ -18,6 +18,7 @@
  */
 
 using System;
+using System.Collections.Generic;
 using DOL.Language;
 
 namespace DOL.GS.Commands
@@ -44,13 +45,15 @@ namespace DOL.GS.Commands
                 amount = Convert.ToInt16(args[1]);
                 GameLiving living = client.Player.TargetObject as GameLiving;
                 if (living != null)
-                    living.TakeDamage(client.Player, eDamageType.Natural, amount, 0);
+                    living.TakeDamage(client.Player, eDamageType.GM, amount, 0);
                 else
                     DisplayMessage(client, LanguageMgr.GetTranslation(client, "GMCommands.Harm.InvalidTarget"));
             }
-            catch (Exception)
+            catch (Exception ex)
             {
-                DisplaySyntax(client);
+                List<string> list = new List<string>();
+                list.Add(ex.ToString());
+                client.Out.SendCustomTextWindow("Exception", list);
             }
         }
     }

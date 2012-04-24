@@ -1,3 +1,5 @@
+using System.IO;
+
 /*
  * DAWN OF LIGHT - The first free open source DAoC server emulator
  *
@@ -17,7 +19,6 @@
  *
  */
 
-using System.IO;
 using System.Reflection;
 
 namespace DOL.Config

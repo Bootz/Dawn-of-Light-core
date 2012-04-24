@@ -23,6 +23,7 @@ using System.Collections.Generic;
 using System.Reflection;
 using DOL.Database;
 using DOL.GS.Housing;
+using DOL.Language;
 using log4net;
 
 namespace DOL.GS.PacketHandler
@@ -125,7 +126,28 @@ namespace DOL.GS.PacketHandler
                 pak.WriteInt((uint)newEmblemBitMask);//TODO other bits
             }
             else pak.WriteInt(0);
-            pak.WritePascalString(obj.Name.Length > 48 ? obj.Name.Substring(0, 48) : obj.Name);
+
+            string name = obj.Name;
+            DataObject translation = null;
+            if (obj is GameStaticItem)
+            {
+                translation = LanguageMgr.GetTranslation(m_gameClient, (GameStaticItem)obj);
+                if (translation != null)
+                {
+                    if (obj is WorldInventoryItem)
+                    {
+                        //if (!Util.IsEmpty(((DBLanguageItem)translation).Name))
+                        //    name = ((DBLanguageItem)translation).Name;
+                    }
+                    else
+                    {
+                        if (!Util.IsEmpty(((DBLanguageGameObject)translation).Name))
+                            name = ((DBLanguageGameObject)translation).Name;
+                    }
+                }
+            }
+            pak.WritePascalString(name.Length > 48 ? name.Substring(0, 48) : name);
+
             if (obj is IDoor)
             {
                 pak.WriteByte(4);
@@ -135,13 +157,13 @@ namespace DOL.GS.PacketHandler
             SendTCP(pak);
         }
 
-        protected override void SendInventorySlotsUpdateRange(ICollection<int> slots, byte preAction)
+        protected override void SendInventorySlotsUpdateRange(ICollection<int> slots, eInventoryWindowType windowType)
         {
             GSTCPPacketOut pak = new GSTCPPacketOut(GetPacketCode(eServerPackets.InventoryUpdate));
             pak.WriteByte((byte)(slots == null ? 0 : slots.Count));
             pak.WriteByte((byte)((m_gameClient.Player.IsCloakHoodUp ? 0x01 : 0x00) | (int)m_gameClient.Player.ActiveQuiverSlot)); //bit0 is hood up bit4 to 7 is active quiver
             pak.WriteByte((byte)m_gameClient.Player.VisibleActiveWeaponSlots);
-            pak.WriteByte(preAction); //preAction (0x00 - Do nothing)
+            pak.WriteByte((byte)windowType); //preAction (0x00 - Do nothing)
             if (slots != null)
             {
                 foreach (int updatedSlot in slots)
@@ -242,7 +264,7 @@ namespace DOL.GS.PacketHandler
                         name = item.Count + " " + name;
                     if (item.SellPrice > 0)
                     {
-                        if (ConsignmentMoney.UseBP)
+                        if (ServerProperties.Properties.CONSIGNMENT_USE_BP)
                             name += "[" + item.SellPrice.ToString() + " BP]";
                         else
                             name += "[" + Money.GetString(item.SellPrice) + "]";

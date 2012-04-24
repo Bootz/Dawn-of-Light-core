@@ -119,13 +119,13 @@ namespace DOL.GS.PacketHandler.Client.v168
                     // make sure player has owner permissions
                     if (!house.HasOwnerPermissions(client.Player))
                     {
-                        ChatUtil.SendSystemMessage(client.Player, "You may not remove Houses that you don't own");
+                        ChatUtil.SendSystemMessage(client.Player, "You don't own this house!");
                         return;
                     }
 
                     client.Player.TempProperties.setProperty(DeedWeak, new WeakRef(orgitem));
                     client.Player.TempProperties.setProperty(TargetHouse, house);
-                    client.Player.Out.SendCustomDialog(LanguageMgr.GetTranslation(client, "Scripts.Player.Housing.HouseRemoveOffer"), HouseRemovalDialogue);
+                    client.Player.Out.SendCustomDialog(LanguageMgr.GetTranslation(client, "WARNING: You are about to delete this house and all indoor and outdoor items attached to it!"), HouseRemovalDialog);
 
                     return;
                 }
@@ -146,7 +146,7 @@ namespace DOL.GS.PacketHandler.Client.v168
                     client.Player.TempProperties.setProperty(DeedWeak, new WeakRef(orgitem));
                     client.Player.TempProperties.setProperty(TargetHouse, house);
                     client.Player.Out.SendMessage("Warning:\n This will remove *all* items from your current house!", eChatType.CT_System, eChatLoc.CL_PopupWindow);
-                    client.Player.Out.SendCustomDialog("Are you sure you want to upgrade your House?", HouseUpgradeDialogue);
+                    client.Player.Out.SendCustomDialog("Are you sure you want to upgrade your House?", HouseUpgradeDialog);
 
                     return;
                 }
@@ -185,10 +185,14 @@ namespace DOL.GS.PacketHandler.Client.v168
                         return;
                     }
 
-                    HouseMgr.HouseTransferToGuild(client.Player);
-                    client.Player.Inventory.RemoveItem(orgitem);
-                    InventoryLogging.LogInventoryAction(client.Player, "(HOUSE;" + housenumber + ")", eInventoryActionType.Other, orgitem.Template, orgitem.Count);
-                    client.Player.Guild.UpdateGuildWindow();
+                    if (HouseMgr.HouseTransferToGuild(client.Player, house))
+                    {
+                        // This will still take the item even if player answers NO to confirmation.
+                        // I'm fixing consignment, not housing, and frankly I'm sick of fixing stuff!  :)  - tolakram
+                        client.Player.Inventory.RemoveItem(orgitem);
+                        InventoryLogging.LogInventoryAction(client.Player, "(HOUSE;" + housenumber + ")", eInventoryActionType.Other, orgitem.Template, orgitem.Count);
+                        client.Player.Guild.UpdateGuildWindow();
+                    }
                     return;
                 }
 
@@ -475,6 +479,15 @@ namespace DOL.GS.PacketHandler.Client.v168
                                     }
                                     return;
                                 case "housing_porch_remove_deed":
+
+                                    var consignmentMerchant = house.ConsignmentMerchant;
+                                    if (consignmentMerchant != null && (consignmentMerchant.DBItems(client.Player).Count > 0 || consignmentMerchant.TotalMoney > 0))
+                                    {
+                                        ChatUtil.SendSystemMessage(client, "All items and money must be removed from your consigmment merchant in order to remove the porch!");
+                                        client.Out.SendInventorySlotsUpdate(new[] { slot });
+                                        return;
+                                    }
+
                                     // try and remove the porch
                                     if (house.RemovePorch())
                                     {
@@ -507,7 +520,7 @@ namespace DOL.GS.PacketHandler.Client.v168
                                         }
                                         else
                                         {
-                                            ChatUtil.SendSystemMessage(client, "You can not add a GameConsignmentMerchant Merchant here.");
+                                            ChatUtil.SendSystemMessage(client, "You can not add a Consignment Merchant here.");
                                             client.Out.SendInventorySlotsUpdate(new[] { slot });
                                         }
                                         return;
@@ -900,7 +913,7 @@ namespace DOL.GS.PacketHandler.Client.v168
             }
         }
 
-        private static void HouseRemovalDialogue(GamePlayer player, byte response)
+        private static void HouseRemovalDialog(GamePlayer player, byte response)
         {
             if (response != 0x01)
                 return;
@@ -914,25 +927,36 @@ namespace DOL.GS.PacketHandler.Client.v168
 
             if (house == null)
             {
-                ChatUtil.SendSystemMessage(player, "No House selected!");
+                ChatUtil.SendSystemMessage(player, "No house selected!");
                 return;
             }
 
             if (item == null || item.SlotPosition == (int)eInventorySlot.Ground
                 || item.OwnerID == null || item.OwnerID != player.InternalID)
             {
-                ChatUtil.SendSystemMessage(player, "You need a House removal Deed for this.");
+                ChatUtil.SendSystemMessage(player, "You need a House Removal Deed for this.");
+                return;
+            }
+
+            // Demand any consignment merchant inventory is removed before allowing a removal
+            // Again, note that sometimes checks are done here, sometimes in housemgr. In this case, at least,
+            // player will get remove item back if they answer no! - tolakram
+            var consignmentMerchant = house.ConsignmentMerchant;
+            if (consignmentMerchant != null && (consignmentMerchant.DBItems(player).Count > 0 || consignmentMerchant.TotalMoney > 0))
+            {
+                ChatUtil.SendSystemMessage(player, "All items and money must be removed from your consignment merchant in order to remove this house!");
                 return;
             }
 
             player.Inventory.RemoveItem(item);
+            log.WarnFormat("HOUSING: {0}:{1} is removing house from lot {2} owned by {3}", player.Name, player.Client.Account.Name, house.HouseNumber, house.OwnerID);
             InventoryLogging.LogInventoryAction(player, "(HOUSE;" + house.HouseNumber + ")", eInventoryActionType.Other, item.Template, item.Count);
             HouseMgr.RemoveHouse(house);
 
-            ChatUtil.SendSystemMessage(player, "Scripts.Player.Housing.HouseRemoved");
+            ChatUtil.SendSystemMessage(player, "Your house has been removed!");
         }
 
-        private static void HouseUpgradeDialogue(GamePlayer player, byte response)
+        private static void HouseUpgradeDialog(GamePlayer player, byte response)
         {
             if (response != 0x01)
                 return;

@@ -1,3 +1,5 @@
+using DOL.GS.PacketHandler;
+
 /*
  * DAWN OF LIGHT - The first free open source DAoC server emulator
  *
@@ -17,7 +19,6 @@
  *
  */
 
-using DOL.GS.PacketHandler;
 using DOL.Language;
 
 namespace DOL.GS.Commands

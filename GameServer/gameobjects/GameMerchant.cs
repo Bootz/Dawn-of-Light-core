@@ -310,7 +310,7 @@ namespace DOL.GS
         {
             base.LoadTemplate(template);
 
-            if (string.IsNullOrEmpty(template.ItemsListTemplateID) == false)
+            if (template != null && string.IsNullOrEmpty(template.ItemsListTemplateID) == false)
             {
                 TradeItems = new MerchantTradeItems(template.ItemsListTemplateID);
             }
@@ -639,6 +639,24 @@ namespace DOL.GS
             : base()
         {
             m_moneyItem = WorldInventoryItem.CreateFromTemplate("aurulite");
+        }
+    }
+
+    public class GameAtlanteanGlassMerchant : GameItemCurrencyMerchant
+    {
+        public GameAtlanteanGlassMerchant()
+            : base()
+        {
+            m_moneyItem = WorldInventoryItem.CreateFromTemplate("atlanteanglass");
+        }
+    }
+
+    public class GameDragonMerchant : GameItemCurrencyMerchant
+    {
+        public GameDragonMerchant()
+            : base()
+        {
+            m_moneyItem = WorldInventoryItem.CreateFromTemplate("dragonscales");
         }
     }
 }

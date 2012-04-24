@@ -101,7 +101,7 @@ namespace DOL.GS
                 }
                 else
                 {
-                    AbstractGameKeep portalKeep = KeepMgr.GetBGPK(player);
+                    AbstractGameKeep portalKeep = GameServer.KeepManager.GetBGPK(player);
                     if (portalKeep != null)
                     {
                         Teleport teleport = new Teleport();

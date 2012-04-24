@@ -17,6 +17,7 @@
  *
  */
 
+using System.Collections;
 using System.Collections.Generic;
 using DOL.GS;
 using DOL.GS.Spells;
@@ -41,7 +42,7 @@ namespace DOL.AI.Brain
             List<GameLiving> newTargets = new List<GameLiving>();
             List<GameLiving> oldTargets = new List<GameLiving>();
             base.CalculateNextAttackTarget();
-            lock (m_aggroTable.SyncRoot)
+            lock ((m_aggroTable as ICollection).SyncRoot)
             {
                 foreach (GameLiving living in m_aggroTable.Keys)
                 {

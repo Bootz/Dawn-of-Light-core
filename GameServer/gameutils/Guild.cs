@@ -241,6 +241,9 @@ namespace DOL.GS
         /// <returns></returns>
         public void SetGuildBank(GamePlayer donating, double amount)
         {
+            if (donating == null || donating.Guild == null)
+                return;
+
             if (amount < 0)
             {
                 donating.Out.SendMessage(LanguageMgr.GetTranslation(donating.Client, "Scripts.Player.Guild.DepositInvalid"), eChatType.CT_Guild, eChatLoc.CL_SystemWindow);
@@ -601,7 +604,7 @@ namespace DOL.GS
         /// <returns></returns>
         public bool AddPlayer(GamePlayer addPlayer, DBRank rank)
         {
-            if (addPlayer == null)
+            if (addPlayer == null || addPlayer.Guild != null)
                 return false;
 
             if (log.IsDebugEnabled)

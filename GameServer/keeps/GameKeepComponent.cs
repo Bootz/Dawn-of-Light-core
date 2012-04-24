@@ -96,7 +96,7 @@ namespace DOL.GS.Keeps
         /// </summary>
         public int Height
         {
-            get { return KeepMgr.GetHeightFromLevel(this.Keep.Level); }
+            get { return GameServer.KeepManager.GetHeightFromLevel(this.Keep.Level); }
         }
 
         /// <summary>
@@ -114,7 +114,7 @@ namespace DOL.GS.Keeps
         {
             get
             {
-                if (m_skin == (int)eComponentSkin.Wall)
+                if (m_skin == (int)eComponentSkin.Wall && !this.Keep.IsPortalKeep)
                     return true;
                 return false;
             }
@@ -339,7 +339,7 @@ namespace DOL.GS.Keeps
                 region = (CurrentRegion as BaseInstance).Skin;
             }
 
-            Battleground bg = KeepMgr.GetBattleground(region);
+            Battleground bg = GameServer.KeepManager.GetBattleground(region);
 
             this.Positions.Clear();
 
@@ -523,7 +523,7 @@ namespace DOL.GS.Keeps
             {
                 GameServer.Database.AddObject(obj);
                 InternalID = obj.ObjectId;
-                log.DebugFormat("Added new component for keep ID {0} health {1}", Keep.KeepID, Health);
+                log.DebugFormat("Added new component {0} for keep ID {1}, skin {2}, health {3}", ID, Keep.KeepID, Skin, Health);
             }
             else
             {
@@ -546,6 +546,7 @@ namespace DOL.GS.Keeps
                     foreach (GameClient client in WorldMgr.GetClientsOfRegion(CurrentRegionID))
                     {
                         client.Out.SendObjectUpdate(this);
+                        client.Out.SendKeepComponentDetailUpdate(this); // I knwo this works, not sure if ObjectUpdate is needed - Tolakram
                     }
                 }
             }
@@ -553,6 +554,10 @@ namespace DOL.GS.Keeps
 
         public override void ModifyAttack(AttackData attackData)
         {
+            // Allow a GM to use commands to damage components, regardless of toughness setting
+            if (attackData.DamageType == eDamageType.GM)
+                return;
+
             int toughness = ServerProperties.Properties.SET_STRUCTURES_TOUGHNESS;
             int baseDamage = attackData.Damage;
             int styleDamage = attackData.StyleDamage;

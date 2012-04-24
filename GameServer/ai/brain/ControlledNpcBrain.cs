@@ -85,7 +85,12 @@ namespace DOL.AI.Brain
             m_owner = owner;
             m_aggressionState = eAggressionState.Defensive;
             m_walkState = eWalkState.Follow;
-            m_aggroLevel = 99;
+            if (owner is GameNPC && (owner as GameNPC).Brain is StandardMobBrain)
+            {
+                m_aggroLevel = ((owner as GameNPC).Brain as StandardMobBrain).AggroLevel;
+            }
+            else
+                m_aggroLevel = 99;
             m_aggroMaxRange = 1500;
         }
 
@@ -110,11 +115,11 @@ namespace DOL.AI.Brain
         }
 
         /// <summary>
-        /// The interval for thinking, 1.5 seconds
+        /// The interval for thinking, set via server property, default is 1500 or every 1.5 seconds
         /// </summary>
         public override int ThinkInterval
         {
-            get { return 1500; }
+            get { return DOL.GS.ServerProperties.Properties.PET_THINK_INTERVAL; }
         }
 
         #region Control
@@ -155,6 +160,48 @@ namespace DOL.AI.Brain
             if (!(owner is GameNPC))
                 throw new Exception("Unrecognized owner: " + owner.GetType().FullName);
             //No GamePlayer at the top of the tree
+            return null;
+        }
+
+        public virtual GameNPC GetNPCOwner()
+        {
+            if (!(Owner is GameNPC))
+                return null;
+
+            GameNPC owner = Owner as GameNPC;
+
+            int i = 0;
+            while (owner != null)
+            {
+                i++;
+                if (i > 50)
+                {
+                    log.Error("Boucle itérative dans GetNPCOwner !");
+                    break;
+                }
+                if (owner.Brain is IControlledBrain)
+                {
+                    if ((owner.Brain as IControlledBrain).Owner is GamePlayer)
+                        return null;
+                    else
+                        owner = (owner.Brain as IControlledBrain).Owner as GameNPC;
+                }
+                else
+                    break;
+            }
+            return owner;
+        }
+
+        public virtual GameLiving GetLivingOwner()
+        {
+            GamePlayer player = GetPlayerOwner();
+            if (player != null)
+                return player;
+
+            GameNPC npc = GetNPCOwner();
+            if (npc != null)
+                return npc;
+
             return null;
         }
 
@@ -337,7 +384,7 @@ namespace DOL.AI.Brain
         {
             GamePlayer playerowner = GetPlayerOwner();
 
-            if (!playerowner.CurrentUpdateArray[Body.ObjectID - 1])
+            if (playerowner != null && !playerowner.CurrentUpdateArray[Body.ObjectID - 1])
             {
                 playerowner.Out.SendObjectUpdate(Body);
                 playerowner.CurrentUpdateArray[Body.ObjectID - 1] = true;
@@ -724,8 +771,13 @@ namespace DOL.AI.Brain
         /// <param name="aggroamount"></param>
         public override void AddToAggroList(GameLiving living, int aggroamount)
         {
-            if (living == Owner) return;
-            base.AddToAggroList(living, aggroamount);
+            GameNPC npc_owner = GetNPCOwner();
+            if (npc_owner == null || !(npc_owner.Brain is StandardMobBrain))
+                base.AddToAggroList(living, aggroamount);
+            else
+            {
+                (npc_owner.Brain as StandardMobBrain).AddToAggroList(living, aggroamount);
+            }
         }
 
         public override int CalculateAggroLevelToTarget(GameLiving target)
@@ -758,7 +810,7 @@ namespace DOL.AI.Brain
                 m_orderAttackTarget = null;
             }
 
-            lock (m_aggroTable.SyncRoot)
+            lock ((m_aggroTable as ICollection).SyncRoot)
             {
                 IDictionaryEnumerator aggros = m_aggroTable.GetEnumerator();
                 List<GameLiving> removable = new List<GameLiving>();
@@ -800,6 +852,23 @@ namespace DOL.AI.Brain
         protected override void AttackMostWanted()
         {
             if (!IsActive) return;
+
+            GameNPC owner_npc = GetNPCOwner();
+            if (owner_npc != null && owner_npc.Brain is StandardMobBrain)
+            {
+                if ((owner_npc.IsCasting || owner_npc.IsAttacking) &&
+                    owner_npc.TargetObject != null &&
+                    owner_npc.TargetObject is GameLiving &&
+                    GameServer.ServerRules.IsAllowedToAttack(owner_npc, owner_npc.TargetObject as GameLiving, false))
+                {
+                    if (!CheckSpells(eCheckSpellType.Offensive))
+                    {
+                        Body.StartAttack(owner_npc.TargetObject);
+                    }
+                    return;
+                }
+            }
+
             GameLiving target = CalculateNextAttackTarget();
 
             if (target != null)

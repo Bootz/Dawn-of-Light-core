@@ -58,7 +58,6 @@ namespace DOL.Database
         /// </summary>
         public LootGenerator()
         {
-            AllowAdd = false;
         }
 
         /// <summary>

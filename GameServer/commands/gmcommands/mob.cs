@@ -44,6 +44,8 @@ namespace DOL.GS.Commands
          "'/mob nfastcreate <ModelID> <level> <number> [radius(10)] [name]' to create multiple mobs within radius",
          "'/mob nrandcreate <number> [radius(50)]' to create multiple random mobs within radius",
          "'/mob model <ModelID> [OID]' to set the mob's model, optionally using OID if mob isn't targeted",
+         "'/mob modelinc <#> Increments the mob model by 1",
+         "'/mob modeldec <#> Decrements the mob model by 1",
          "'/mob size <size>' to set the mob's size (1..255)",
          "'/mob translationid <translation id>' to set the mob's translation id",
          "'/mob name <name>' to set the mob's name",
@@ -93,7 +95,7 @@ namespace DOL.GS.Commands
          "'/mob dropcount [number]' to set the max number of drops for mob (omit number to view current value)",
          "'/mob dropcount2 [number]' same as '/mob dropcount' but for the 'MobDrop' generator",
          "'/mob addloot <ItemTemplateID> <chance> [count]' to add loot to the mob's unique drop table.  Optionally specify count of how many to drop if chance = 100%",
-         "'/mob addloot2 <ItemTemplateID> <chance> [count]' same as '/mob addloot' but for the 'MobDrop' generator",
+         "'/mob addloot2 <ItemTemplateID> <chance> [count]' to add loot to the mob's drop table. Optionally specify count of how many item to drop if chance < 100%",
          "'/mob addotd <ItemTemplateID> <min level>' add a one time drop to this mob.",
          "'/mob viewloot [random] [inv]' to view the selected mob's loot table.  Use random to simulate a kill drop, random inv to simulate and generate the loots",
          "'/mob removeloot <ItemTemplateID>' to remove loot from the mob's unique drop table",
@@ -150,6 +152,8 @@ namespace DOL.GS.Commands
                     && args[1] != "nfastcreate"
                     && args[1] != "npctemplate"
                     && args[1] != "model"
+                    && args[1] != "modelinc"
+                    && args[1] != "modeldec"
                     && args[1] != "copy"
                     && args[1] != "select"
                     && args[1] != "reload"
@@ -178,8 +182,10 @@ namespace DOL.GS.Commands
                     case "nfastcreate": nfastcreate(client, args); break;
                     case "nrandcreate": nrandcreate(client, args); break;
                     case "model": model(client, targetMob, args); break;
+                    case "modelinc": modelinc(client, targetMob, args); break;
+                    case "modeldec": modeldec(client, targetMob, args); break;
                     case "size": size(client, targetMob, args); break;
-                    case "translationid": translationid(client, targetMob, args); break;
+                    //case "translationid": translationid(client, targetMob, args); break;
                     case "name": name(client, targetMob, args); break;
                     case "suffix": suffix(client, targetMob, args); break;
                     case "guild": guild(client, targetMob, args); break;
@@ -263,8 +269,9 @@ namespace DOL.GS.Commands
                         return;
                 }
             }
-            catch
+            catch (Exception ex)
             {
+                client.Out.SendMessage(ex.ToString(), eChatType.CT_System, eChatLoc.CL_PopupWindow);
                 DisplaySyntax(client);
             }
         }
@@ -548,6 +555,96 @@ namespace DOL.GS.Commands
             client.Out.SendMessage("Created " + number + " mobs", eChatType.CT_System, eChatLoc.CL_SystemWindow);
         }
 
+        #region auto increment/decrement model display
+
+        // List of non-displayed models
+        // used with modelinc and modeldec
+        List<ushort> invmodel = new List<ushort>() { 3, 4, 604, 666, 1000, 1001, 1002, 1003, 1004, 1237, 1238, 1239, 1240, 1241, 1242, 1243, 1244, 1245, 1246,
+			1247, 1248, 1249, 1250, 1251, 1252, 1253, 1254, 1275, 1391, 1392, 1393, 1441, 1442, 1443, 1444, 1445, 1446, 1447, 1448, 1449,
+			1450, 1451, 1452, 1453, 1454, 1455, 1456, 1457, 1458, 1459, 1460, 1461, 1462, 1463, 1464, 1465, 1466, 1467, 1468, 1469, 1470,
+			1471, 1472, 1473, 1474, 1475, 1476, 1477, 1478, 1479, 1480, 1481, 1482, 1483, 1484, 1485, 1486, 1487, 1488, 1489, 1490, 1491,
+			1492, 1493, 1494, 1495, 1496, 1497, 1498, 1499, 1500, 1501, 1502, 1503, 1504, 1505, 1506, 1507, 1508, 1509, 1510, 1511, 1512,
+			1513, 1514, 1515, 1516, 1517, 1518, 1519, 1520, 1521, 1522, 1523, 1524, 1525, 1526, 1527, 1528, 1529, 1530, 1531, 1532, 1533,
+			1534, 1535, 1536, 1537, 1538, 1539, 1540, 1541, 1542, 1543, 1544, 1545, 1546, 1547, 1548, 1549, 1550, 1551, 1552, 1553, 1554,
+			1555, 1556, 1557, 1558, 1559, 1560, 1561, 1562, 1567, 1568, 1569, 1570, 1571, 1572, 1573, 1587, 1588, 1589, 1590, 1591, 1592,
+			1593, 1594, 1595, 1598, 1599, 1600, 1601, 1602, 1603, 1604, 1605, 1608, 1609, 1610, 1611, 1612, 1613, 1614, 1615, 1616, 1617,
+			1618, 1619, 1620, 1621, 1622, 1624, 1626, 1627, 1628, 1629, 1630, 1631, 1632, 1633, 1634, 1635, 1636, 1637, 1638, 1639, 1640,
+			1641, 1643, 1644, 1645, 1646, 1671, 1673, 1674, 1675, 1677, 1678, 1679, 1680, 1682, 1683, 1684, 1685, 1686, 1737, 1738, 1739,
+			1761, 1762,	1763, 1764, 1765, 1766, 1767, 1768, 1769, 1822, 1871, 1872, 1873, 1874, 1875, 1876, 1877, 1880, 1881, 1882, 1886,
+			1907, 1923,	1926, 1927, 1928, 1943, 2004, 2005, 2006, 2007, 2008, 2019, 2067, 2068, 2069, 2070, 2071, 2072, 2073, 2280, 2281,
+			2282, 2283,	2284, 2285, 2286, 2287, 2288, 2289, 2290, 2291, 2292, 2293, 2294, 2299, 2300, 2302, 2305, 2319, 2333, 2334, 2335,
+			2336, 2337,	2338, 2364 };
+
+        private void modelinc(GameClient client, GameNPC targetMob, string[] args)
+        {
+            if (targetMob == null)
+            {
+                DisplaySyntax(client, args[1]);
+                return;
+            }
+
+            if (targetMob.Model >= 2363)
+            {
+                client.Out.SendMessage("Highest mob model reached!", eChatType.CT_System, eChatLoc.CL_SystemWindow);
+                return;
+            }
+
+            ushort model = targetMob.Model;
+            model++;
+
+            //Some models are not used, or cannot be targetted, i.e. ambient mobs and some invisible mobs, don't set mobs to these models
+            while (invmodel.Contains(model))
+                model++;
+
+            try
+            {
+                targetMob.Model = model;
+                targetMob.SaveIntoDatabase();
+                client.Out.SendMessage("Mob model changed to: " + targetMob.Model, eChatType.CT_System, eChatLoc.CL_SystemWindow);
+            }
+            catch (Exception)
+            {
+                DisplaySyntax(client, args[1]);
+                return;
+            }
+        }
+
+        private void modeldec(GameClient client, GameNPC targetMob, string[] args)
+        {
+            if (targetMob == null)
+            {
+                DisplaySyntax(client, args[1]);
+                return;
+            }
+
+            if (targetMob.Model == 1)
+            {
+                client.Out.SendMessage("Mob model cannot be 0!", eChatType.CT_System, eChatLoc.CL_SystemWindow);
+                return;
+            }
+
+            ushort model = targetMob.Model;
+            model--;
+
+            //Some models are not used, or cannot be targetted, i.e. ambient mobs and some invisible mobs, don't set mobs to these models
+            while (invmodel.Contains(model))
+                model--;
+
+            try
+            {
+                targetMob.Model = model;
+                targetMob.SaveIntoDatabase();
+                client.Out.SendMessage("Mob model changed to: " + targetMob.Model, eChatType.CT_System, eChatLoc.CL_SystemWindow);
+            }
+            catch (Exception)
+            {
+                DisplaySyntax(client, args[1]);
+                return;
+            }
+        }
+
+        #endregion auto increment/decrement model display
+
         private void model(GameClient client, GameNPC targetMob, string[] args)
         {
             if (args.Length == 4)
@@ -630,36 +727,36 @@ namespace DOL.GS.Commands
             }
         }
 
-        private void translationid(GameClient client, GameNPC targetMob, string[] args)
-        {
-            if (targetMob.GetType().IsSubclassOf(typeof(GameMovingObject)))
-            {
-                // Can be funny when we remove (e.g.) a ram or a boat (why are we dropped on the sea???) from the world. ;-)
-                client.Out.SendMessage("The selected object is type of GameMovingObject and it's translation id cannot be changed " +
-                                       "via command. Please change the translation id in your code / database.",
-                                       eChatType.CT_System, eChatLoc.CL_SystemWindow);
-                return;
-            }
+        //private void translationid(GameClient client, GameNPC targetMob, string[] args)
+        //{
+        //    if (targetMob.GetType().IsSubclassOf(typeof(GameMovingObject)))
+        //    {
+        //        // Can be funny when we remove (e.g.) a ram or a boat (why are we dropped on the sea???) from the world. ;-)
+        //        client.Out.SendMessage("The selected object is type of GameMovingObject and it's translation id cannot be changed " +
+        //                               "via command. Please change the translation id in your code / database.",
+        //                               eChatType.CT_System, eChatLoc.CL_SystemWindow);
+        //        return;
+        //    }
 
-            string id = "";
+        //    string id = "";
 
-            if (args.Length > 2)
-                id = String.Join("", args, 2, args.Length - 2);
+        //    if (args.Length > 2)
+        //        id = String.Join("", args, 2, args.Length - 2);
 
-            if (id != "")
-            {
-                targetMob.TranslationId = id;
-                targetMob.SaveIntoDatabase();
+        //    if (id != "")
+        //    {
+        //        targetMob.TranslationId = id;
+        //        targetMob.SaveIntoDatabase();
 
-                targetMob.RemoveFromWorld();
-                GameNPC.RefreshTranslation(null, id);
-                targetMob.AddToWorld();
+        //        targetMob.RemoveFromWorld();
+        //        GameNPC.RefreshTranslation(null, id);
+        //        targetMob.AddToWorld();
 
-                client.Out.SendMessage("Mob translation id changed to: " + id, eChatType.CT_System, eChatLoc.CL_SystemWindow);
-            }
-            else
-                DisplaySyntax(client, args[1]);
-        }
+        //        client.Out.SendMessage("Mob translation id changed to: " + id, eChatType.CT_System, eChatLoc.CL_SystemWindow);
+        //    }
+        //    else
+        //        DisplaySyntax(client, args[1]);
+        //}
 
         private void name(GameClient client, GameNPC targetMob, string[] args)
         {
@@ -1128,11 +1225,15 @@ namespace DOL.GS.Commands
             info.Add(" + Realm: " + GlobalConstants.RealmToName(targetMob.Realm));
             info.Add(" + Level: " + targetMob.Level);
             info.Add(" + Brain: " + (targetMob.Brain == null ? "(null)" : targetMob.Brain.GetType().ToString()));
+
+            if (targetMob.DamageRvRMemory > 0)
+                info.Add("  - Damage RvR Memory: " + targetMob.DamageRvRMemory);
+
             if (targetMob.Brain != null && targetMob.Brain is IControlledBrain)
             {
                 try
                 {
-                    info.Add(" + -- Owner: " + (targetMob.Brain as IControlledBrain).GetPlayerOwner().Name);
+                    info.Add(" + -- Owner: " + (targetMob.Brain as IControlledBrain).GetPlayerOwner() != null ? (targetMob.Brain as IControlledBrain).GetPlayerOwner().Name : (targetMob.Brain as IControlledBrain).GetNPCOwner().Name);
                 }
                 catch
                 {
@@ -1142,6 +1243,21 @@ namespace DOL.GS.Commands
             if (targetMob.NPCTemplate != null)
             {
                 info.Add(" + NPCTemplate: " + "[" + targetMob.NPCTemplate.TemplateId + "] " + targetMob.NPCTemplate.Name);
+            }
+
+            if (targetMob is Keeps.IKeepItem)
+            {
+                info.Add(" ");
+                Keeps.IKeepItem keepItem = targetMob as Keeps.IKeepItem;
+                if (keepItem.Component != null && keepItem.Component.Keep != null)
+                {
+                    info.Add(" + KeepItem: " + keepItem.Component.Keep.Name);
+                }
+                else
+                {
+                    info.Add(" + KeepItem:  No Component or Keep found!");
+                }
+                info.Add(" ");
             }
 
             IOldAggressiveBrain aggroBrain = targetMob.Brain as IOldAggressiveBrain;
@@ -1189,6 +1305,8 @@ namespace DOL.GS.Commands
             info.Add(" + INT  /  EMP  /  PIE  /  CHR");
             info.Add(" + " + targetMob.Intelligence + "  /  " + targetMob.Empathy + "  /  " + targetMob.Piety + "  /  " + targetMob.Charisma);
             info.Add(" + Block / Parry / Evade %:  " + targetMob.BlockChance + " / " + targetMob.ParryChance + " / " + targetMob.EvadeChance);
+            info.Add(" + Attack Speed (Melee Speed Increase %):  " + targetMob.AttackSpeed(targetMob.AttackWeapon) + " (" + (100 - targetMob.GetModified(eProperty.MeleeSpeed)) + ")");
+            info.Add(" + Casting Speed Increase %:  " + targetMob.GetModified(eProperty.CastingSpeed));
 
             if (targetMob.LeftHandSwingChance > 0)
                 info.Add(" + Left Swing %: " + targetMob.LeftHandSwingChance);
@@ -1213,16 +1331,36 @@ namespace DOL.GS.Commands
             if (targetMob.BodyType > 0)
                 info.Add(" + Body Type:  " + targetMob.BodyType);
 
-            info.Add(" + Resist Crush/Slash/Thrust:  " + targetMob.GetDamageResist(eProperty.Resist_Crush)
+            info.Add(" ");
+
+            info.Add("Race Resists:");
+            info.Add(" +  -- Crush/Slash/Thrust:  " + targetMob.GetDamageResist(eProperty.Resist_Crush)
                      + " / " + targetMob.GetDamageResist(eProperty.Resist_Slash)
                      + " / " + targetMob.GetDamageResist(eProperty.Resist_Thrust));
-            info.Add(" +  -- Heat/Cold/Matter/Natural:  " + targetMob.GetDamageResist(eProperty.Resist_Heat)
+            info.Add(" +  -- Heat/Cold/Matter:  " + targetMob.GetDamageResist(eProperty.Resist_Heat)
                      + " / " + targetMob.GetDamageResist(eProperty.Resist_Cold)
-                     + " / " + targetMob.GetDamageResist(eProperty.Resist_Matter)
-                     + " / " + targetMob.GetDamageResist(eProperty.Resist_Natural));
+                     + " / " + targetMob.GetDamageResist(eProperty.Resist_Matter));
             info.Add(" +  -- Body/Spirit/Energy:  " + targetMob.GetDamageResist(eProperty.Resist_Body)
                      + " / " + targetMob.GetDamageResist(eProperty.Resist_Spirit)
                      + " / " + targetMob.GetDamageResist(eProperty.Resist_Energy));
+            info.Add(" +  -- Natural:  " + targetMob.GetDamageResist(eProperty.Resist_Natural));
+
+            info.Add(" ");
+
+            info.Add("Current Resists:");
+            info.Add(" +  -- Crush/Slash/Thrust:  " + targetMob.GetModified(eProperty.Resist_Crush)
+                     + " / " + targetMob.GetModified(eProperty.Resist_Slash)
+                     + " / " + targetMob.GetModified(eProperty.Resist_Thrust));
+            info.Add(" +  -- Heat/Cold/Matter:  " + targetMob.GetModified(eProperty.Resist_Heat)
+                     + " / " + targetMob.GetModified(eProperty.Resist_Cold)
+                     + " / " + targetMob.GetModified(eProperty.Resist_Matter));
+            info.Add(" +  -- Body/Spirit/Energy:  " + targetMob.GetModified(eProperty.Resist_Body)
+                     + " / " + targetMob.GetModified(eProperty.Resist_Spirit)
+                     + " / " + targetMob.GetModified(eProperty.Resist_Energy));
+            info.Add(" +  -- Natural:  " + targetMob.GetModified(eProperty.Resist_Natural));
+
+            info.Add(" ");
+
             info.Add(" + Position (X, Y, Z, H):  " + targetMob.X + ", " + targetMob.Y + ", " + targetMob.Z + ", " + targetMob.Heading);
 
             if (targetMob.GuildName != null && targetMob.GuildName.Length > 0)
@@ -1464,10 +1602,7 @@ namespace DOL.GS.Commands
                 targetMob.LoadDataQuests();
                 foreach (GamePlayer player in targetMob.GetPlayersInRadius(WorldMgr.VISIBILITY_DISTANCE))
                 {
-                    eQuestIndicator indicator = eQuestIndicator.None;
-                    if (targetMob.ShowQuestIndicator(player))
-                        indicator = eQuestIndicator.Available;
-                    player.Out.SendNPCsQuestEffect(targetMob, indicator);
+                    player.Out.SendNPCsQuestEffect(targetMob, targetMob.GetQuestIndicator(player));
                 }
                 client.Out.SendMessage(targetMob.DataQuestList.Count + " Data Quests loaded for this mob.", eChatType.CT_System, eChatLoc.CL_SystemWindow);
             }
@@ -1790,14 +1925,7 @@ namespace DOL.GS.Commands
         {
             T mxlt =
                 GameServer.Database.SelectObject<T>("MobName = '" + GameServer.Database.Escape(targetMob.Name) +
-                    "' AND LootTemplateName = '" + GameServer.Database.Escape(targetMob.Name) + "'");
-
-            if (mxlt == null && args.Length < 3)
-            {
-                DisplayMessage(client,
-                    "Mob '" + targetMob.Name + "' does not have a MobXLootTemplate, use /mob addmobxlt <max drop count> to add one.");
-                return;
-            }
+                                                    "' AND LootTemplateName = '" + GameServer.Database.Escape(targetMob.Name) + "'");
 
             if (args.Length < 3)
             {
@@ -1853,13 +1981,13 @@ namespace DOL.GS.Commands
                 if (item == null)
                 {
                     DisplayMessage(client,
-                        "You cannot add the " + lootTemplateID + " to the " + targetMob.Name + " because the item does not exist.");
+                                   "You cannot add the " + lootTemplateID + " to the " + targetMob.Name + " because the item does not exist.");
                     return;
                 }
 
                 var template =
                     GameServer.Database.SelectObjects<LootTemplateType>("TemplateName = '" + GameServer.Database.Escape(name) +
-                        "' AND ItemTemplateID = '" + GameServer.Database.Escape(lootTemplateID) + "'");
+                                                                        "' AND ItemTemplateID = '" + GameServer.Database.Escape(lootTemplateID) + "'");
                 if (template != null)
                 {
                     foreach (var loot in template)
@@ -1908,16 +2036,16 @@ namespace DOL.GS.Commands
 
                 MobXLootType mxlt =
                     GameServer.Database.SelectObject<MobXLootType>("MobName = '" + GameServer.Database.Escape(targetMob.Name) +
-                        "' AND LootTemplateName = '" + GameServer.Database.Escape(name) + "'");
+                                                                   "' AND LootTemplateName = '" + GameServer.Database.Escape(name) + "'");
                 if (mxlt == null)
                 {
                     DisplayMessage(client,
-                        "If you need to limit max number of drops per kill for this mob then use /mob addmobxlt <max num drops> to add a MobXLootTemplate entry.");
+                                   "If you need to limit max number of drops per kill for this mob then use /mob addmobxlt <max num drops> to add a MobXLootTemplate entry.");
                 }
                 else
                 {
                     DisplayMessage(client,
-                        "A MobXLootTemplate entry exists for this mob and limits the total drops per kill to " + mxlt.DropCount);
+                                   "A MobXLootTemplate entry exists for this mob and limits the total drops per kill to " + mxlt.DropCount);
                 }
             }
             catch (Exception)
@@ -2053,8 +2181,8 @@ namespace DOL.GS.Commands
                     from loot in template
                     let drop = GameServer.Database.FindObjectByKey<ItemTemplate>(loot.ItemTemplateID)
                     select "- " + (drop == null ? "(Template Not Found)" : drop.Name) +
-                        " (" + loot.ItemTemplateID + ") Count: " + loot.Count + " Chance: " + loot.Chance
-                    );
+                    " (" + loot.ItemTemplateID + ") Count: " + loot.Count + " Chance: " + loot.Chance
+                );
             }
             if (!didDefault)
             {
@@ -2065,8 +2193,8 @@ namespace DOL.GS.Commands
                     from loot in template
                     let drop = GameServer.Database.FindObjectByKey<ItemTemplate>(loot.ItemTemplateID)
                     select "- " + (drop == null ? "(Template Not Found)" : drop.Name) +
-                        " (" + loot.ItemTemplateID + ") Count: " + loot.Count + " Chance: " + loot.Chance
-                    );
+                    " (" + loot.ItemTemplateID + ") Count: " + loot.Count + " Chance: " + loot.Chance
+                );
             }
         }
 
@@ -2309,20 +2437,33 @@ namespace DOL.GS.Commands
                     }
                     else
                     {
-                        foreach (Assembly assembly in AppDomain.CurrentDomain.GetAssemblies())
-                        {
-                            targetMob = (GameNPC)assembly.CreateInstance(dbMob.ClassType, true);
-                            mob = (GameNPC)assembly.CreateInstance(dbMob.ClassType, true);
+                        ArrayList asms = new ArrayList(ScriptMgr.Scripts);
+                        asms.Add(typeof(GameServer).Assembly);
 
-                            if (mob != null)
-                                break;
+                        foreach (Assembly script in asms)
+                        {
+                            try
+                            {
+                                mob = (GameNPC)script.CreateInstance(dbMob.ClassType, false);
+                                targetMob = (GameNPC)script.CreateInstance(dbMob.ClassType, false);
+
+                                if (mob != null)
+                                    break;
+                            }
+                            catch (Exception e)
+                            {
+                                client.Out.SendMessage(e.ToString(), eChatType.CT_System, eChatLoc.CL_PopupWindow);
+                            }
                         }
                     }
 
-                    targetMob.LoadFromDatabase(dbMob);
+                    if (targetMob != null)
+                    {
+                        targetMob.LoadFromDatabase(dbMob);
+                    }
                 }
 
-                if (mob == null)
+                if (mob == null || targetMob == null)
                 {
                     client.Out.SendMessage("Unable to find mob named:  " + mobName, eChatType.CT_System, eChatLoc.CL_SystemWindow);
                     return;
@@ -2927,7 +3068,7 @@ namespace DOL.GS.Commands
 
             if (targetMob.Brain != null && targetMob.Brain is StandardMobBrain)
             {
-                Hashtable aggroList = (targetMob.Brain as StandardMobBrain).AggroTable;
+                Dictionary<GameLiving, long> aggroList = (targetMob.Brain as StandardMobBrain).AggroTable;
 
                 if (aggroList.Count > 0)
                 {
@@ -2936,7 +3077,7 @@ namespace DOL.GS.Commands
 
                     foreach (GameLiving living in aggroList.Keys)
                     {
-                        text.Add(living.Name + ": " + (long)aggroList[living]);
+                        text.Add(living.Name + ": " + aggroList[living]);
                     }
                 }
             }

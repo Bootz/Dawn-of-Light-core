@@ -1,3 +1,5 @@
+using DOL.GS.PacketHandler;
+
 /*
  * DAWN OF LIGHT - The first free open source DAoC server emulator
  *
@@ -17,7 +19,6 @@
  *
  */
 
-using DOL.GS.PacketHandler; 
 using DOL.Language;
 
 namespace DOL.GS.Commands
@@ -115,9 +116,6 @@ namespace DOL.GS.Commands
         public void OnCommand(GameClient client, string[] args)
         {
             if (IsSpammingCommand(client.Player, "duel"))
-                return;
-
-            if (client.Player.IsMuted)
                 return;
 
             switch (client.Player.CurrentRegionID)

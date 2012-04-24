@@ -1,4 +1,5 @@
 /*
+/*
  * DAWN OF LIGHT - The first free open source DAoC server emulator
  *
  * This program is free software; you can redistribute it and/or
@@ -588,6 +589,21 @@ namespace DOL.GS
             noCombatTimer.Start(11000);
         }
 
+        /// <summary>
+        /// gets the DamageRvR Memory of this player
+        /// </summary>
+        public override long DamageRvRMemory
+        {
+            get
+            {
+                return m_damageRvRMemory;
+            }
+            set
+            {
+                m_damageRvRMemory = value;
+            }
+        }
+
         public int InCombatTimerExpired(RegionTimer timer)
         {
             Out.SendUpdateMaxSpeed();
@@ -600,6 +616,12 @@ namespace DOL.GS
         {
             if (log.IsInfoEnabled)
                 log.Info("Player " + Name + "(" + Client.Account.Name + ") went linkdead!");
+
+            // LD Necros need to be "Unshaded"
+            if (Client.Player.CharacterClass.Player.IsShade)
+            {
+                Client.Player.CharacterClass.Player.Shade(false);
+            }
 
             // Dead link-dead players release on live servers
             if (!IsAlive)
@@ -623,6 +645,8 @@ namespace DOL.GS
             }
 
             UpdateEquipmentAppearance();
+
+            LeaveHouse();
 
             SaveIntoDatabase();
 
@@ -662,8 +686,8 @@ namespace DOL.GS
 
         private void CheckIfNearEnemyKeepAndAddToRvRLinkDeathListIfNecessary()
         {
-            AbstractGameKeep keep = KeepMgr.getKeepCloseToSpot(this.CurrentRegionID, this, WorldMgr.VISIBILITY_DISTANCE);
-            if (keep != null && this.Client.Account.PrivLevel == 1 && KeepMgr.IsEnemy(keep, this))
+            AbstractGameKeep keep = GameServer.KeepManager.GetKeepCloseToSpot(this.CurrentRegionID, this, WorldMgr.VISIBILITY_DISTANCE);
+            if (keep != null && this.Client.Account.PrivLevel == 1 && GameServer.KeepManager.IsEnemy(keep, this))
             {
                 if (WorldMgr.RvRLinkDeadPlayers.ContainsKey(this.m_InternalID))
                 {
@@ -743,12 +767,16 @@ namespace DOL.GS
             }
 
             //check for battleground caps
-            Battleground bg = KeepMgr.GetBattleground(CurrentRegionID);
+            Battleground bg = GameServer.KeepManager.GetBattleground(CurrentRegionID);
             if (bg != null)
             {
                 if (Level > bg.MaxLevel || RealmLevel >= bg.MaxRealmLevel)
                 {
-                    KeepMgr.ExitBattleground(this);
+                    // Only kick players out
+                    if (Client.Account.PrivLevel == (int)ePrivLevel.Player)
+                    {
+                        GameServer.KeepManager.ExitBattleground(this);
+                    }
                 }
             }
 
@@ -804,9 +832,14 @@ namespace DOL.GS
                     return false;
                 }
 
-                string stats = Statistics.GetStatisticsMessage();
-                if (stats != "")
-                    Out.SendMessage(stats, eChatType.CT_System, eChatLoc.CL_SystemWindow);
+                if (Statistics != null)
+                {
+                    string stats = Statistics.GetStatisticsMessage();
+                    if (stats != "")
+                    {
+                        Out.SendMessage(stats, eChatType.CT_System, eChatLoc.CL_SystemWindow);
+                    }
+                }
 
                 if (!IsSitting)
                 {
@@ -1138,7 +1171,7 @@ namespace DOL.GS
             }
 
             //battlegrounds caps
-            Battleground bg = KeepMgr.GetBattleground(CurrentRegionID);
+            Battleground bg = GameServer.KeepManager.GetBattleground(CurrentRegionID);
             if (bg != null && releaseCommand == eReleaseType.RvR)
             {
                 if (Level > bg.MaxLevel)
@@ -1253,7 +1286,7 @@ namespace DOL.GS
                     }
                 case eReleaseType.RvR:
                     {
-                        foreach (AbstractGameKeep keep in KeepMgr.GetKeepsOfRegion(CurrentRegionID))
+                        foreach (AbstractGameKeep keep in GameServer.KeepManager.GetKeepsOfRegion(CurrentRegionID))
                         {
                             if (keep.IsPortalKeep && keep.OriginalRealm == Realm)
                             {
@@ -1268,7 +1301,7 @@ namespace DOL.GS
                         if (relX == 0)
                         {
                             relRegion = CurrentRegion.ID;
-                            KeepMgr.GetBorderKeepLocation(((byte)Realm * 2) / 1, out relX, out relY, out relZ, out relHeading);
+                            GameServer.KeepManager.GetBorderKeepLocation(((byte)Realm * 2) / 1, out relX, out relY, out relZ, out relHeading);
                         }
                         break;
                     }
@@ -1324,7 +1357,7 @@ namespace DOL.GS
                                 {
                                     //get the bg cap
                                     byte cap = 50;
-                                    foreach (AbstractGameKeep keep in KeepMgr.GetKeepsOfRegion(CurrentRegionID))
+                                    foreach (AbstractGameKeep keep in GameServer.KeepManager.GetKeepsOfRegion(CurrentRegionID))
                                     {
                                         if (keep.DBKeep.BaseLevel < cap)
                                         {
@@ -1333,7 +1366,7 @@ namespace DOL.GS
                                         }
                                     }
                                     //get the portal location
-                                    foreach (AbstractGameKeep keep in KeepMgr.GetKeepsOfRegion(CurrentRegionID))
+                                    foreach (AbstractGameKeep keep in GameServer.KeepManager.GetKeepsOfRegion(CurrentRegionID))
                                     {
                                         if (keep.DBKeep.BaseLevel > 50 && keep.Realm == Realm)
                                         {
@@ -1356,17 +1389,17 @@ namespace DOL.GS
                                         {
                                             case eRealm.Albion:
                                                 {
-                                                    KeepMgr.GetBorderKeepLocation(1, out relX, out relY, out relZ, out relHeading);
+                                                    GameServer.KeepManager.GetBorderKeepLocation(1, out relX, out relY, out relZ, out relHeading);
                                                     break;
                                                 }
                                             case eRealm.Midgard:
                                                 {
-                                                    KeepMgr.GetBorderKeepLocation(3, out relX, out relY, out relZ, out relHeading);
+                                                    GameServer.KeepManager.GetBorderKeepLocation(3, out relX, out relY, out relZ, out relHeading);
                                                     break;
                                                 }
                                             case eRealm.Hibernia:
                                                 {
-                                                    KeepMgr.GetBorderKeepLocation(5, out relX, out relY, out relZ, out relHeading);
+                                                    GameServer.KeepManager.GetBorderKeepLocation(5, out relX, out relY, out relZ, out relHeading);
                                                     break;
                                                 }
                                         }
@@ -2154,9 +2187,24 @@ namespace DOL.GS
                 ChangeHealth(this, eHealthChangeType.Regenerate, GetModified(eProperty.HealthRegenerationRate));
             }
 
+            #region PVP DAMAGE
+
+            if (DamageRvRMemory > 0)
+                DamageRvRMemory -= (long)Math.Max(GetModified(eProperty.HealthRegenerationRate), 0);
+
+            #endregion PVP DAMAGE
+
             //If we are fully healed, we stop the timer
             if (Health >= MaxHealth)
             {
+                #region PVP DAMAGE
+
+                // Fully Regenerated, Set DamageRvRMemory to 0
+                if (DamageRvRMemory > 0)
+                    DamageRvRMemory = 0;
+
+                #endregion PVP DAMAGE
+
                 //We clean all damagedealers if we are fully healed,
                 //no special XP calculations need to be done
                 lock (m_xpGainers.SyncRoot)
@@ -2206,7 +2254,8 @@ namespace DOL.GS
 
             if (Endurance < MaxEndurance || sprinting)
             {
-                int regen = GetModified(eProperty.EnduranceRegenerationRate);
+                int regen = GetModified(eProperty.EnduranceRegenerationRate);  //default is 1
+                int endchant = GetModified(eProperty.FatigueConsumption);      //Pull chant/buff value
 
                 int longwind = 5;
                 if (sprinting && IsMoving)
@@ -2217,6 +2266,8 @@ namespace DOL.GS
                         longwind = 5 - (ra.GetAmountForLevel(CalculateSkillLevel(ra)) * 5 / 100);
 
                     regen -= longwind;
+
+                    if (endchant > 1) regen = (int)Math.Ceiling(regen * endchant * 0.01);
                     if (Endurance + regen > MaxEndurance - longwind)
                     {
                         regen -= (Endurance + regen) - (MaxEndurance - longwind);
@@ -2568,12 +2619,12 @@ namespace DOL.GS
         /// Holds the player specializable skills and style lines
         /// (KeyName -> Specialization)
         /// </summary>
-        protected readonly Hashtable m_specialization = new Hashtable();
+        protected readonly Dictionary<string, Specialization> m_specialization = new Dictionary<string, Specialization>();
 
         /// <summary>
         /// Holds the players specs again but ordered
         /// </summary>
-        protected readonly ArrayList m_specList = new ArrayList();
+        protected readonly List<Specialization> m_specList = new List<Specialization>();
 
         /// <summary>
         /// Holds the Spell lines the player can use
@@ -2594,11 +2645,6 @@ namespace DOL.GS
         /// Used to lock the style list
         /// </summary>
         public Object lockStyleList = new Object();
-
-        /// <summary>
-        /// Holds all non trainable skills in determined order without styles
-        /// </summary>
-        //protected readonly ArrayList m_skillList = new ArrayList();
 
         /// <summary>
         /// Temporary Stats Boni
@@ -2811,14 +2857,14 @@ namespace DOL.GS
         {
             if (skill == null)
                 return;
-            Specialization oldskill = m_specialization[skill.KeyName] as Specialization;
-            if (oldskill == null)
+
+            Specialization oldskill = null;
+            if (!m_specialization.TryGetValue(skill.KeyName, out oldskill))
             {
                 //DOLConsole.WriteLine("Spec "+skill.Name+" added");
-                m_specialization[skill.KeyName] = skill;
-                lock (m_specialization.SyncRoot)
+                lock ((m_specialization as ICollection).SyncRoot)
                 {
-                    lock (m_specList.SyncRoot)
+                    lock ((m_specList as ICollection).SyncRoot)
                     {
                         m_specialization[skill.KeyName] = skill;
                         m_specList.Add(skill);
@@ -2843,12 +2889,11 @@ namespace DOL.GS
         public virtual bool RemoveSpecialization(string specKeyName)
         {
             Specialization playerSpec = null;
-            lock (m_specialization.SyncRoot)
+            lock ((m_specialization as ICollection).SyncRoot)
             {
-                lock (m_specList.SyncRoot)
+                lock ((m_specList as ICollection).SyncRoot)
                 {
-                    playerSpec = (Specialization)m_specialization[specKeyName];
-                    if (playerSpec == null)
+                    if (!m_specialization.TryGetValue(specKeyName, out playerSpec))
                         return false;
                     m_specList.Remove(playerSpec);
                     m_specialization.Remove(specKeyName);
@@ -2922,6 +2967,8 @@ namespace DOL.GS
                     }
                 }
             }
+
+            CharacterClass.OnLevelUp(this, originalLevel);
         }
 
         public virtual int RespecAll()
@@ -3053,9 +3100,9 @@ namespace DOL.GS
         /// <returns>the found specialization or null</returns>
         public virtual Specialization GetSpecialization(string keyName)
         {
-            Specialization spec = m_specialization[keyName] as Specialization;
+            Specialization spec = null;
 
-            if (spec == null)
+            if (!m_specialization.TryGetValue(keyName, out spec))
             {
                 // try case insensitive search
                 foreach (Specialization sp in m_specialization.Values)
@@ -3079,7 +3126,7 @@ namespace DOL.GS
         /// <returns>found specialization or null</returns>
         public virtual Specialization GetSpecializationByName(string name, bool caseSensitive)
         {
-            lock (m_specList.SyncRoot)
+            lock ((m_specList as ICollection).SyncRoot)
             {
                 if (caseSensitive)
                 {
@@ -3169,7 +3216,7 @@ namespace DOL.GS
         public virtual void RemoveAllSpecs()
         {
             ArrayList specs = new ArrayList();
-            lock (m_specList.SyncRoot)
+            lock ((m_specList as ICollection).SyncRoot)
             {
                 foreach (Specialization spec in m_specList)
                     specs.Add(spec);
@@ -3204,7 +3251,7 @@ namespace DOL.GS
         /// <returns></returns>
         public virtual bool HasSpecialization(string keyName)
         {
-            return m_specialization[keyName] is Specialization;
+            return m_specialization.ContainsKey(keyName);
         }
 
         /// <summary>
@@ -3315,10 +3362,10 @@ namespace DOL.GS
         /// <returns></returns>
         public override int GetBaseSpecLevel(string keyName)
         {
-            Specialization spec = m_specialization[keyName] as Specialization;
-            if (spec == null)
-                return 0;
-            return spec.Level;
+            Specialization spec = null;
+            if (m_specialization.TryGetValue(keyName, out spec))
+                return m_specialization[keyName].Level;
+            return 0;
         }
 
         /// <summary>
@@ -3332,8 +3379,8 @@ namespace DOL.GS
             if (keyName == GlobalSpellsLines.Champion_Spells)
                 return 50;
 
-            Specialization spec = m_specialization[keyName] as Specialization;
-            if (spec == null)
+            Specialization spec = null;
+            if (!m_specialization.TryGetValue(keyName, out spec))
             {
                 if (keyName == GlobalSpellsLines.Combat_Styles_Effect)
                 {
@@ -3685,7 +3732,7 @@ namespace DOL.GS
             IList newStyles = new ArrayList();
             lock (lockStyleList)
             {
-                lock (m_specList.SyncRoot)
+                lock ((m_specList as ICollection).SyncRoot)
                 {
                     foreach (Specialization spec in m_specList)
                     {
@@ -5309,7 +5356,7 @@ namespace DOL.GS
                 Out.SendMessage(LanguageMgr.GetTranslation(Client, "GamePlayer.OnLevelUp.StatRaise"), eChatType.CT_Important, eChatLoc.CL_SystemWindow);
             }
 
-            CharacterClass.OnLevelUp(this);
+            CharacterClass.OnLevelUp(this, previouslevel);
             UpdateSpellLineLevels(true);
             RefreshSpecDependantSkills(true);
 
@@ -5850,11 +5897,7 @@ namespace DOL.GS
                 Out.SendMessage(LanguageMgr.GetTranslation(Client, "GamePlayer.StartAttack.CannotMelee"), eChatType.CT_YouHit, eChatLoc.CL_SystemWindow);
                 return;
             }
-            //			if(attackTarget!=null && attackTarget is GamePlayer && ((GamePlayer)attackTarget).IsShade)
-            //			{
-            //				Out.SendMessage("You cannot attack shaded player!", eChatType.CT_YouHit, eChatLoc.CL_SystemWindow);
-            //				return;
-            //			}
+
             if (ActiveWeaponSlot == eActiveWeaponSlot.Distance)
             {
                 if (ServerProperties.Properties.ALLOW_OLD_ARCHERY == false)
@@ -5917,10 +5960,8 @@ namespace DOL.GS
 
                 if (IsStealthed)
                 {
-                    /*
-                     * -Chance to unstealth while nocking an arrow = stealth spec / level
-                     * -Chance to unstealth nocking a crit = stealth / level  0.20
-                     */
+                    // -Chance to unstealth while nocking an arrow = stealth spec / level
+                    // -Chance to unstealth nocking a crit = stealth / level  0.20
                     int stealthSpec = GetModifiedSpecLevel(Specs.Stealth);
                     int stayStealthed = stealthSpec * 100 / Level;
                     if (RangedAttackType == eRangedAttackType.Critical)
@@ -5937,7 +5978,7 @@ namespace DOL.GS
                 else
                     Out.SendMessage(LanguageMgr.GetTranslation(Client, "GamePlayer.StartAttack.CombatTarget", attackTarget.GetName(0, false)), eChatType.CT_YouHit, eChatLoc.CL_SystemWindow);
             }
-            // vampiir
+
             if (CharacterClass is PlayerClass.ClassVampiir)
             {
                 GameSpellEffect removeEffect = SpellHandler.FindEffectOnTarget(this, "VampiirSpeedEnhancement");
@@ -6780,6 +6821,16 @@ namespace DOL.GS
 
         public override void TakeDamage(GameObject source, eDamageType damageType, int damageAmount, int criticalAmount)
         {
+            #region PVP DAMAGE
+
+            if (source is GamePlayer || (source is GameNPC && (source as GameNPC).Brain is IControlledBrain && ((source as GameNPC).Brain as IControlledBrain).GetPlayerOwner() != null))
+            {
+                if (Realm != source.Realm && source.Realm != 0)
+                    DamageRvRMemory += (long)(damageAmount + criticalAmount);
+            }
+
+            #endregion PVP DAMAGE
+
             base.TakeDamage(source, damageType, damageAmount, criticalAmount);
             if (this.HasAbility(Abilities.DefensiveCombatPowerRegeneration))
             {
@@ -6788,10 +6839,11 @@ namespace DOL.GS
         }
 
         /// <summary>
-        /// Gets the effective AF of this living
+        /// Gets the effective AF of this living.  This is used for the overall AF display
+        /// on the character but not used in any damage equations.
         /// </summary>
         public override int EffectiveOverallAF
-        { // TODO: consider player level against armor level
+        {
             get
             {
                 int eaf = 0;
@@ -7087,11 +7139,6 @@ namespace DOL.GS
             if (item == null) return 0;
             // vampiir random armor debuff change ~
             double eaf = (item.SPD_ABS + GetModified(eProperty.ArmorAbsorption)) * 0.01;
-            /*GameSpellEffect effect = SpellHandler.FindEffectOnTarget(this, typeof(VampiirArmorDebuff));
-            if (effect != null && slot == (effect.SpellHandler as VampiirArmorDebuff).Slot)
-            {
-                eaf -= (int)(effect.SpellHandler as VampiirArmorDebuff).Spell.Value;
-            }*/
             return eaf;
         }
 
@@ -7161,10 +7208,9 @@ namespace DOL.GS
                     cap += 3;
                 if (DPS > cap)
                     DPS = cap;
-                //				double result = (DPS*0.1 * weapon.SPD_ABS*0.1 * 3 * (1 + (weapon.SPD_ABS*0.1 - 2) * .03));
+
                 double result = DPS * weapon.SPD_ABS * 0.03 * (0.94 + 0.003 * weapon.SPD_ABS);
 
-                // TODO: ToA damage bonus
                 if (weapon.Hand == 1) //2h
                 {
                     result *= 1.1 + (WeaponSpecLevel(weapon) - 1) * 0.005;
@@ -7177,14 +7223,36 @@ namespace DOL.GS
                         {
                             switch ((RangeAttackAmmo.SPD_ABS) & 0x3)
                             {
-                                case 0: ammoDamageBonus = 0.85; break; //Blunt       (light) -15%
-                                case 1: ammoDamageBonus = 1; break; //Bodkin     (medium)   0%
-                                case 2: ammoDamageBonus = 1.15; break; //doesn't exist on live
-                                case 3: ammoDamageBonus = 1.25; break; //Broadhead (X-heavy) +25%
+                                case 0: ammoDamageBonus = 0.85; break; 	//Blunt       (light) -15%
+                                case 1: ammoDamageBonus = 1; break; 	//Bodkin     (medium)   0%
+                                case 2: ammoDamageBonus = 1.15; break; 	//doesn't exist on live
+                                case 3: ammoDamageBonus = 1.25; break; 	//Broadhead (X-heavy) +25%
                             }
                         }
                         result *= ammoDamageBonus;
                     }
+                }
+
+                if (weapon.Item_Type == Slot.RANGED && (weapon.Object_Type == (int)eObjectType.Longbow || weapon.Object_Type == (int)eObjectType.RecurvedBow || weapon.Object_Type == (int)eObjectType.CompositeBow))
+                {
+                    if (ServerProperties.Properties.ALLOW_OLD_ARCHERY == true)
+                    {
+                        result += GetModified(eProperty.RangedDamage) * 0.01;
+                    }
+                    else if (ServerProperties.Properties.ALLOW_OLD_ARCHERY == false)
+                    {
+                        result += GetModified(eProperty.SpellDamage) * 0.01;
+                        result += GetModified(eProperty.RangedDamage) * 0.01;
+                    }
+                }
+                else if (weapon.Item_Type == Slot.RANGED)
+                {
+                    //Ranged damage buff,debuff,Relic,RA
+                    result += GetModified(eProperty.RangedDamage) * 0.01;
+                }
+                else if (weapon.Item_Type == Slot.RIGHTHAND || weapon.Item_Type == Slot.LEFTHAND || weapon.Item_Type == Slot.TWOHAND)
+                {
+                    result += GetModified(eProperty.MeleeDamage) * 0.01;
                 }
 
                 return result;
@@ -7270,16 +7338,16 @@ namespace DOL.GS
         /// Returns the AttackRange of this living
         /// </summary>
         public override int AttackRange
-        { /*
-		tested with:
-		staff					= 125-130
-		sword			   		= 126-128.06
-		shield (Numb style)		= 127-129
-		polearm	(Impale style)	= 127-130
-		mace (Daze style)		= 127.5-128.7
+        {
+            /* tested with:
+            staff					= 125-130
+            sword			   		= 126-128.06
+            shield (Numb style)		= 127-129
+            polearm	(Impale style)	= 127-130
+            mace (Daze style)		= 127.5-128.7
 
-		Think it's safe to say that it never changes; different with mobs.
-			 */
+            Think it's safe to say that it never changes; different with mobs. */
+
             get
             {
                 GameLiving livingTarget = TargetObject as GameLiving;
@@ -7436,7 +7504,7 @@ namespace DOL.GS
             {
                 // twohanded used weapons get 2H-Bonus = 10% + (Skill / 2)%
                 int spec = WeaponSpecLevel(weapon) - 1;
-                damage *= 1.2 + spec * 0.005;
+                damage *= 1.1 + spec * 0.005;
             }
 
             if (weapon.Item_Type == Slot.RANGED)
@@ -7552,17 +7620,6 @@ namespace DOL.GS
 
             DuelStop();
 
-            /*
-            1.65 Release Notes
-            - We now, by default, display RvR combat deaths in the color of the realm scoring the kill.
-
-            Example:
-
-            (green text)Midchar was just killed by Hibchar!
-            (blue text)Albchar was just killed by Midchar!
-            (red text) HibChar was just killed by Albion Keep Lord!
-             */
-
             eChatType messageType;
             if (m_releaseType == eReleaseType.Duel)
                 messageType = eChatType.CT_Emote;
@@ -7647,7 +7704,6 @@ namespace DOL.GS
                 m_automaticRelease = m_releaseType == eReleaseType.Duel;
                 m_releasePhase = 0;
                 m_deathTick = Environment.TickCount; // we use realtime, because timer window is realtime
-                //UpdatePlayerStatus();
 
                 Out.SendTimerWindow(LanguageMgr.GetTranslation(Client, "System.ReleaseTimer"), (m_automaticRelease ? RELEASE_MINIMUM_WAIT : RELEASE_TIME));
                 m_releaseTimer = new RegionTimer(this);
@@ -7721,7 +7777,6 @@ namespace DOL.GS
 
             // sent after buffs drop
             // GamePlayer.Die.CorpseLies:		{0} just died. {1} corpse lies on the ground.
-            //Message.SystemToOthers(this, GetName(0, true) + " just died.  " + GetPronoun(1, true) + " corpse lies on the ground.", eChatType.CT_PlayerDied);
             Message.SystemToOthers2(this, eChatType.CT_PlayerDied, "GamePlayer.Die.CorpseLies", GetName(0, true), GetPronoun(this.Client, 1, true));
             if (m_releaseType == eReleaseType.Duel)
             {
@@ -8472,25 +8527,16 @@ namespace DOL.GS
 
         #region Vault/Money/Items/Trading/UseSlot/ApplyPoison
 
-        private GameVault m_activeVault;
-        private GameConsignmentMerchant m_activeConMerchant;
+        private IGameInventoryObject m_activeInventoryObject;
 
         /// <summary>
-        /// The currently active house vault.
+        /// The currently active InventoryObject
+        /// This is new and will probably replace the above Active methods in time.
         /// </summary>
-        public GameVault ActiveVault
+        public IGameInventoryObject ActiveInventoryObject
         {
-            get { return m_activeVault; }
-            set { m_activeVault = value; }
-        }
-
-        /// <summary>
-        /// The currently active Consignment Merchant
-        /// </summary>
-        public GameConsignmentMerchant ActiveConMerchant
-        {
-            get { return m_activeConMerchant; }
-            set { m_activeConMerchant = value; }
+            get { return m_activeInventoryObject; }
+            set { m_activeInventoryObject = value; }
         }
 
         /// <summary>
@@ -8939,8 +8985,8 @@ namespace DOL.GS
 
                     // Artifacts don't require charges.
 
-                    if ((type < 2 && useItem.SpellID > 0 && useItem.Charges < 1 && !(useItem is InventoryArtifact)) ||
-                        (type == 2 && useItem.SpellID1 > 0 && useItem.Charges1 < 1 && !(useItem is InventoryArtifact)) ||
+                    if ((type < 2 && useItem.SpellID > 0 && useItem.Charges < 1 && useItem.MaxCharges > -1 && !(useItem is InventoryArtifact)) ||
+                        (type == 2 && useItem.SpellID1 > 0 && useItem.Charges1 < 1 && useItem.MaxCharges1 > -1 && !(useItem is InventoryArtifact)) ||
                         (useItem.PoisonSpellID > 0 && useItem.PoisonCharges < 1))
                     {
                         Out.SendMessage("The " + useItem.Name + " is out of charges.", eChatType.CT_System, eChatLoc.CL_SystemWindow);
@@ -11630,12 +11676,61 @@ namespace DOL.GS
         public virtual void RefreshItemBonuses()
         {
             m_itemBonus = new PropertyIndexer();
+            string slotToLoad = "";
+            switch (VisibleActiveWeaponSlots)
+            {
+                case 16: slotToLoad = "rightandleftHandSlot"; break;
+                case 18: slotToLoad = "leftandtwoHandSlot"; break;
+                case 31: slotToLoad = "leftHandSlot"; break;
+                case 34: slotToLoad = "twoHandSlot"; break;
+                case 51: slotToLoad = "distanceSlot"; break;
+                case 240: slotToLoad = "righttHandSlot"; break;
+                case 242: slotToLoad = "twoHandSlot"; break;
+                default: break;
+            }
 
+            //log.Debug("VisibleActiveWeaponSlots= " + VisibleActiveWeaponSlots);
             foreach (InventoryItem item in Inventory.EquippedItems)
             {
                 if (item == null)
                     continue;
+                // skip weapons. only active weapons should fire equip event, done in player.SwitchWeapon
+                bool add = true;
+                if (slotToLoad != "")
+                {
+                    switch (item.SlotPosition)
+                    {
+                        case Slot.TWOHAND:
+                            if (slotToLoad.Contains("twoHandSlot") == false)
+                            {
+                                add = false;
+                            }
+                            break;
 
+                        case Slot.RIGHTHAND:
+                            if (slotToLoad.Contains("right") == false)
+                            {
+                                add = false;
+                            }
+                            break;
+                        case Slot.SHIELD:
+                        case Slot.LEFTHAND:
+                            if (slotToLoad.Contains("left") == false)
+                            {
+                                add = false;
+                            }
+                            break;
+                        case Slot.RANGED:
+                            if (slotToLoad != "distanceSlot")
+                            {
+                                add = false;
+                            }
+                            break;
+                        default: break;
+                    }
+                }
+
+                if (!add) continue;
                 if (item is IGameInventoryItem)
                 {
                     (item as IGameInventoryItem).CheckValid(this);
@@ -12049,11 +12144,15 @@ namespace DOL.GS
                         {
                             long moneyToGuild = moneyObject.TotalCopper * Guild.GetGuildDuesPercent() / 100;
                             if (Guild.GetGuildDuesPercent() != 100)
+                            {
                                 AddMoney(moneyObject.TotalCopper, LanguageMgr.GetTranslation(Client, "GamePlayer.PickupObject.YouPickUp", Money.GetString(moneyObject.TotalCopper)));
+                            }
                             else
+                            {
                                 AddMoney(moneyObject.TotalCopper);
+                            }
                             InventoryLogging.LogInventoryAction("(ground)", this, eInventoryActionType.Loot, moneyObject.TotalCopper);
-                            Guild.SetGuildBank(Client.Player, moneyToGuild);
+                            Guild.SetGuildBank(this, moneyToGuild);
                         }
                         else
                         {
@@ -12168,7 +12267,7 @@ namespace DOL.GS
                     }
                 }
             }
-            lock (m_specList.SyncRoot)
+            lock ((m_specList as ICollection).SyncRoot)
             {
                 foreach (Specialization spec in m_specList)
                 {
@@ -12293,7 +12392,7 @@ namespace DOL.GS
 
             #region Load Specs
 
-            lock (m_specList.SyncRoot)
+            lock ((m_specList as ICollection).SyncRoot)
             {
                 tmpStr = character.SerializedSpecs;
                 if (tmpStr != null && tmpStr.Length > 0)
@@ -12333,23 +12432,7 @@ namespace DOL.GS
 
             LoadSpellLines();
 
-            /* -- Kakuri Jan 8 2009 --
-             * Calling OnLevelUp() when loading a character is a very poor way of loading skills and abilities.
-             * OnLevelUp() should *ONLY* be called when a character actually levels up.
-             * Skills and abilities should perhaps have their own handler, instead of being embedded in each
-             * class's OnLevelUp().
-             * I'm not up for fixing it at the moment, but there is a significant bug which I'm not exactly "fixing"
-             * but rather countering below. On PvE servers from lvls 21-50 OnLevelUp() grants the character an
-             * extra Realm Specialization Point (see DOL.GS.CharacterClassSpec.OnLevelUp() in PlayerClass.cs).
-             * Since OnLevelUp() is called every time the character is loaded from the database, each
-             * time a player logs in to the game they get an extra RSP.
-             */
-            CharacterClass.OnLevelUp(this); // load all skills from DB first to keep the order
-            if (this.Level > 20 && GameServer.Instance.Configuration.ServerType == eGameServerType.GST_PvE)
-            {
-                this.RealmSpecialtyPoints--;
-            }
-
+            CharacterClass.OnLevelUp(this, Level); // load all skills from DB first to keep the order
             CharacterClass.OnRealmLevelUp(this);
             RefreshSpecDependantSkills(false);
             UpdateSpellLineLevels(false);
@@ -12362,7 +12445,7 @@ namespace DOL.GS
 
             RemoveAllSpellLines();
 
-            Hashtable disabledSpells = new Hashtable();
+            Dictionary<ushort, int> disabledSpells = new Dictionary<ushort, int>();
 
             //Load the disabled spells
             string tmpStr = character.DisabledSpells;
@@ -12375,7 +12458,7 @@ namespace DOL.GS
                     int duration;
                     if (values.Length >= 2 && ushort.TryParse(values[0], out spellid) && int.TryParse(values[1], out duration))
                     {
-                        if (disabledSpells.Contains(spellid))
+                        if (disabledSpells.ContainsKey(spellid))
                             continue;
                         disabledSpells.Add(spellid, duration);
                     }
@@ -12410,7 +12493,7 @@ namespace DOL.GS
                                     foreach (Spell spell in SkillBase.GetSpellList(splLine.KeyName))
                                     {
                                         if (disabledSpells.ContainsKey(spell.ID))
-                                            DisableSkill(spell, (int)disabledSpells[spell.ID]);
+                                            DisableSkill(spell, disabledSpells[spell.ID]);
                                     }
                                 }
                                 else if (log.IsErrorEnabled)
@@ -12875,8 +12958,13 @@ namespace DOL.GS
 
         #endregion GetPronoun/GetExamineMessages
 
+        #region Stealth / Wireframe
+
         bool m_isWireframe = false;
 
+        /// <summary>
+        /// Player is drawn as a Wireframe.  Not sure why or when this is used.  -- Tolakram
+        /// </summary>
         public bool IsWireframe
         {
             get { return m_isWireframe; }
@@ -12892,8 +12980,6 @@ namespace DOL.GS
                     }
             }
         }
-
-        #region Stealth
 
         /// <summary>
         /// Property that holds tick when stealth state was changed last time
@@ -13251,7 +13337,7 @@ namespace DOL.GS
             return this.IsWithinRadius(enemy, range);
         }
 
-        #endregion Stealth
+        #endregion Stealth / Wireframe
 
         #region Task
 
@@ -14252,7 +14338,11 @@ namespace DOL.GS
         /// </summary>
         public bool IsShade
         {
-            get { return m_ShadeEffect != null; }
+            get
+            {
+                bool shadeModel = Model == ShadeModel;
+                return m_ShadeEffect != null ? true : shadeModel;
+            }
         }
 
         /// <summary>
@@ -14296,12 +14386,13 @@ namespace DOL.GS
                     case 2: return (ushort)(DBCharacter.Gender + 1359); //Avalonian
                     case 3: return (ushort)(DBCharacter.Gender + 1355); //Highlander
                     case 4: return (ushort)(DBCharacter.Gender + 1357); //Saracen
-                    case 5: return (ushort)(DBCharacter.Gender + 1365); //Norseman
+
                     case 16: return (ushort)(DBCharacter.Gender + 1361); //HalfOgre
 
                     // Midgard Models.
                     case 6: return (ushort)(DBCharacter.Gender + 1363); //Troll
-                    case 7: return (ushort)(DBCharacter.Gender + 1365); //Dwarf
+                    case 7: return (ushort)(DBCharacter.Gender + 1369); //Dwarf
+                    case 5: return (ushort)(DBCharacter.Gender + 1365); //Norseman
                     case 8: return (ushort)(DBCharacter.Gender + 1367); //Kobold
                     case 14: return (ushort)(DBCharacter.Gender + 1371); //Valkyn
                     case 17: return (ushort)(DBCharacter.Gender + 1373); //Frostalf
@@ -15313,7 +15404,7 @@ namespace DOL.GS
             if (!Champion || ChampionLevel == CL_MAX_LEVEL || experience <= 0 || IsPraying)
                 return;
 
-            if (source != eXPSource.GM)
+            if (source != eXPSource.GM && source != eXPSource.Quest)
             {
                 double modifier = ServerProperties.Properties.CL_XP_RATE;
 
@@ -15434,7 +15525,7 @@ namespace DOL.GS
         /// <summary>
         /// Load champion spells of this player
         /// </summary>
-        protected virtual void LoadChampionSpells(Hashtable disabledSpells)
+        protected virtual void LoadChampionSpells(Dictionary<ushort, int> disabledSpells)
         {
             try
             {
@@ -15470,7 +15561,7 @@ namespace DOL.GS
                     foreach (Spell spell in SkillBase.GetSpellList(ChampionSpellLineName))
                     {
                         if (disabledSpells.ContainsKey(spell.ID))
-                            DisableSkill(spell, (int)disabledSpells[spell.ID]);
+                            DisableSkill(spell, disabledSpells[spell.ID]);
                     }
                 }
             }
@@ -15902,6 +15993,18 @@ namespace DOL.GS
         }
 
         /// <summary>
+        /// Player is delving a spell
+        /// </summary>
+        /// <param name="output"></param>
+        /// <param name="spell"></param>
+        /// <param name="spellLine"></param>
+        /// <returns>false if not handled here, use default delve</returns>
+        public virtual bool DelveSpell(IList<string> output, Spell spell, SpellLine spellLine)
+        {
+            return false;
+        }
+
+        /// <summary>
         /// Delve a weapon style for this player
         /// </summary>
         /// <param name="delveInfo"></param>
@@ -16046,26 +16149,6 @@ namespace DOL.GS
 
         protected virtual string ItemBonusDescription(int iBonus, int iBonusType)
         {
-            /*Not needed.
-            string BonusName;
-            if (iBonusType == (int)eProperty.Stat_First)
-                BonusName = "Strength";
-            else if (iBonusType == (int)eProperty.Stat_Last)
-                BonusName = "Charisma";
-            else if (iBonusType == (int)eProperty.Resist_First)
-                BonusName = "Resist Body";
-            else if (iBonusType == (int)eProperty.Resist_Last)
-                BonusName = "Resist Thrust";
-            else if (iBonusType == (int)eProperty.Skill_First)
-                BonusName = "Two Handed";
-            else if (iBonusType == (int)eProperty.Skill_Last)
-                BonusName = "Scythe";
-            else if (!Enum.IsDefined(typeof(eProperty), (eProperty)iBonusType)) BonusName = iBonusType.ToString();
-
-            string BonusName = ((eProperty)iBonusType).ToString();
-            string str = BonusName.ToString().Replace("_", " ") + ": ";
-            return str + iBonus + (((iBonusType < 20) && (iBonusType > 10)) ? "%" : "");
-             */
             //This displays the bonuses just like the Live servers. there is a check against the pts/% differences
             string str = ((iBonusType == 150) | (iBonusType == 210) | (iBonusType == 10) | (iBonusType == 151) | (iBonusType == 186)) ? "pts of " : "% to ";  //150(Health Regen) 151(PowerRegen) and 186(Style reductions) need the prefix of "pts of " to be correct
 
@@ -16117,7 +16200,7 @@ namespace DOL.GS
             return "+" + iBonus + str + SkillBase.GetPropertyName(((eProperty)iBonusType));
         }
 
-        public double GetEvadeChance()
+        public virtual double GetEvadeChance()
         {
             double evadeChance = 0;
 
@@ -16145,7 +16228,7 @@ namespace DOL.GS
             return Math.Round(evadeChance * 10000) / 100;
         }
 
-        public double GetBlockChance()
+        public virtual double GetBlockChance()
         {
             double blockChance = 0;
             InventoryItem lefthand = null;
@@ -16172,7 +16255,7 @@ namespace DOL.GS
             return Math.Round(blockChance * 10000) / 100;
         }
 
-        public double GetParryChance()
+        public virtual double GetParryChance()
         {
             double parryChance = 0;
 

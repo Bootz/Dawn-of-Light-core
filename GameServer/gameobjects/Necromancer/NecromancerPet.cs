@@ -37,6 +37,21 @@ namespace DOL.GS
         private static readonly log4net.ILog log = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
 
         /// <summary>
+        /// gets the DamageRvR Memory of this NecromancerPet
+        /// </summary>
+        public override long DamageRvRMemory
+        {
+            get
+            {
+                return m_damageRvRMemory;
+            }
+            set
+            {
+                m_damageRvRMemory = value;
+            }
+        }
+
+        /// <summary>
         /// Proc IDs for various pet weapons.
         /// </summary>
         private enum Procs
@@ -113,7 +128,7 @@ namespace DOL.GS
             if (Brain == null || (Brain as IControlledBrain) == null)
                 return base.GetModified(property);
 
-            GamePlayer owner = (Brain as IControlledBrain).Owner as GamePlayer;
+            GameLiving owner = (Brain as IControlledBrain).GetLivingOwner();
 
             switch (property)
             {

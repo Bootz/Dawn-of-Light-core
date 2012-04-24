@@ -1,3 +1,5 @@
+using System.Collections.Generic;
+
 /*
  * DAWN OF LIGHT - The first free open source DAoC server emulator
  *
@@ -17,7 +19,6 @@
  *
  */
 
-using System.Collections.Generic;
 using DOL.Language;
 
 namespace DOL.GS.PlayerClass
@@ -67,9 +68,9 @@ namespace DOL.GS.PlayerClass
             get { return eClassType.Hybrid; }
         }
 
-        public override void OnLevelUp(GamePlayer player)
+        public override void OnLevelUp(GamePlayer player, int previousLevel)
         {
-            base.OnLevelUp(player);
+            base.OnLevelUp(player, previousLevel);
 
             // RDSandersJR: Check to see if we are using old archery if so,
             //              use Specs.CompositeBow

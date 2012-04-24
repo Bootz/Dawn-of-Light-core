@@ -93,7 +93,7 @@ namespace DOL.GS.Commands
             }
 
             AbstractGameKeep myKeep = (AbstractGameKeep)client.Player.TempProperties.getProperty<object>(TEMP_KEEP_LAST, null);
-            if (myKeep == null) myKeep = KeepMgr.getKeepCloseToSpot(client.Player.CurrentRegionID, client.Player, 10000);
+            if (myKeep == null) myKeep = GameServer.KeepManager.GetKeepCloseToSpot(client.Player.CurrentRegionID, client.Player, 10000);
 
             switch (args[1])
             {
@@ -133,7 +133,7 @@ namespace DOL.GS.Commands
                             return;
                         }
 
-                        if ((keepID >> 8) != 0 || KeepMgr.Keeps[keepID] != null)
+                        if ((keepID >> 8) != 0 || GameServer.KeepManager.Keeps[keepID] != null)
                         {
                             DisplayMessage(client, "KeepID must be unused and less than 256.");
                             return;
@@ -2105,7 +2105,7 @@ namespace DOL.GS.Commands
                             return;
                         }
 
-                        if (KeepMgr.getKeepByID(keepid) != null)
+                        if (GameServer.KeepManager.GetKeepByID(keepid) != null)
                         {
                             DisplayMessage(client, LanguageMgr.GetTranslation(client, "GMCommands.Keep.TowerCreate.KeepIDExists", keepid));
                             return;
@@ -2185,7 +2185,7 @@ namespace DOL.GS.Commands
                             return;
                         }
 
-                        if (KeepMgr.getKeepByID(keepid) != null)
+                        if (GameServer.KeepManager.GetKeepByID(keepid) != null)
                         {
                             DisplayMessage(client, LanguageMgr.GetTranslation(client, "GMCommands.Keep.TowerCreate.KeepIDExists", keepid));
                             return;
@@ -2283,6 +2283,8 @@ namespace DOL.GS.Commands
                                 c.Out.SendKeepComponentInfo(keepComponent);
                             }
                         }
+
+                        GameServer.KeepManager.RegisterKeep(k.KeepID, k);
                         break;
                     }
 

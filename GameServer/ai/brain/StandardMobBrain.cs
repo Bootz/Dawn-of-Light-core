@@ -21,10 +21,10 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Reflection;
-
 using DOL.Events;
 using DOL.GS;
 using DOL.GS.Effects;
+using DOL.GS.Keeps;
 using DOL.GS.Movement;
 using DOL.GS.PacketHandler;
 using DOL.GS.SkillHandler;
@@ -103,7 +103,8 @@ namespace DOL.AI.Brain
                 Body.WalkToSpawn();
                 return;
             }
-
+            // If the NPC is Moving on path, it can detect closed doors and open them
+            if (Body.IsMovingOnPath) DetectDoor();
             //Instead - lets just let CheckSpells() make all the checks for us
             //Check for just positive spells
             CheckSpells(eCheckSpellType.Defensive);
@@ -141,7 +142,7 @@ namespace DOL.AI.Brain
                 }
             }
             //If the npc can move, and the npc is not casting, not moving, and not attacking or in combat
-            else if (Body.MaxSpeedBase > 0 && Body.CurrentSpellHandler == null && !Body.IsMoving && !Body.AttackState && !Body.InCombat)
+            else if (Body.MaxSpeedBase > 0 && Body.CurrentSpellHandler == null && !Body.IsMoving && !Body.AttackState && !Body.InCombat && !Body.IsMovingOnPath)
             {
                 //If the npc is not at it's spawn position, we tell it to walk to it's spawn position
                 //Satyr: If we use a tolerance to stop their Way back home we also need the same
@@ -172,7 +173,7 @@ namespace DOL.AI.Brain
             }
 
             //If we are not attacking, and not casting, and not moving, and we aren't facing our spawn heading, we turn to the spawn heading
-            if (!Body.InCombat && !Body.AttackState && !Body.IsCasting && !Body.IsMoving && Body.IsWithinRadius(Body.SpawnPoint, 500) == false)
+            if (!Body.IsMovingOnPath && !Body.InCombat && !Body.AttackState && !Body.IsCasting && !Body.IsMoving && Body.IsWithinRadius(Body.SpawnPoint, 500) == false)
             {
                 Body.WalkToSpawn(); // Mobs do not walk back at 2x their speed..
                 Body.IsReturningHome = false; // We are returning to spawn but not the long walk home, so aggro still possible
@@ -314,12 +315,12 @@ namespace DOL.AI.Brain
         /// <summary>
         /// List of livings that this npc has aggro on, living => aggroamount
         /// </summary>
-        protected readonly Hashtable m_aggroTable = new Hashtable();
+        protected readonly Dictionary<GameLiving, long> m_aggroTable = new Dictionary<GameLiving, long>();
 
         /// <summary>
         /// The aggression table for this mob
         /// </summary>
-        public Hashtable AggroTable
+        public Dictionary<GameLiving, long> AggroTable
         {
             get { return m_aggroTable; }
         }
@@ -350,7 +351,7 @@ namespace DOL.AI.Brain
             get
             {
                 bool hasAggro = false;
-                lock (m_aggroTable.SyncRoot)
+                lock ((m_aggroTable as ICollection).SyncRoot)
                 {
                     hasAggro = (m_aggroTable.Count > 0);
                 }
@@ -370,11 +371,11 @@ namespace DOL.AI.Brain
             // do not modify aggro list if dead
             if (!brain.Body.IsAlive) return;
 
-            lock (m_aggroTable.SyncRoot)
+            lock ((m_aggroTable as ICollection).SyncRoot)
             {
-                IDictionaryEnumerator dictEnum = m_aggroTable.GetEnumerator();
+                Dictionary<GameLiving, long>.Enumerator dictEnum = m_aggroTable.GetEnumerator();
                 while (dictEnum.MoveNext())
-                    brain.AddToAggroList((GameLiving)dictEnum.Key, Body.MaxHealth);
+                    brain.AddToAggroList(dictEnum.Current.Key, Body.MaxHealth);
             }
         }
 
@@ -449,11 +450,11 @@ namespace DOL.AI.Brain
 
                 if (player.Group != null)
                 { // player is in group, add whole group to aggro list
-                    lock (m_aggroTable.SyncRoot)
+                    lock ((m_aggroTable as ICollection).SyncRoot)
                     {
                         foreach (GamePlayer p in player.Group.GetPlayersInTheGroup())
                         {
-                            if (m_aggroTable[p] == null)
+                            if (!m_aggroTable.ContainsKey(p))
                             {
                                 m_aggroTable[p] = 1L;	// add the missing group member on aggro table
                             }
@@ -491,28 +492,22 @@ namespace DOL.AI.Brain
                         protect.ProtectSource.Out.SendMessage(LanguageMgr.GetTranslation(protect.ProtectSource.Client, "AI.Brain.StandardMobBrain.YouProtDist", player.GetName(0, false), Body.GetName(0, false)), eChatType.CT_System, eChatLoc.CL_SystemWindow);
                         //player.Out.SendMessage("You are protected by " + protect.ProtectSource.GetName(0, false) + " from " + Body.GetName(0, false) + ".", eChatType.CT_System, eChatLoc.CL_SystemWindow);
 
-                        lock (m_aggroTable.SyncRoot)
+                        lock ((m_aggroTable as ICollection).SyncRoot)
                         {
-                            if (m_aggroTable[protect.ProtectSource] != null)
-                            {
-                                long amount = (long)m_aggroTable[protect.ProtectSource];
-                                amount += protectAmount;
-                                m_aggroTable[protect.ProtectSource] = amount;
-                            }
+                            if (m_aggroTable.ContainsKey(protect.ProtectSource))
+                                m_aggroTable[protect.ProtectSource] += protectAmount;
                             else
-                            {
-                                m_aggroTable[protect.ProtectSource] = (long)protectAmount;
-                            }
+                                m_aggroTable[protect.ProtectSource] = protectAmount;
                         }
                     }
                 }
             }
 
-            lock (m_aggroTable.SyncRoot)
+            lock ((m_aggroTable as ICollection).SyncRoot)
             {
-                if (m_aggroTable[living] != null)
+                if (m_aggroTable.ContainsKey(living))
                 {
-                    long amount = (long)m_aggroTable[living];
+                    long amount = m_aggroTable[living];
                     amount += aggroamount;
 
                     // can't be removed this way, set to minimum
@@ -525,7 +520,7 @@ namespace DOL.AI.Brain
                 {
                     if (aggroamount > 0)
                     {
-                        m_aggroTable[living] = (long)aggroamount;
+                        m_aggroTable[living] = aggroamount;
                     }
                     else
                     {
@@ -542,11 +537,11 @@ namespace DOL.AI.Brain
         /// <returns></returns>
         public virtual long GetAggroAmountForLiving(GameLiving living)
         {
-            lock (m_aggroTable.SyncRoot)
+            lock ((m_aggroTable as ICollection).SyncRoot)
             {
-                if (m_aggroTable[living] != null)
+                if (m_aggroTable.ContainsKey(living))
                 {
-                    return (long)m_aggroTable[living];
+                    return m_aggroTable[living];
                 }
                 return 0;
             }
@@ -558,7 +553,7 @@ namespace DOL.AI.Brain
         /// <param name="living"></param>
         public virtual void RemoveFromAggroList(GameLiving living)
         {
-            lock (m_aggroTable.SyncRoot)
+            lock ((m_aggroTable as ICollection).SyncRoot)
             {
                 m_aggroTable.Remove(living);
             }
@@ -569,7 +564,7 @@ namespace DOL.AI.Brain
         /// </summary>
         public virtual void ClearAggroList()
         {
-            lock (m_aggroTable.SyncRoot)
+            lock ((m_aggroTable as ICollection).SyncRoot)
             {
                 m_aggroTable.Clear();
                 Body.TempProperties.removeProperty(Body.Attackers);
@@ -580,11 +575,11 @@ namespace DOL.AI.Brain
         /// Makes a copy of current aggro list
         /// </summary>
         /// <returns></returns>
-        public virtual Hashtable CloneAggroList()
+        public virtual Dictionary<GameLiving, long> CloneAggroList()
         {
-            lock (m_aggroTable.SyncRoot)
+            lock ((m_aggroTable as ICollection).SyncRoot)
             {
-                return (Hashtable)m_aggroTable.Clone();
+                return new Dictionary<GameLiving, long>(m_aggroTable);
             }
         }
 
@@ -614,14 +609,14 @@ namespace DOL.AI.Brain
         protected virtual GameLiving CalculateNextAttackTarget()
         {
             GameLiving maxAggroObject = null;
-            lock (m_aggroTable.SyncRoot)
+            lock ((m_aggroTable as ICollection).SyncRoot)
             {
                 double maxAggro = 0;
-                IDictionaryEnumerator aggros = m_aggroTable.GetEnumerator();
+                Dictionary<GameLiving, long>.Enumerator aggros = m_aggroTable.GetEnumerator();
                 List<GameLiving> removable = new List<GameLiving>();
                 while (aggros.MoveNext())
                 {
-                    GameLiving living = (GameLiving)aggros.Key;
+                    GameLiving living = aggros.Current.Key;
 
                     // check to make sure this target is still valid
                     if (living.IsAlive == false ||
@@ -638,7 +633,7 @@ namespace DOL.AI.Brain
                     if (living.EffectList.GetOfType<NecromancerShadeEffect>() != null)
                         continue;
 
-                    long amount = (long)aggros.Value;
+                    long amount = aggros.Current.Value;
 
                     if (living.IsAlive
                         && amount > maxAggro
@@ -686,12 +681,18 @@ namespace DOL.AI.Brain
                 return 0;
 
             // related to the pet owner if applicable
-            if (target is GamePet)
+            if (target is GameNPC)
             {
-                GamePlayer thisLiving = (((GamePet)target).Brain as IControlledBrain).GetPlayerOwner();
-                if (thisLiving != null)
-                    if (thisLiving.IsObjectGreyCon(Body))
-                        return 0;
+                IControlledBrain brain = ((GameNPC)target).Brain as IControlledBrain;
+                if (brain != null)
+                {
+                    GameLiving thisLiving = (((GameNPC)target).Brain as IControlledBrain).GetLivingOwner();
+                    if (thisLiving != null)
+                    {
+                        if (thisLiving.IsObjectGreyCon(Body))
+                            return 0;
+                    }
+                }
             }
 
             if (target.IsObjectGreyCon(Body)) return 0;	// only attack if green+ to target
@@ -701,7 +702,30 @@ namespace DOL.AI.Brain
                 GamePlayer player = (GamePlayer)target;
                 AggroLevel = Body.Faction.GetAggroToFaction(player);
             }
+            else if (Body.Faction != null && target is GameNPC)
+            {
+                GameNPC npc = (GameNPC)target;
+                if (npc.Faction != null)
+                {
+                    if (npc.Brain is IControlledBrain && (npc.Brain as IControlledBrain).GetPlayerOwner() != null)
+                    {
+                        GamePlayer factionChecker = (npc.Brain as IControlledBrain).GetPlayerOwner();
+                        AggroLevel = Body.Faction.GetAggroToFaction(factionChecker);
+                    }
+                    else
+                    {
+                        if (Body.Faction.EnemyFactions.Contains(npc.Faction))
+                            AggroLevel = 100;
+                    }
+                }
+            }
+
+            //we put this here to prevent aggroing non-factions npcs
+            if (target.Realm == eRealm.None && target is GameNPC)
+                return 0;
+
             if (AggroLevel >= 100) return 100;
+
             return AggroLevel;
         }
 
@@ -773,7 +797,7 @@ namespace DOL.AI.Brain
                 if (eArgs != null && eArgs.HealSource is GameLiving)
                 {
                     // first check to see if the healer is in our aggrolist so we don't go attacking anyone who heals
-                    if (m_aggroTable[(GameLiving)eArgs.HealSource] != null)
+                    if (m_aggroTable.ContainsKey(eArgs.HealSource as GameLiving))
                     {
                         if (eArgs.HealSource is GamePlayer || (eArgs.HealSource is GameNPC && (((GameNPC)eArgs.HealSource).Flags & GameNPC.eFlags.PEACE) == 0))
                         {
@@ -1020,21 +1044,62 @@ namespace DOL.AI.Brain
         /// <returns></returns>
         public virtual bool CheckSpells(eCheckSpellType type)
         {
-            if (this.Body != null && this.Body.Spells != null && this.Body.Spells.Count > 0 && !Body.IsCasting)
+            if (Body.IsCasting)
+                return true;
+
+            bool casted = false;
+
+            if (Body != null && Body.Spells != null && Body.Spells.Count > 0)
             {
-                bool casted = false;
+                ArrayList spell_rec = new ArrayList();
+                Spell tire = null;
+                bool needpet = false;
+                bool needheal = false;
+
                 if (type == eCheckSpellType.Defensive)
                 {
                     foreach (Spell spell in Body.Spells)
                     {
-                        if (!Body.IsBeingInterrupted && Body.GetSkillDisabledDuration(spell) == 0 && CheckDefensiveSpells(spell))
+                        if (Body.GetSkillDisabledDuration(spell) > 0) continue;
+                        if (spell.Target.ToLower() == "enemy" || spell.Target.ToLower() == "area" || spell.Target.ToLower() == "cone") continue;
+                        // If we have no pets
+                        if (Body.ControlledBrain == null)
                         {
-                            casted = true;
-                            break;
+                            if (spell.SpellType.ToLower() == "pet") continue;
+                            if (spell.SpellType.ToLower().Contains("summon"))
+                            {
+                                spell_rec.Add(spell);
+                                needpet = true;
+                            }
+                        }
+                        if (Body.ControlledBrain != null && Body.ControlledBrain.Body != null)
+                        {
+                            if (Util.Chance(30) && Body.ControlledBrain != null && spell.SpellType.ToLower() == "heal" &&
+                                Body.GetDistanceTo(Body.ControlledBrain.Body) <= spell.Range &&
+                                Body.ControlledBrain.Body.HealthPercent < 60 && spell.Target.ToLower() != "self")
+                            {
+                                spell_rec.Add(spell);
+                                needheal = true;
+                            }
+                            if (LivingHasEffect(Body.ControlledBrain.Body, spell) && (spell.Target.ToLower() != "self")) continue;
+                        }
+                        if (!needpet && !needheal)
+                            spell_rec.Add(spell);
+                    }
+                    if (spell_rec.Count > 0)
+                    {
+                        tire = (Spell)spell_rec[Util.Random((spell_rec.Count - 1))];
+                        if (!Body.IsReturningToSpawnPoint)
+                        {
+                            if (tire.Uninterruptible && CheckDefensiveSpells(tire))
+                                casted = true;
+                            else
+                                if (!Body.IsBeingInterrupted && CheckDefensiveSpells(tire))
+                                    casted = true;
                         }
                     }
                 }
-                else
+                else if (type == eCheckSpellType.Offensive)
                 {
                     foreach (Spell spell in Body.Spells)
                     {
@@ -1042,24 +1107,26 @@ namespace DOL.AI.Brain
                         {
                             if (spell.CastTime > 0)
                             {
-                                if (!Body.IsBeingInterrupted && Body.CurrentRegion.Time - Body.LastAttackedByEnemyTick > 10 * 1000 && Util.Chance(50) && CheckOffensiveSpells(spell))
-                                {
-                                    casted = true;
-                                    break;
-                                }
-                            }
-                            else
-                            {
-                                CheckInstantSpells(spell);
+                                if (spell.Target.ToLower() == "enemy" || spell.Target.ToLower() == "area" || spell.Target.ToLower() == "cone")
+                                    spell_rec.Add(spell);
                             }
                         }
                     }
+                    if (spell_rec.Count > 0)
+                    {
+                        tire = (Spell)spell_rec[Util.Random((spell_rec.Count - 1))];
+
+                        if (tire.Uninterruptible && CheckOffensiveSpells(tire))
+                            casted = true;
+                        else
+                            if (!Body.IsBeingInterrupted && CheckOffensiveSpells(tire))
+                                casted = true;
+                    }
                 }
-                if (this is IControlledBrain && !Body.AttackState)
-                    ((IControlledBrain)this).Follow(((IControlledBrain)this).Owner);
+
                 return casted;
             }
-            return false;
+            return casted;
         }
 
         /// <summary>
@@ -1107,9 +1174,14 @@ namespace DOL.AI.Brain
                     {
                         // Buff self, if not in melee, but not each and every mob
                         // at the same time, because it looks silly.
-                        if (!LivingHasEffect(Body, spell) && !Body.AttackState && Util.Chance(40))
+                        if (!LivingHasEffect(Body, spell) && !Body.AttackState && Util.Chance(40) && spell.Target.ToLower() != "pet")
                         {
                             Body.TargetObject = Body;
+                            break;
+                        }
+                        if (Body.ControlledBrain != null && Body.ControlledBrain.Body != null && Util.Chance(40) && Body.GetDistanceTo(Body.ControlledBrain.Body) <= spell.Range && !LivingHasEffect(Body.ControlledBrain.Body, spell) && spell.Target.ToLower() != "self")
+                        {
+                            Body.TargetObject = Body.ControlledBrain.Body;
                             break;
                         }
                         break;
@@ -1120,14 +1192,30 @@ namespace DOL.AI.Brain
                 #region Disease Cure/Poison Cure/Summon
 
                 case "CureDisease":
-                    if (!Body.IsDiseased)
+                    if (Body.IsDiseased)
+                    {
+                        Body.TargetObject = Body;
                         break;
-                    Body.TargetObject = Body;
+                    }
+                    if (Body.ControlledBrain != null && Body.ControlledBrain.Body != null && Body.ControlledBrain.Body.IsDiseased
+&& Body.GetDistanceTo(Body.ControlledBrain.Body) <= spell.Range && spell.Target.ToLower() != "self")
+                    {
+                        Body.TargetObject = Body.ControlledBrain.Body;
+                        break;
+                    }
                     break;
                 case "CurePoison":
-                    if (!LivingIsPoisoned(Body))
+                    if (LivingIsPoisoned(Body))
+                    {
+                        Body.TargetObject = Body;
                         break;
-                    Body.TargetObject = Body;
+                    }
+                    if (Body.ControlledBrain != null && Body.ControlledBrain.Body != null && LivingIsPoisoned(Body.ControlledBrain.Body)
+&& Body.GetDistanceTo(Body.ControlledBrain.Body) <= spell.Range && spell.Target.ToLower() != "self")
+                    {
+                        Body.TargetObject = Body.ControlledBrain.Body;
+                        break;
+                    }
                     break;
                 case "Summon":
                     Body.TargetObject = Body;
@@ -1160,15 +1248,36 @@ namespace DOL.AI.Brain
                 case "Heal":
                     // Chance to heal self when dropping below 30%, do NOT spam it.
 
-                    if (Body.HealthPercent < 30 && Util.Chance(10))
+                    if (Body.HealthPercent < 30 && Util.Chance(10) && spell.Target.ToLower() != "pet")
                     {
                         Body.TargetObject = Body;
                         break;
                     }
 
+                    if (Body.ControlledBrain != null && Body.ControlledBrain.Body != null
+                        && Body.GetDistanceTo(Body.ControlledBrain.Body) <= spell.Range && Body.ControlledBrain.Body.HealthPercent < 60 && spell.Target.ToLower() != "self")
+                    {
+                        Body.TargetObject = Body.ControlledBrain.Body;
+                        break;
+                    }
                     break;
 
                 #endregion Heals
+
+                //case "SummonAnimistFnF":
+                //case "SummonAnimistPet":
+                case "SummonCommander":
+                case "SummonDruidPet":
+                case "SummonHunterPet":
+                case "SummonNecroPet":
+                case "SummonUnderhill":
+                case "SummonSimulacrum":
+                case "SummonSpiritFighter":
+                    //case "SummonTheurgistPet":
+                    if (Body.ControlledBrain != null)
+                        break;
+                    Body.TargetObject = Body;
+                    break;
             }
 
             if (Body.TargetObject != null)
@@ -1356,9 +1465,17 @@ namespace DOL.AI.Brain
         {
             get
             {
+                /* Roaming:
+                   <0 means random range
+                   0 means no roaming
+                   >0 means range of roaming
+                   defaut roaming range is defined in CanRandomWalk method
+                */
                 if (!DOL.GS.ServerProperties.Properties.ALLOW_ROAM)
                     return false;
                 if (Body.RoamingRange == 0)
+                    return false;
+                if (!string.IsNullOrWhiteSpace(Body.PathID))
                     return false;
                 return true;
             }
@@ -1387,5 +1504,32 @@ namespace DOL.AI.Brain
         }
 
         #endregion Random Walk
+
+        #region DetectDoor
+
+        public virtual void DetectDoor()
+        {
+            ushort range = (ushort)((ThinkInterval / 800) * Body.CurrentWayPoint.MaxSpeed);
+
+            foreach (IDoor door in Body.CurrentRegion.GetDoorsInRadius(Body.X, Body.Y, Body.Z, range, false))
+            {
+                if (door is GameKeepDoor)
+                {
+                    if (Body.Realm != door.Realm) return;
+                    door.Open();
+                    //Body.Say("GameKeep Door is near by");
+                    //somebody can insert here another action for GameKeep Doors
+                    return;
+                }
+                else
+                {
+                    door.Open();
+                    return;
+                }
+            }
+            return;
+        }
+
+        #endregion DetectDoor
     }
 }

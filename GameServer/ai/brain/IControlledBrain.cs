@@ -86,6 +86,10 @@ namespace DOL.AI.Brain
 
         GamePlayer GetPlayerOwner();
 
+        GameNPC GetNPCOwner();
+
+        GameLiving GetLivingOwner();
+
         void SetAggressionState(eAggressionState state);
 
         bool IsMainPet { get; set; }

@@ -19,6 +19,7 @@
 
 using System;
 using System.Collections;
+using System.Collections.Generic;
 using System.Reflection;
 using DOL.Events;
 using DOL.GS;
@@ -84,7 +85,13 @@ namespace DOL.AI.Brain
             if (CheckTether())
             {
                 Body.StopFollowing();
-                ClearAggroList();
+                GameDragon dragon = Body as GameDragon;
+                if (dragon != null)
+                {
+                    dragon.PrepareToStun();
+                }
+
+                // ClearAggroList();
                 Body.WalkToSpawn();
                 return;
             }
@@ -288,11 +295,12 @@ namespace DOL.AI.Brain
 
             ArrayList inRangeLiving = new ArrayList();
 
-            lock (m_aggroTable.SyncRoot)
+            lock ((m_aggroTable as ICollection).SyncRoot)
             {
-                foreach (DictionaryEntry dictEntry in m_aggroTable)
+                Dictionary<GameLiving, long>.Enumerator enumerator = m_aggroTable.GetEnumerator();
+                while (enumerator.MoveNext())
                 {
-                    GameLiving living = dictEntry.Key as GameLiving;
+                    GameLiving living = enumerator.Current.Key;
                     if (living != null &&
                         living.IsAlive &&
                         living.EffectList.GetOfType<NecromancerShadeEffect>() == null &&

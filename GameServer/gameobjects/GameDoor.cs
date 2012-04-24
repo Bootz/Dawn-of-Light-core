@@ -123,7 +123,7 @@ namespace DOL.GS
         /// <summary>
         /// door open = 0 / lock = 1
         /// </summary>
-        public int Locked
+        public virtual int Locked
         {
             get { return m_locked; }
             set { m_locked = value; }
@@ -137,7 +137,7 @@ namespace DOL.GS
         /// <summary>
         /// door index which is unique
         /// </summary>
-        public int DoorID
+        public virtual int DoorID
         {
             get { return m_doorID; }
             set { m_doorID = value; }
@@ -146,7 +146,7 @@ namespace DOL.GS
         /// <summary>
         /// Get the ZoneID of this door
         /// </summary>
-        public ushort ZoneID
+        public virtual ushort ZoneID
         {
             get { return (ushort)(DoorID / 1000000); }
         }
@@ -156,7 +156,7 @@ namespace DOL.GS
         /// <summary>
         /// Door Type
         /// </summary>
-        public int Type
+        public virtual int Type
         {
             get { return m_type; }
             set { m_type = value; }
@@ -165,7 +165,7 @@ namespace DOL.GS
         /// <summary>
         /// This is used to identify what sound a door makes when open / close
         /// </summary>
-        public uint Flag
+        public virtual uint Flag
         {
             get { return m_flags; }
             set { m_flags = value; }
@@ -179,7 +179,7 @@ namespace DOL.GS
         /// <summary>
         /// The state of door (open or close)
         /// </summary>
-        public eDoorState State
+        public virtual eDoorState State
         {
             get { return m_state; }
             set
@@ -203,7 +203,7 @@ namespace DOL.GS
         /// <summary>
         /// Call this function to open the door
         /// </summary>
-        public void Open()
+        public virtual void Open(GameLiving opener = null)
         {
             if (Locked == 0)
                 this.State = eDoorState.Open;
@@ -221,7 +221,7 @@ namespace DOL.GS
             }
         }
 
-        public byte Status
+        public virtual byte Status
         {
             get
             {
@@ -233,7 +233,7 @@ namespace DOL.GS
         /// <summary>
         /// Call this function to close the door
         /// </summary>
-        public void Close()
+        public virtual void Close(GameLiving closer = null)
         {
             if (!m_openDead)
                 this.State = eDoorState.Closed;
@@ -245,7 +245,7 @@ namespace DOL.GS
         /// </summary>
         /// <param name="npc"></param>
         /// <param name="open"></param>
-        public void NPCManipulateDoorRequest(GameNPC npc, bool open)
+        public virtual void NPCManipulateDoorRequest(GameNPC npc, bool open)
         {
             npc.TurnTo(this.X, this.Y);
             if (open && m_state != eDoorState.Open)
@@ -317,7 +317,7 @@ namespace DOL.GS
 
         private static long m_healthregentimer = 0;
 
-        public void RegenDoorHealth()
+        public virtual void RegenDoorHealth()
         {
             Health = 0;
             if (Locked == 0)
@@ -327,7 +327,7 @@ namespace DOL.GS
             m_timer = new Timer(new TimerCallback(StartHealthRegen), null, 0, 1000);
         }
 
-        public void StartHealthRegen(object param)
+        public virtual void StartHealthRegen(object param)
         {
             if (HealthPercent >= 40)
             {

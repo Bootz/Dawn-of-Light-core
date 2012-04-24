@@ -1,3 +1,5 @@
+//#define MonitorCallbacks
+//#define CollectStatistic
 /*
  * DAWN OF LIGHT - The first free open source DAoC server emulator
  *
@@ -16,8 +18,6 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
  */
-//#define MonitorCallbacks
-//#define CollectStatistic
 
 using System;
 using System.Diagnostics;

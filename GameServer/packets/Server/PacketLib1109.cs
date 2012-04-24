@@ -111,6 +111,9 @@ namespace DOL.GS.PacketHandler
                 return;
             }
 
+            // Create a GameInventoryItem so item will display correctly in inventory window
+            item = GameInventoryItem.Create<InventoryItem>(item);
+
             pak.WriteByte((byte)item.Level);
 
             int value1; // some object types use this field to display count
@@ -245,7 +248,7 @@ namespace DOL.GS.PacketHandler
                 name = item.Count + " " + name;
             if (item.SellPrice > 0)
             {
-                if (ConsignmentMoney.UseBP)
+                if (ServerProperties.Properties.CONSIGNMENT_USE_BP)
                     name += "[" + item.SellPrice.ToString() + " BP]";
                 else
                     name += "[" + Money.GetShortString(item.SellPrice) + "]";

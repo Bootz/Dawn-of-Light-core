@@ -18,6 +18,7 @@
  */
 
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using DOL.Database;
 using DOL.GS.Housing;
@@ -31,13 +32,6 @@ namespace DOL.GS
     public class GameHouseVault : GameVault, IHouseHookpointItem
     {
         private static readonly log4net.ILog log = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
-
-        /// <summary>
-        /// This list holds all the players that are currently viewing
-        /// the vault; it is needed to update the contents of the vault
-        /// for any one observer if there is a change.
-        /// </summary>
-        private readonly Dictionary<string, GamePlayer> _observers = new Dictionary<string, GamePlayer>();
 
         private readonly string _templateID;
         private readonly object _vaultLock = new object();
@@ -148,7 +142,7 @@ namespace DOL.GS
             {
                 foreach (GamePlayer observer in _observers.Values)
                 {
-                    observer.ActiveVault = null;
+                    observer.ActiveInventoryObject = null;
                 }
 
                 _observers.Clear();
@@ -162,9 +156,28 @@ namespace DOL.GS
 
         #endregion IHouseHookpointItem Members
 
-        public override string GetOwner(GamePlayer player)
+        public override string GetOwner(GamePlayer player = null)
         {
             return CurrentHouse.DatabaseItem.OwnerID;
+        }
+
+        public override IList GetExamineMessages(GamePlayer player)
+        {
+            IList list = new ArrayList();
+            list.Add("[Right click to display the contents of house vault " + (m_vaultIndex + 1) + "]");
+            return list;
+        }
+
+        public override string Name
+        {
+            get
+            {
+                return base.Name + " " + (m_vaultIndex + 1);
+            }
+            set
+            {
+                base.Name = value;
+            }
         }
 
         /// <summary>
@@ -199,12 +212,13 @@ namespace DOL.GS
         protected override void NotifyObservers(GamePlayer player, IDictionary<int, InventoryItem> updateItems)
         {
             var inactiveList = new List<string>();
+            bool hasUpdatedPlayer = false;
 
             lock (_vaultLock)
             {
                 foreach (GamePlayer observer in _observers.Values)
                 {
-                    if (observer.ActiveVault != this)
+                    if (observer.ActiveInventoryObject != this)
                     {
                         inactiveList.Add(observer.Name);
                         continue;
@@ -212,19 +226,28 @@ namespace DOL.GS
 
                     if (!IsWithinRadius(observer, WorldMgr.INFO_DISTANCE))
                     {
-                        observer.ActiveVault = null;
+                        observer.ActiveInventoryObject = null;
                         inactiveList.Add(observer.Name);
 
                         continue;
                     }
 
-                    observer.Client.Out.SendInventoryItemsUpdate(updateItems, 0);
+                    observer.Client.Out.SendInventoryItemsUpdate(updateItems, PacketHandler.eInventoryWindowType.Update);
+
+                    if (observer == player)
+                        hasUpdatedPlayer = true;
                 }
 
                 // now remove all inactive observers.
                 foreach (string observerName in inactiveList)
                 {
                     _observers.Remove(observerName);
+                }
+
+                // The above code is suspect, it seems to work 80% of the time, so let's make sure we update the player doing the move - Tolakram
+                if (hasUpdatedPlayer == false)
+                {
+                    player.Client.Out.SendInventoryItemsUpdate(updateItems, PacketHandler.eInventoryWindowType.Update);
                 }
             }
         }

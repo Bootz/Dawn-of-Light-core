@@ -26,6 +26,8 @@ namespace DOL.GS.RealmAbilities
 {
     public class ArrowSummoningAbility : TimedRealmAbility
     {
+        private static readonly log4net.ILog log = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
+
         public ArrowSummoningAbility(DBAbility dba, int level) : base(dba, level) { }
 
         public override void Execute(GameLiving living)
@@ -99,6 +101,9 @@ namespace DOL.GS.RealmAbilities
         [ScriptLoadedEvent]
         public static void OnScriptLoaded(DOLEvent e, object sender, EventArgs args)
         {
+            if (!ServerProperties.Properties.LOAD_ARROW_SUMMONING)
+                return;
+
             ItemTemplate arrow_summoning1 = GameServer.Database.FindObjectByKey<ItemTemplate>("arrow_summoning1");
             if (arrow_summoning1 == null)
             {

@@ -1,3 +1,5 @@
+using DOL.Database;
+
 /*
  * DAWN OF LIGHT - The first free open source DAoC server emulator
  *
@@ -18,7 +20,6 @@
  */
 
 using log4net;
-using DOL.Database;
 
 namespace DOL.GS.DatabaseConverters
 {
@@ -66,7 +67,7 @@ namespace DOL.GS.DatabaseConverters
                     Zone zone = region.GetZone(mob.X, mob.Y);
                     if (zone != null)
                     {
-                        mob.Realm = (byte)zone.GetRealm();
+                        mob.Realm = (byte)zone.Realm;
                     }
                 }
 

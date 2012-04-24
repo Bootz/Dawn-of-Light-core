@@ -34,6 +34,7 @@ using DOL.GS.Quests;
 using DOL.GS.RealmAbilities;
 using DOL.GS.Spells;
 using DOL.GS.Styles;
+using DOL.Language;
 using log4net;
 
 namespace DOL.GS.PacketHandler
@@ -68,7 +69,7 @@ namespace DOL.GS.PacketHandler
             {
                 //Enable encryption
 #if !NOENCRYPTION
-                pak.WriteByte(0x01);
+				pak.WriteByte(0x01);
 #else
                 pak.WriteByte(0x00);
 #endif
@@ -83,12 +84,12 @@ namespace DOL.GS.PacketHandler
                 pak.WriteByte(0x00);
 
 #if !NOENCRYPTION
-                byte[] publicKey = new byte[500];
-                UInt32 keyLen = CryptLib168.ExportRSAKey(publicKey, (UInt32) 500, false);
-                pak.WriteShort((ushort) keyLen);
-                pak.Write(publicKey, 0, (int) keyLen);
-                //From now on we expect RSA!
-                ((PacketEncoding168) m_gameClient.PacketProcessor.Encoding).EncryptionState = PacketEncoding168.eEncryptionState.RSAEncrypted;
+				byte[] publicKey = new byte[500];
+				UInt32 keyLen = CryptLib168.ExportRSAKey(publicKey, (UInt32) 500, false);
+				pak.WriteShort((ushort) keyLen);
+				pak.Write(publicKey, 0, (int) keyLen);
+				//From now on we expect RSA!
+				((PacketEncoding168) m_gameClient.PacketProcessor.Encoding).EncryptionState = PacketEncoding168.eEncryptionState.RSAEncrypted;
 #endif
 
                 SendTCP(pak);
@@ -230,11 +231,27 @@ namespace DOL.GS.PacketHandler
                                             continue;
 
                                         description = area.Description;
+
+                                        DataObject translation = LanguageMgr.GetTranslation(m_gameClient, area);
+                                        if (translation != null)
+                                        {
+                                            if (!Util.IsEmpty(((DBLanguageArea)translation).ScreenDescription)) // Thats correct!
+                                                description = ((DBLanguageArea)translation).ScreenDescription;
+                                        }
                                         break;
                                     }
 
                                     if (description == "")
+                                    {
                                         description = zon.Description;
+
+                                        DataObject translation = LanguageMgr.GetTranslation(m_gameClient, zon);
+                                        if (translation != null)
+                                        {
+                                            if (!Util.IsEmpty(((DBLanguageZone)translation).ScreenDescription)) // Thats correct!
+                                                description = ((DBLanguageZone)translation).ScreenDescription;
+                                        }
+                                    }
 
                                     pak.FillString(description, 24);
                                 }
@@ -924,7 +941,28 @@ namespace DOL.GS.PacketHandler
                     (obj as GameStaticItemTimed).IsOwner(m_gameClient.Player))
                     flag |= 0x04;
                 pak.WriteShort((ushort)flag);
-                pak.WritePascalString(obj.Name);
+
+                string name = obj.Name;
+                DataObject translation = null;
+                if (obj is GameStaticItem)
+                {
+                    translation = LanguageMgr.GetTranslation(m_gameClient, (GameStaticItem)obj);
+                    if (translation != null)
+                    {
+                        if (obj is WorldInventoryItem)
+                        {
+                            //if (!Util.IsEmpty(((DBLanguageItem)translation).Name))
+                            //    name = ((DBLanguageItem)translation).Name;
+                        }
+                        else
+                        {
+                            if (!Util.IsEmpty(((DBLanguageGameObject)translation).Name))
+                                name = ((DBLanguageGameObject)translation).Name;
+                        }
+                    }
+                }
+                pak.WritePascalString(name);
+
                 if (obj is IDoor)
                 {
                     pak.WriteByte(4);
@@ -1037,9 +1075,19 @@ namespace DOL.GS.PacketHandler
                         add += "-NON"; // indicates NON flag for GMs
                 }
 
-                DBLanguageNPC translation = npc.GetTranslation(m_gameClient);
+                string name = npc.Name;
+                string guildName = npc.GuildName;
 
-                string name = translation.Name;/*npc.Name;*/
+                DataObject translation = LanguageMgr.GetTranslation(m_gameClient, npc);
+                if (translation != null)
+                {
+                    if (!Util.IsEmpty(((DBLanguageNPC)translation).Name))
+                        name = ((DBLanguageNPC)translation).Name;
+
+                    if (!Util.IsEmpty(((DBLanguageNPC)translation).GuildName))
+                        guildName = ((DBLanguageNPC)translation).GuildName;
+                }
+
                 if (name.Length + add.Length + 2 > 47) // clients crash with too long names
                     name = name.Substring(0, 47 - add.Length - 2);
                 if (add.Length > 0)
@@ -1047,17 +1095,12 @@ namespace DOL.GS.PacketHandler
 
                 pak.WritePascalString(name);
 
-                //if (npc.GuildName.Length > 47)
-                //    pak.WritePascalString(npc.GuildName.Substring(0, 47));
-                //else pak.WritePascalString(npc.GuildName);
-
-                string guildName = translation.GuildName;
                 if (guildName.Length > 47)
                     guildName = guildName.Substring(0, 47);
 
                 pak.WritePascalString(guildName);
-                pak.WriteByte(0x00);
 
+                pak.WriteByte(0x00);
                 SendTCP(pak);
             }
         }
@@ -1678,26 +1721,26 @@ namespace DOL.GS.PacketHandler
             }
         }
 
-        public virtual void SendInventoryItemsUpdate(IDictionary<int, InventoryItem> updateItems, byte windowType)
+        public virtual void SendInventoryItemsUpdate(IDictionary<int, InventoryItem> updateItems, eInventoryWindowType windowType)
         {
         }
 
-        protected virtual void SendInventoryItemsPartialUpdate(IDictionary<int, InventoryItem> items, byte windowType)
+        protected virtual void SendInventoryItemsPartialUpdate(IDictionary<int, InventoryItem> items, eInventoryWindowType windowType)
         {
         }
 
         public virtual void SendInventoryItemsUpdate(ICollection<InventoryItem> itemsToUpdate)
         {
-            SendInventoryItemsUpdate(0, itemsToUpdate);
+            SendInventoryItemsUpdate(eInventoryWindowType.Update, itemsToUpdate);
         }
 
-        public virtual void SendInventoryItemsUpdate(byte preAction, ICollection<InventoryItem> itemsToUpdate)
+        public virtual void SendInventoryItemsUpdate(eInventoryWindowType windowType, ICollection<InventoryItem> itemsToUpdate)
         {
             if (m_gameClient.Player == null)
                 return;
             if (itemsToUpdate == null)
             {
-                SendInventorySlotsUpdateRange(null, preAction);
+                SendInventorySlotsUpdateRange(null, windowType);
                 return;
             }
 
@@ -1712,14 +1755,14 @@ namespace DOL.GS.PacketHandler
                 slotsToUpdate.Add(item.SlotPosition);
                 if (slotsToUpdate.Count >= ServerProperties.Properties.MAX_ITEMS_PER_PACKET)
                 {
-                    SendInventorySlotsUpdateRange(slotsToUpdate, preAction);
+                    SendInventorySlotsUpdateRange(slotsToUpdate, windowType);
                     slotsToUpdate.Clear();
-                    preAction = 0;
+                    windowType = eInventoryWindowType.Update;
                 }
             }
             if (slotsToUpdate.Count > 0)
             {
-                SendInventorySlotsUpdateRange(slotsToUpdate, preAction);
+                SendInventorySlotsUpdateRange(slotsToUpdate, windowType);
             }
         }
 
@@ -3086,11 +3129,15 @@ namespace DOL.GS.PacketHandler
 
         public virtual void SendExitHouse(House house, ushort unknown = 0)
         {
-            using (var pak = new GSTCPPacketOut(GetPacketCode(eServerPackets.HouseExit)))
+            // do not send anything if client is leaving house due to linkdeath
+            if (m_gameClient != null && m_gameClient.Player != null && m_gameClient.ClientState != GameClient.eClientState.Linkdead)
             {
-                pak.WriteShort((ushort)house.HouseNumber);
-                pak.WriteShort(unknown);
-                SendTCP(pak);
+                using (var pak = new GSTCPPacketOut(GetPacketCode(eServerPackets.HouseExit)))
+                {
+                    pak.WriteShort((ushort)house.HouseNumber);
+                    pak.WriteShort(unknown);
+                    SendTCP(pak);
+                }
             }
         }
 
@@ -3239,9 +3286,16 @@ namespace DOL.GS.PacketHandler
                 pak.WriteShort(0);
                 pak.WriteInt(0);
 
-                DBLanguageNPC translation = obj.GetTranslation(m_gameClient);
+                string name = obj.Name;
 
-                pak.WritePascalString(translation.Name);/*pak.WritePascalString(obj.Name);*/
+                DataObject translation = LanguageMgr.GetTranslation(m_gameClient, obj);
+                if (translation != null)
+                {
+                    if (!Util.IsEmpty(((DBLanguageNPC)translation).Name))
+                        name = ((DBLanguageNPC)translation).Name;
+                }
+
+                pak.WritePascalString(name);/*pak.WritePascalString(obj.Name);*/
                 pak.WriteByte(0); // trailing ?
                 SendTCP(pak);
             }
@@ -3263,9 +3317,16 @@ namespace DOL.GS.PacketHandler
                 pak.WriteShort((ushort)time); // time (?)
                 pak.WriteInt((uint)siegeWeapon.ObjectID);
 
-                DBLanguageNPC translation = siegeWeapon.GetTranslation(m_gameClient);
+                string name = siegeWeapon.Name;
 
-                pak.WritePascalString(translation.Name + " (" + siegeWeapon.CurrentState + ")");
+                DataObject translation = LanguageMgr.GetTranslation(m_gameClient, siegeWeapon);
+                if (translation != null)
+                {
+                    if (!Util.IsEmpty(((DBLanguageNPC)translation).Name))
+                        name = ((DBLanguageNPC)translation).Name;
+                }
+
+                pak.WritePascalString(name + " (" + siegeWeapon.CurrentState + ")");
                 foreach (InventoryItem item in siegeWeapon.Ammo)
                 {
                     pak.WriteByte((byte)item.SlotPosition);
@@ -3453,96 +3514,90 @@ namespace DOL.GS.PacketHandler
 
         public virtual void SendMarketExplorerWindow(IList<InventoryItem> items, byte page, byte maxpage)
         {
+            if (m_gameClient == null || m_gameClient.Player == null)
+                return;
+
             using (var pak = new GSTCPPacketOut(GetPacketCode(eServerPackets.MarketExplorerWindow)))
             {
-                pak.WriteByte((byte)(page < items.Count / 20 ? 20 : items.Count % 20));
+                pak.WriteByte((byte)items.Count);
                 pak.WriteByte(page);
                 pak.WriteByte(maxpage);
                 pak.WriteByte(0);
-
-                InventoryItem item;
-
-                int lastindex = 19 + (page * 20);
-                for (int index = 0 + (page * 20); index < lastindex; index++)
+                foreach (InventoryItem item in items)
                 {
-                    if (items[index] != null)
+                    pak.WriteByte((byte)items.IndexOf(item));
+                    pak.WriteByte((byte)item.Level);
+                    int value1; // some object types use this field to display count
+                    int value2; // some object types use this field to display count
+                    switch (item.Object_Type)
                     {
-                        item = items[index];
-                        pak.WriteByte((byte)index);
-                        pak.WriteByte((byte)item.Level);
-                        int value1; // some object types use this field to display count
-                        int value2; // some object types use this field to display count
-                        switch (item.Object_Type)
-                        {
-                            case (int)eObjectType.Arrow:
-                            case (int)eObjectType.Bolt:
-                            case (int)eObjectType.Poison:
-                            case (int)eObjectType.GenericItem:
-                                value1 = item.PackSize;
-                                value2 = item.SPD_ABS;
-                                break;
-                            case (int)eObjectType.Thrown:
-                                value1 = item.DPS_AF;
-                                value2 = item.PackSize;
-                                break;
-                            case (int)eObjectType.Instrument:
-                                value1 = (item.DPS_AF == 2 ? 0 : item.DPS_AF); // 0x00 = Lute ; 0x01 = Drum ; 0x03 = Flute
-                                value2 = 0;
-                                break; // unused
-                            case (int)eObjectType.Shield:
-                                value1 = item.Type_Damage;
-                                value2 = item.DPS_AF;
-                                break;
-                            case (int)eObjectType.GardenObject:
-                            case (int)eObjectType.HouseWallObject:
-                            case (int)eObjectType.HouseFloorObject:
-                                value1 = 0;
-                                value2 = item.SPD_ABS;
-                                break;
-                            default:
-                                value1 = item.DPS_AF;
-                                value2 = item.SPD_ABS;
-                                break;
-                        }
-                        pak.WriteByte((byte)value1);
-                        pak.WriteByte((byte)value2);
-                        if (items[index].Object_Type == (int)eObjectType.GardenObject)
-                            pak.WriteByte((byte)(item.DPS_AF));
-                        else
-                            pak.WriteByte((byte)(item.Hand << 6));
-                        pak.WriteByte((byte)((item.Type_Damage > 3 ? 0 : item.Type_Damage << 6) | item.Object_Type));
-                        pak.WriteByte((byte)(m_gameClient.Player.HasAbilityToUseItem(item.Template) ? 0 : 1));
-                        pak.WriteShort((ushort)(item.PackSize > 1 ? item.Weight * item.PackSize : item.Weight));
-                        pak.WriteByte(item.ConditionPercent);
-                        pak.WriteByte(item.DurabilityPercent);
-                        pak.WriteByte((byte)item.Quality);
-                        pak.WriteByte((byte)item.Bonus);
-                        pak.WriteShort((ushort)item.Model);
-                        if (item.Emblem != 0)
-                            pak.WriteShort((ushort)item.Emblem);
-                        else
-                            pak.WriteShort((ushort)item.Color);
-                        pak.WriteShort((byte)item.Effect);
-                        pak.WriteShort(item.OwnerLot); //lot
-                        pak.WriteInt((uint)item.SellPrice);
+                        case (int)eObjectType.Arrow:
+                        case (int)eObjectType.Bolt:
+                        case (int)eObjectType.Poison:
+                        case (int)eObjectType.GenericItem:
+                            value1 = item.PackSize;
+                            value2 = item.SPD_ABS; break;
+                        case (int)eObjectType.Thrown:
+                            value1 = item.DPS_AF;
+                            value2 = item.PackSize; break;
+                        case (int)eObjectType.Instrument:
+                            value1 = (item.DPS_AF == 2 ? 0 : item.DPS_AF); // 0x00 = Lute ; 0x01 = Drum ; 0x03 = Flute
+                            value2 = 0; break; // unused
+                        case (int)eObjectType.Shield:
+                            value1 = item.Type_Damage;
+                            value2 = item.DPS_AF; break;
+                        case (int)eObjectType.GardenObject:
+                        case (int)eObjectType.HouseWallObject:
+                        case (int)eObjectType.HouseFloorObject:
+                            value1 = 0;
+                            value2 = item.SPD_ABS; break;
+                        default:
+                            value1 = item.DPS_AF;
+                            value2 = item.SPD_ABS; break;
+                    }
+                    pak.WriteByte((byte)value1);
+                    pak.WriteByte((byte)value2);
+                    if (item.Object_Type == (int)eObjectType.GardenObject)
+                        pak.WriteByte((byte)(item.DPS_AF));
+                    else
+                        pak.WriteByte((byte)(item.Hand << 6));
+                    pak.WriteByte((byte)((item.Type_Damage > 3 ? 0 : item.Type_Damage << 6) | item.Object_Type));
+                    pak.WriteByte((byte)(m_gameClient.Player.HasAbilityToUseItem(item.Template) ? 0 : 1));
+                    pak.WriteShort((ushort)(item.PackSize > 1 ? item.Weight * item.PackSize : item.Weight));
+                    pak.WriteByte((byte)item.ConditionPercent);
+                    pak.WriteByte((byte)item.DurabilityPercent);
+                    pak.WriteByte((byte)item.Quality);
+                    pak.WriteByte((byte)item.Bonus);
+                    pak.WriteShort((ushort)item.Model);
+                    if (item.Emblem != 0)
+                        pak.WriteShort((ushort)item.Emblem);
+                    else
+                        pak.WriteShort((ushort)item.Color);
+                    pak.WriteShort((byte)item.Effect);
+                    pak.WriteShort(item.OwnerLot);//lot
+                    pak.WriteInt((uint)item.SellPrice);
 
-                        if (ConsignmentMoney.UseBP)
-                        {
-                            string bpPrice = "";
-                            if (item.SellPrice > 0)
-                                bpPrice = "[" + item.SellPrice + " BP";
-                            if (item.PackSize > 1)
-                                pak.WritePascalString(item.PackSize + " " + item.Name + bpPrice);
-                            else
-                                pak.WritePascalString(item.Name + bpPrice);
-                        }
+                    if (ServerProperties.Properties.CONSIGNMENT_USE_BP)
+                    {
+                        string bpPrice = "";
+                        if (item.SellPrice > 0)
+                            bpPrice = "[" + item.SellPrice.ToString() + " BP";
+
+                        if (item.Count > 1)
+                            pak.WritePascalString(item.Count + " " + item.Name);
+                        else if (item.PackSize > 1)
+                            pak.WritePascalString(item.PackSize + " " + item.Name + bpPrice);
                         else
-                        {
-                            if (item.PackSize > 1)
-                                pak.WritePascalString(item.PackSize + " " + item.Name);
-                            else
-                                pak.WritePascalString(item.Name);
-                        }
+                            pak.WritePascalString(item.Name + bpPrice);
+                    }
+                    else
+                    {
+                        if (item.Count > 1)
+                            pak.WritePascalString(item.Count + " " + item.Name);
+                        else if (item.PackSize > 1)
+                            pak.WritePascalString(item.PackSize + " " + item.Name);
+                        else
+                            pak.WritePascalString(item.Name);
                     }
                 }
 
@@ -3596,15 +3651,18 @@ namespace DOL.GS.PacketHandler
             }
         }
 
-        public virtual void SendConsignmentMerchantMoney(long copper)
+        public virtual void SendConsignmentMerchantMoney(long money)
         {
             using (var pak = new GSTCPPacketOut(GetPacketCode(eServerPackets.ConsignmentMerchantMoney)))
             {
-                pak.WriteByte((byte)Money.GetCopper(copper));
-                pak.WriteByte((byte)Money.GetSilver(copper));
-                pak.WriteShort((ushort)Money.GetGold(copper));
-                pak.WriteShort((ushort)Money.GetPlatinum(copper));
-                pak.WriteShort((ushort)Money.GetMithril(copper));
+                pak.WriteByte((byte)Money.GetCopper(money));
+                pak.WriteByte((byte)Money.GetSilver(money));
+                pak.WriteShort((ushort)Money.GetGold(money));
+
+                // Yes, these are sent in reverse order! - tolakram confirmed 1.98 - 1.109
+                pak.WriteShort((ushort)Money.GetMithril(money));
+                pak.WriteShort((ushort)Money.GetPlatinum(money));
+
                 SendTCP(pak);
             }
         }
@@ -3823,7 +3881,7 @@ namespace DOL.GS.PacketHandler
             }
         }
 
-        protected virtual void SendInventorySlotsUpdateRange(ICollection<int> slots, byte preAction)
+        protected virtual void SendInventorySlotsUpdateRange(ICollection<int> slots, eInventoryWindowType windowType)
         {
             using (var pak = new GSTCPPacketOut(GetPacketCode(eServerPackets.InventoryUpdate)))
             {
@@ -3832,7 +3890,7 @@ namespace DOL.GS.PacketHandler
                     (byte)((m_gameClient.Player.IsCloakHoodUp ? 0x01 : 0x00) | (int)m_gameClient.Player.ActiveQuiverSlot));
                 //bit0 is hood up bit4 to 7 is active quiver
                 pak.WriteByte(m_gameClient.Player.VisibleActiveWeaponSlots);
-                pak.WriteByte(preAction); //preAction (0x00 - Do nothing)
+                pak.WriteByte((byte)windowType); //preAction (0x00 - Do nothing)
                 if (slots != null)
                 {
                     foreach (int updatedSlot in slots)
@@ -3908,7 +3966,7 @@ namespace DOL.GS.PacketHandler
                             name = item.Count + " " + name;
                         if (item.SellPrice > 0)
                         {
-                            if (ConsignmentMoney.UseBP)
+                            if (ServerProperties.Properties.CONSIGNMENT_USE_BP)
                                 name += "[" + item.SellPrice + " BP]";
                             else
                                 name += "[" + Money.GetString(item.SellPrice) + "]";
@@ -3920,7 +3978,7 @@ namespace DOL.GS.PacketHandler
             }
         }
 
-        public virtual void SendInventoryItemsPartialUpdate(List<InventoryItem> items, byte windowType)
+        public virtual void SendInventoryItemsPartialUpdate(List<InventoryItem> items, eInventoryWindowType windowType)
         {
         }
 

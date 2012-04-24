@@ -1,3 +1,5 @@
+using System.Collections.Generic;
+
 /*
  * DAWN OF LIGHT - The first free open source DAoC server emulator
  *
@@ -18,7 +20,6 @@
  */
 
 using DOL.Language;
-using System.Collections.Generic;
 
 namespace DOL.GS.PlayerClass
 {
@@ -67,9 +68,9 @@ namespace DOL.GS.PlayerClass
             return AutotrainableSkills;
         }
 
-        public override void OnLevelUp(GamePlayer player)
+        public override void OnLevelUp(GamePlayer player, int previousLevel)
         {
-            base.OnLevelUp(player);
+            base.OnLevelUp(player, previousLevel);
 
             // RDSandersJR: Check to see if we are using old archery if so, use Specs.Longbow
             if (ServerProperties.Properties.ALLOW_OLD_ARCHERY == true)

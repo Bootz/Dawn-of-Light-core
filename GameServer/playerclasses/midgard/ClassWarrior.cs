@@ -1,3 +1,5 @@
+using System.Collections.Generic;
+
 /*
  * DAWN OF LIGHT - The first free open source DAoC server emulator
  *
@@ -17,7 +19,6 @@
  *
  */
 
-using System.Collections.Generic;
 using DOL.Language;
 
 namespace DOL.GS.PlayerClass
@@ -65,9 +66,9 @@ namespace DOL.GS.PlayerClass
         /// Update all skills and add new for current level
         /// </summary>
         /// <param name="player"></param>
-        public override void OnLevelUp(GamePlayer player)
+        public override void OnLevelUp(GamePlayer player, int previousLevel)
         {
-            base.OnLevelUp(player);
+            base.OnLevelUp(player, previousLevel);
 
             player.AddAbility(SkillBase.GetAbility(Abilities.Weapon_Thrown));
             player.AddAbility(SkillBase.GetAbility(Abilities.Shield, ShieldLevel.Medium));

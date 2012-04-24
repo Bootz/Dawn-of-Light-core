@@ -22,9 +22,9 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Reflection;
-
 using DOL.Database;
 using DOL.GS.Keeps;
+using DOL.Language;
 using log4net;
 
 namespace DOL.GS.PacketHandler
@@ -123,11 +123,27 @@ namespace DOL.GS.PacketHandler
                                         continue;
 
                                     description = area.Description;
+
+                                    DataObject translation = LanguageMgr.GetTranslation(m_gameClient, area);
+                                    if (translation != null)
+                                    {
+                                        if (!Util.IsEmpty(((DBLanguageArea)translation).ScreenDescription)) // Thats correct!
+                                            description = ((DBLanguageArea)translation).ScreenDescription;
+                                    }
                                     break;
                                 }
 
                                 if (description == "")
+                                {
                                     description = zon.Description;
+
+                                    DataObject translation = LanguageMgr.GetTranslation(m_gameClient, zon);
+                                    if (translation != null)
+                                    {
+                                        if (!Util.IsEmpty(((DBLanguageZone)translation).ScreenDescription)) // Thats correct!
+                                            description = ((DBLanguageZone)translation).ScreenDescription;
+                                    }
+                                }
 
                                 pak.FillString(description, 24);
                             }
@@ -461,7 +477,7 @@ namespace DOL.GS.PacketHandler
             int HibKeeps = 0;
             int OwnerDFTowers = 0;
             eRealm OwnerDF = eRealm.None;
-            foreach (AbstractGameKeep keep in KeepMgr.GetNFKeeps())
+            foreach (AbstractGameKeep keep in GameServer.KeepManager.GetFrontierKeeps())
             {
                 switch ((eRealm)keep.Realm)
                 {

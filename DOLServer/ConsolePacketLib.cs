@@ -196,11 +196,11 @@ namespace DOLGameServerConsole
 
         public void SendInventorySlotsUpdate(ICollection<int> slots) { }
 
-        public void SendInventoryItemsUpdate(byte preAction, ICollection<InventoryItem> itemsToUpdate) { }
+        public void SendInventoryItemsUpdate(eInventoryWindowType windowType, ICollection<InventoryItem> itemsToUpdate) { }
 
-        public void SendInventoryItemsUpdate(IDictionary<int, InventoryItem> updateItems, byte windowType) { }
+        public void SendInventoryItemsUpdate(IDictionary<int, InventoryItem> updateItems, eInventoryWindowType windowType) { }
 
-        public void SendInventoryItemsPartialUpdate(IDictionary<int, InventoryItem> items, byte windowType) { }
+        public void SendInventoryItemsPartialUpdate(IDictionary<int, InventoryItem> items, eInventoryWindowType windowType) { }
 
         public void SendDoorState(Region region, IDoor door) { }
 
@@ -392,7 +392,7 @@ namespace DOLGameServerConsole
 
         public void SendMarketExplorerWindow(IList<InventoryItem> items, byte page, byte maxpage) { }
 
-        public void SendConsignmentMerchantMoney(long copper) { }
+        public void SendConsignmentMerchantMoney(long money) { }
 
         public void SendMinotaurRelicMapRemove(byte id) { }
 

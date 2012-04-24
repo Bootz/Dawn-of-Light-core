@@ -485,6 +485,9 @@ namespace DOL.GS.ServerRules
             if (player.Client.Account.PrivLevel > 1)
                 return false;
 
+            if (player.CurrentRegion.IsHousing)
+                return false; // Workaround: falling from houses should not produce damage
+
             return true;
         }
 
@@ -1035,7 +1038,7 @@ namespace DOL.GS.ServerRules
 
                     if (player != null)
                     {
-                        AbstractGameKeep keep = KeepMgr.getKeepCloseToSpot(living.CurrentRegionID, living, 16000);
+                        AbstractGameKeep keep = GameServer.KeepManager.GetKeepCloseToSpot(living.CurrentRegionID, living, 16000);
                         if (keep != null)
                         {
                             byte bonus = 0;
@@ -1280,7 +1283,7 @@ namespace DOL.GS.ServerRules
                 bool BG = false;
                 if (!ServerProperties.Properties.ALLOW_BPS_IN_BGS)
                 {
-                    foreach (AbstractGameKeep keep in KeepMgr.GetKeepsOfRegion(killedPlayer.CurrentRegionID))
+                    foreach (AbstractGameKeep keep in GameServer.KeepManager.GetKeepsOfRegion(killedPlayer.CurrentRegionID))
                     {
                         if (keep.DBKeep.BaseLevel < 50)
                         {
@@ -1326,7 +1329,7 @@ namespace DOL.GS.ServerRules
                     {
                         GamePlayer killerPlayer = living as GamePlayer;
                         //only gain rps in a battleground if you are under the cap
-                        Battleground bg = KeepMgr.GetBattleground(killerPlayer.CurrentRegionID);
+                        Battleground bg = GameServer.KeepManager.GetBattleground(killerPlayer.CurrentRegionID);
                         if (bg == null || (killerPlayer.RealmLevel < bg.MaxRealmLevel))
                         {
                             realmPoints = (int)(realmPoints * (1.0 + 2.0 * (killedPlayer.RealmLevel - killerPlayer.RealmLevel) / 900.0));
@@ -1398,7 +1401,7 @@ namespace DOL.GS.ServerRules
 
                     if (!BG && living is GamePlayer)
                     {
-                        AbstractGameKeep keep = KeepMgr.getKeepCloseToSpot(living.CurrentRegionID, living, 16000);
+                        AbstractGameKeep keep = GameServer.KeepManager.GetKeepCloseToSpot(living.CurrentRegionID, living, 16000);
                         if (keep != null)
                         {
                             byte bonus = 0;
@@ -2034,6 +2037,18 @@ namespace DOL.GS.ServerRules
             hookpointObject.AddToWorld();
 
             return hookpointObject;
+        }
+
+        /// <summary>
+        /// This creates the housing consignment merchant attached to a house.
+        /// You can override this to create your own consignment merchant derived from the standard merchant
+        /// </summary>
+        /// <returns></returns>
+        public virtual GameConsignmentMerchant CreateHousingConsignmentMerchant(House house)
+        {
+            var m = new GameConsignmentMerchant();
+            m.Name = "Consignment Merchant";
+            return m;
         }
 
         #region MessageToLiving

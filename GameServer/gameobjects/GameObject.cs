@@ -384,12 +384,12 @@ namespace DOL.GS
             set { }
         }
 
-        private House m_currentHouse;
+        protected House m_currentHouse;
 
         /// <summary>
         /// Either the house an object is in or working on (player editing a house)
         /// </summary>
-        public House CurrentHouse
+        public virtual House CurrentHouse
         {
             get { return m_currentHouse; }
             set { m_currentHouse = value; }
@@ -398,9 +398,9 @@ namespace DOL.GS
         /// <summary>
         /// Is this object in a house
         /// </summary>
-        private bool m_inHouse;
+        protected bool m_inHouse;
 
-        public bool InHouse
+        public virtual bool InHouse
         {
             get { return m_inHouse; }
             set { m_inHouse = value; }

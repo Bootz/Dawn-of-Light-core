@@ -299,6 +299,10 @@ namespace DOL.GS.Keeps
 
         public override void ModifyAttack(AttackData attackData)
         {
+            // Allow a GM to use commands to damage components, regardless of toughness setting
+            if (attackData.DamageType == eDamageType.GM)
+                return;
+
             int toughness = ServerProperties.Properties.SET_KEEP_DOOR_TOUGHNESS;
             int baseDamage = attackData.Damage;
             int styleDamage = attackData.StyleDamage;
@@ -378,7 +382,7 @@ namespace DOL.GS.Keeps
                 return false;
             }
 
-            if (!KeepMgr.IsEnemy(this, player) || player.Client.Account.PrivLevel != 1)
+            if (!GameServer.KeepManager.IsEnemy(this, player) || player.Client.Account.PrivLevel != 1)
             {
                 int keepz = Z, distance = 0;
 
@@ -456,7 +460,7 @@ namespace DOL.GS.Keeps
 
             IList list = base.GetExamineMessages(player);
             string text = "You select the " + Name + ".";
-            if (!KeepMgr.IsEnemy(this, player))
+            if (!GameServer.KeepManager.IsEnemy(this, player))
             {
                 text = text + " It belongs to your realm.";
             }
@@ -674,7 +678,7 @@ namespace DOL.GS.Keeps
         /// <summary>
         /// call when player try to open door
         /// </summary>
-        public void Open()
+        public void Open(GameLiving opener = null)
         {
             //do nothing because gamekeep must be destroyed to be open
         }
@@ -682,7 +686,7 @@ namespace DOL.GS.Keeps
         /// <summary>
         /// call when player try to close door
         /// </summary>
-        public void Close()
+        public void Close(GameLiving closer = null)
         {
             //do nothing because gamekeep must be destroyed to be open
         }
