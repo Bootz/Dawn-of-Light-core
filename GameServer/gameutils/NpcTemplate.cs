@@ -22,6 +22,7 @@ using System.Collections;
 using System.Linq;
 using System.Reflection;
 using DOL.Database;
+using DOL.GS.Spells;
 using DOL.GS.Styles;
 using log4net;
 

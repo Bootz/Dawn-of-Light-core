@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Reflection;
+using DOL.GS;
 using log4net;
 
 namespace DOL.GS

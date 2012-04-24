@@ -18,6 +18,9 @@
  */
 
 using System;
+using System.Collections.Generic;
+using System.Text;
+using DOL.AI.Brain;
 using DOL.GS.PacketHandler;
 
 namespace DOL.GS.Spells

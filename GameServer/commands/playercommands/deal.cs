@@ -1,3 +1,5 @@
+using DOL.GS;
+
 namespace DOL.GS.Commands
 {
     [CmdAttribute(

@@ -17,6 +17,9 @@
  *
  */
 
+using System;
+using System.Collections;
+
 namespace DOL.GS.PacketHandler.Client.v168
 {
     [PacketHandler(PacketHandlerType.TCP, 0xCE ^ 168, "Show warmap bonuses")]

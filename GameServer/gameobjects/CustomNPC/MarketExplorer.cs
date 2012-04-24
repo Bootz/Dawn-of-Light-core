@@ -1,6 +1,12 @@
 using System;
+using System.Collections;
 using System.Collections.Generic;
+using System.Timers;
+using DOL;
 using DOL.Database;
+using DOL.Events;
+using DOL.GS;
+using DOL.GS.GameEvents;
 using DOL.GS.Housing;
 using DOL.GS.PacketHandler;
 

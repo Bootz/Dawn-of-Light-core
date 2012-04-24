@@ -1,5 +1,8 @@
 using System;
+using System.Reflection;
 using DOL.Events;
+using DOL.GS.Commands;
+using DOL.GS.PacketHandler;
 
 namespace DOL.GS.GameEvents
 {

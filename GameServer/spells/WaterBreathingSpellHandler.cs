@@ -1,5 +1,3 @@
-using DOL.GS.Effects;
-
 /*
  * DAWN OF LIGHT - The first free open source DAoC server emulator
  *
@@ -20,7 +18,12 @@ using DOL.GS.Effects;
  */
 
 //made by DeMAN
+using System;
+using System.Reflection;
+using DOL.Events;
+using DOL.GS.Effects;
 using DOL.GS.PacketHandler;
+using log4net;
 
 namespace DOL.GS.Spells
 {

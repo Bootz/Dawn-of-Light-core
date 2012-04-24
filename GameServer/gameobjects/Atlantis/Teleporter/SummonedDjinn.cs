@@ -18,6 +18,8 @@
  */
 
 using System;
+using System.Collections.Generic;
+using System.Text;
 using DOL.Events;
 
 namespace DOL.GS

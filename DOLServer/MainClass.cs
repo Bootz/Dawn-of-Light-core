@@ -19,6 +19,7 @@
 
 using System;
 using System.Collections;
+using System.IO;
 using System.Threading;
 using DOL.DOLServer.Actions;
 

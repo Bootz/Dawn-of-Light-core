@@ -17,8 +17,10 @@
  *
  */
 
+using System;
 using System.Collections;
 using System.Reflection;
+using DOL.AI.Brain;
 using log4net;
 
 namespace DOL.GS.Effects

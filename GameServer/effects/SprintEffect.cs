@@ -17,6 +17,9 @@
  *
  */
 
+using System;
+using System.Collections;
+using DOL.GS.RealmAbilities;
 using DOL.Language;
 
 namespace DOL.GS.Effects

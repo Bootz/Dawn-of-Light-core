@@ -1,4 +1,7 @@
+using System.Collections;
+
 using DOL.Database;
+using DOL.GS;
 
 namespace DOL.GS.SkillHandler
 {

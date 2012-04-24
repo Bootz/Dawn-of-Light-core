@@ -19,6 +19,8 @@
 
 using System;
 using System.Reflection;
+using System.Text;
+using DOL.Database;
 
 namespace DOL.GS.Quests
 {

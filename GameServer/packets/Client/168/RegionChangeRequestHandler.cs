@@ -21,6 +21,7 @@ using System;
 using System.Collections;
 using System.Reflection;
 using DOL.Database;
+using DOL.GS.Keeps;
 using DOL.GS.Quests;
 using DOL.GS.ServerRules;
 using log4net;

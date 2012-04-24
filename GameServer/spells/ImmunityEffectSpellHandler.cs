@@ -17,7 +17,10 @@
  *
  */
 
+using System;
+using System.Collections;
 using DOL.AI.Brain;
+using DOL.Database;
 using DOL.GS.Effects;
 
 namespace DOL.GS.Spells

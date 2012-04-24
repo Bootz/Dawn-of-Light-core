@@ -27,6 +27,10 @@
  * the Unlock/Lock Functions work properly!
  */
 
+using System;
+using System.Collections.Generic;
+using System.Text;
+
 namespace DOL.GS
 {
     public class BaseProtector : GameNPC

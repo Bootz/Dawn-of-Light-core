@@ -19,8 +19,13 @@
 
 using System;
 using DOL.AI.Brain;
+using DOL.Database;
+using DOL.Events;
+using DOL.GS;
 using DOL.GS.Effects;
+using DOL.GS.Keeps;
 using DOL.GS.PacketHandler;
+using DOL.GS.SkillHandler;
 
 namespace DOL.GS.Spells
 {

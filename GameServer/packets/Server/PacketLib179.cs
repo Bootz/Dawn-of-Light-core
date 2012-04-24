@@ -18,6 +18,7 @@
  */
 #define NOENCRYPTION
 
+using System;
 using System.Reflection;
 using DOL.GS.Housing;
 using DOL.GS.PlayerTitles;

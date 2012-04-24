@@ -1,12 +1,15 @@
 ﻿//TODO: make sunkaio do a small AOE fire attack when he's hit by a player with melee damage.
 
 using System;
+using System.Collections;
 using System.Collections.Generic;
+using System.Reflection;
 using DOL.AI.Brain;
 using DOL.Events;
 using DOL.GS;
 using DOL.GS.Atlantis;
 using DOL.GS.PacketHandler;
+using log4net;
 
 namespace DOL.GS
 {

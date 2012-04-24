@@ -1,5 +1,3 @@
-using System.Reflection;
-
 /*
  * DAWN OF LIGHT - The first free open source DAoC server emulator
  *
@@ -19,8 +17,12 @@ using System.Reflection;
  *
  */
 
+using System;
+using System.Collections.Generic;
+using System.Reflection;
 using DOL.Database;
 using DOL.Events;
+using DOL.GS;
 using DOL.Language;
 using log4net;
 

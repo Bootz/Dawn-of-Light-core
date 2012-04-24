@@ -1,3 +1,11 @@
+using System;
+using System.Collections;
+using System.Reflection;
+using DOL.Events;
+using DOL.GS.Effects;
+using DOL.GS.PacketHandler;
+using log4net;
+
 namespace DOL.GS.SkillHandler
 {
     /// <summary>

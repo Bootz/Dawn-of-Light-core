@@ -18,10 +18,14 @@
  */
 
 using System;
+using System.Collections;
 using System.Collections.Generic;
+using System.Text;
 using DOL.AI.Brain;
 using DOL.Events;
+using DOL.GS.Effects;
 using DOL.GS.PacketHandler;
+using DOL.GS.PropertyCalc;
 using DOL.Language;
 
 namespace DOL.GS.Spells

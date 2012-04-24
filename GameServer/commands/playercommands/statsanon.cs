@@ -18,8 +18,10 @@
 */
 
 // By Daeli
-
+using System;
+using DOL.GS;
 using DOL.GS.PacketHandler;
+using log4net;
 
 namespace DOL.GS.Commands
 {

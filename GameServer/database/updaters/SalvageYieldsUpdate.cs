@@ -1,6 +1,4 @@
-﻿using DOL.Database;
-
-/*
+﻿/*
  * DAWN OF LIGHT - The first free open source DAoC server emulator
  *
  * This program is free software; you can redistribute it and/or
@@ -19,6 +17,9 @@
  *
  */
 
+using System;
+using System.Collections;
+using DOL.Database;
 using log4net;
 
 namespace DOL.GS.DatabaseUpdate

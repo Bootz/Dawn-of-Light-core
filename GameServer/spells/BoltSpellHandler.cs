@@ -21,6 +21,7 @@ using System;
 using DOL.AI.Brain;
 using DOL.Database;
 using DOL.GS.Effects;
+using DOL.GS.Keeps;
 using DOL.GS.PacketHandler;
 using DOL.GS.SkillHandler;
 

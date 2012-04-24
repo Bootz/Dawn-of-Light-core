@@ -18,7 +18,10 @@
  */
 
 using System;
+using System.Collections.Generic;
+using System.Text;
 using DOL.Events;
+using DOL.GS.Behaviour;
 using DOL.GS.Behaviour.Attributes;
 using DOL.GS.PacketHandler;
 using DOL.Language;

@@ -17,6 +17,8 @@
  *
  */
 
+using System;
+using DOL.Events;
 using DOL.GS;
 
 namespace DOL.Events

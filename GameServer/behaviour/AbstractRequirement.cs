@@ -19,7 +19,9 @@
 
 using System;
 using System.Reflection;
+using System.Text;
 using DOL.Events;
+using DOL.GS.Behaviour;
 using DOL.GS.Behaviour.Attributes;
 using log4net;
 

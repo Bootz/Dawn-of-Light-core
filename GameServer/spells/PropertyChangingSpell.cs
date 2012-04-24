@@ -1,3 +1,5 @@
+using System;
+
 /*
  * DAWN OF LIGHT - The first free open source DAoC server emulator
  *
@@ -17,12 +19,13 @@
  *
  */
 
-using System;
+using System.Reflection;
 using DOL.AI.Brain;
 using DOL.Database;
 using DOL.GS.Effects;
 using DOL.GS.PacketHandler;
 using DOL.GS.PropertyCalc;
+using log4net;
 
 namespace DOL.GS.Spells
 {

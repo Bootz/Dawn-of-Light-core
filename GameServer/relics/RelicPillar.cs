@@ -17,6 +17,11 @@
  *
  */
 
+using System;
+using System.Collections.Generic;
+using System.Text;
+using DOL.GS;
+
 namespace DOL.GS.Relics
 {
     /// <summary>

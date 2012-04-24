@@ -18,6 +18,7 @@
  */
 
 using DOL.GS.Appeal;
+using DOL.GS.ServerProperties;
 using DOL.Language;
 
 namespace DOL.GS.Commands

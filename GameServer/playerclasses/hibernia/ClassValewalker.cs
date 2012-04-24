@@ -18,6 +18,8 @@ USA.
 *
 */
 
+using System;
+using DOL.GS;
 using DOL.Language;
 
 namespace DOL.GS.PlayerClass

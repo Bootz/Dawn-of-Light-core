@@ -17,6 +17,10 @@
  *
  */
 
+using System;
+using System.Collections;
+using DOL.Database;
+
 namespace DOL.GS
 {
     /// <summary>

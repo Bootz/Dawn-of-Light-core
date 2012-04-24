@@ -19,6 +19,7 @@
 
 using System;
 using DOL.Events;
+using DOL.Language;
 
 namespace DOL.GS.PlayerTitles
 {

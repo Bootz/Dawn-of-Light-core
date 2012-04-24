@@ -24,6 +24,7 @@ using System.Reflection;
 using System.Text.RegularExpressions;
 using DOL.Database;
 using DOL.Events;
+using DOL.GS;
 using DOL.GS.ServerProperties;
 using log4net;
 

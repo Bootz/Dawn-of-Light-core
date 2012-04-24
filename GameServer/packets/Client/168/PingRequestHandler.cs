@@ -18,6 +18,7 @@
  */
 
 using System;
+using System.Text;
 
 namespace DOL.GS.PacketHandler.Client.v168
 {

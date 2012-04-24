@@ -20,8 +20,11 @@
  */
 
 using System;
+using System.Collections;
 using System.Diagnostics;
+using System.IO;
 using System.Reflection;
+using System.Text;
 using System.Threading;
 using log4net;
 using ThreadState = System.Threading.ThreadState;

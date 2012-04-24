@@ -18,6 +18,7 @@
  */
 
 using System.Reflection;
+using System.Text;
 using System.Threading;
 using DOL.GS;
 using log4net;

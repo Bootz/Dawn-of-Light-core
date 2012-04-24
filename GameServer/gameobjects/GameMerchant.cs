@@ -19,11 +19,14 @@
 
 using System;
 using System.Collections;
+using System.Reflection;
 using System.Threading;
 using DOL.AI.Brain;
 using DOL.Database;
+using DOL.GS.Movement;
 using DOL.GS.PacketHandler;
 using DOL.Language;
+using log4net;
 
 namespace DOL.GS
 {

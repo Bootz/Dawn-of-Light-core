@@ -17,8 +17,11 @@
  *
  */
 
+using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Reflection;
+using DOL.GS;
 using DOL.Language;
 using log4net;
 

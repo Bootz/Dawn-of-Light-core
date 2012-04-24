@@ -22,10 +22,9 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Reflection;
-
+using DOL.GS.Effects;
 using DOL.GS.RealmAbilities;
 using DOL.GS.Styles;
-
 using log4net;
 
 namespace DOL.GS.PacketHandler

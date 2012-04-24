@@ -17,6 +17,9 @@
  *
  */
 
+using System;
+using System.Collections;
+using System.Collections.Generic;
 using DOL.Language;
 
 namespace DOL.GS.PlayerClass

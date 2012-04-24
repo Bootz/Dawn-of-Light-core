@@ -21,6 +21,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using DOL.Database;
+using DOL.GS.Effects;
 using DOL.GS.Spells;
 
 namespace DOL.GS.RealmAbilities

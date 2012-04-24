@@ -17,6 +17,8 @@
  *
  */
 
+using System;
+
 namespace DOL.GS.PacketHandler.Client.v168
 {
     [PacketHandlerAttribute(PacketHandlerType.TCP, 0x2C ^ 168, "handle Change LFG flag")]

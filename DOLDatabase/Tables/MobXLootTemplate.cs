@@ -23,6 +23,8 @@
  * - Roach's modifications to add loottemplate base mobdrops
  */
 
+using System;
+using DOL.Database;
 using DOL.Database.Attributes;
 
 namespace DOL.Database

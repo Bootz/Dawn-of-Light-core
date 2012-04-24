@@ -17,6 +17,7 @@
  *
  */
 
+using System;
 using System.Collections;
 
 namespace DOL.GS.PacketHandler.Client.v168

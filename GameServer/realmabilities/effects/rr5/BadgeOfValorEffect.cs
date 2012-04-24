@@ -1,6 +1,9 @@
 using System;
 using System.Collections.Generic;
 using DOL.Events;
+using DOL.GS.PacketHandler;
+using DOL.GS.PropertyCalc;
+using DOL.GS.SkillHandler;
 
 namespace DOL.GS.Effects
 {

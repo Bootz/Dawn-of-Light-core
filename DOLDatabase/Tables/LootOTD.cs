@@ -17,6 +17,9 @@
  *
  */
 
+using System;
+
+using DOL.Database;
 using DOL.Database.Attributes;
 
 namespace DOL

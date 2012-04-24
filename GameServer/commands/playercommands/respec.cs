@@ -34,6 +34,7 @@
  * 	Added: /respec buy
  */
 
+using System.Collections;
 using DOL.GS.PacketHandler;
 
 namespace DOL.GS.Commands

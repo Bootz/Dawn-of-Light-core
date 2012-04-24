@@ -3,6 +3,8 @@ using System.Collections;
 using System.Reflection;
 using DOL.GS.Utils;
 using log4net;
+using DictionaryEntry = DOL.GS.Collections.DictionaryEntry;
+using Hashtable = DOL.GS.Collections.Hashtable;
 
 namespace DOL.GS.Collections
 {

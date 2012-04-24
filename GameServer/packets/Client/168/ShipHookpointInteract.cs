@@ -17,6 +17,8 @@
  *
  */
 
+using DOL.GS.Keeps;
+
 namespace DOL.GS.PacketHandler.Client.v168
 {
     [PacketHandler(PacketHandlerType.TCP, 0xE4, "ship hookpoint interact")]

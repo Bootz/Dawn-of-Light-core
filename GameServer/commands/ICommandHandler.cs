@@ -17,6 +17,9 @@
  *
  */
 
+using System;
+using DOL.GS;
+
 namespace DOL.GS.Commands
 {
     /// <summary>

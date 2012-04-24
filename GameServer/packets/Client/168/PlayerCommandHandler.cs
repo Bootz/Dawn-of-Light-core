@@ -17,6 +17,8 @@
  *
  */
 
+using System;
+
 namespace DOL.GS.PacketHandler.Client.v168
 {
     [PacketHandler(PacketHandlerType.TCP, 0x07 ^ 168, "Handles the players commands")]

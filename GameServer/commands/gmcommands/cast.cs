@@ -18,7 +18,9 @@
  */
 
 using System;
+using DOL.GS;
 using DOL.GS.Effects;
+using DOL.GS.PacketHandler;
 using DOL.GS.Spells;
 using DOL.Language;
 

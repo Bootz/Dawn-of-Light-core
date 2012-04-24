@@ -18,9 +18,10 @@
  */
 
 using System;
-
 using DOL.Database;
 using DOL.Events;
+using DOL.GS.Keeps;
+using DOL.GS.PacketHandler;
 
 namespace DOL.GS.ServerRules
 {

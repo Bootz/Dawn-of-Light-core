@@ -1,4 +1,11 @@
+using System;
+using System.Collections;
 using System.Collections.Generic;
+using DOL;
+using DOL.Database;
+using DOL.Events;
+using DOL.GS;
+using DOL.GS.PacketHandler;
 
 namespace DOL.GS.Effects
 {

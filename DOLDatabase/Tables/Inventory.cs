@@ -18,7 +18,10 @@
  */
 
 using System;
+using System.Collections.Generic;
 using System.Reflection;
+using System.Timers;
+using DOL.Database;
 using DOL.Database.Attributes;
 using log4net;
 

@@ -25,6 +25,7 @@
  * Suncheck: Bring the /task-System more like real servers
  */
 
+using System.Collections;
 using System.Collections.Generic;
 using DOL.GS.PacketHandler;
 using DOL.GS.Quests;

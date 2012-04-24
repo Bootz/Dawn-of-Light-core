@@ -1,5 +1,3 @@
-using DOL.GS.Housing;
-
 /*
  * DAWN OF LIGHT - The first free open source DAoC server emulator
  *
@@ -19,6 +17,9 @@ using DOL.GS.Housing;
  *
  */
 
+using System;
+using System.Collections;
+using DOL.GS.Housing;
 using DOL.GS.PacketHandler;
 
 namespace DOL.GS.Commands

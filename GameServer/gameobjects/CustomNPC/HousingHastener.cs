@@ -17,8 +17,13 @@
  *
  */
 
+using System;
 using System.Collections;
 using DOL.Database;
+using DOL.GS.Effects;
+using DOL.GS.Keeps;
+using DOL.GS.PacketHandler;
+using DOL.GS.Spells;
 using DOL.Language;
 
 namespace DOL.GS

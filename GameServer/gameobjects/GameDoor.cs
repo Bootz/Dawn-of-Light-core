@@ -18,9 +18,23 @@
  */
 
 using System;
+using System.Collections;
+using System.Collections.Generic;
+using System.Reflection;
 using System.Threading;
+using DOL.AI.Brain;
 using DOL.Database;
+using DOL.Events;
+using DOL.GS.Effects;
+using DOL.GS.Keeps;
 using DOL.GS.PacketHandler;
+using DOL.GS.PacketHandler.Client.v168;
+using DOL.GS.PropertyCalc;
+using DOL.GS.Quests;
+using DOL.GS.SkillHandler;
+using DOL.GS.Spells;
+using DOL.GS.Styles;
+using DOL.GS.Utils;
 using DOL.Language;
 
 namespace DOL.GS

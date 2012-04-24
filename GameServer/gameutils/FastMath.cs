@@ -17,6 +17,8 @@
  *
  */
 
+using System;
+
 namespace DOL.GS.Utils
 {
     public static class FastMath

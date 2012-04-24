@@ -1,4 +1,6 @@
+using DOL.GS;
 using DOL.GS.Housing;
+using DOL.GS.PacketHandler;
 
 namespace DOL.GS.Commands
 {

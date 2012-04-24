@@ -18,8 +18,10 @@
  */
 
 using System;
+using System.Collections;
 using DOL.AI.Brain;
 using DOL.Events;
+using DOL.GS.Keeps;
 using DOL.GS.PacketHandler;
 
 namespace DOL.GS.Spells

@@ -1,3 +1,6 @@
+using System.Collections;
+using System.Collections.Generic;
+
 /*
  * DAWN OF LIGHT - The first free open source DAoC server emulator
  *
@@ -17,10 +20,11 @@
  *
  */
 
-using System.Collections;
-using System.Collections.Generic;
+using System.Reflection;
 using DOL.Database;
+using DOL.GS;
 using DOL.GS.Effects;
+using DOL.GS.PacketHandler;
 
 namespace DOL.GS.RealmAbilities
 {

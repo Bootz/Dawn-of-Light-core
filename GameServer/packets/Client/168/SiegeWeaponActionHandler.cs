@@ -17,6 +17,8 @@
  *
  */
 
+using System;
+
 namespace DOL.GS.PacketHandler.Client.v168
 {
     /// <summary>

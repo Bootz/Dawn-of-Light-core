@@ -18,8 +18,10 @@
  */
 
 using System;
+using DOL;
 using DOL.Database;
 using DOL.GS;
+using DOL.GS.PacketHandler;
 using DOL.Tests;
 using NUnit.Framework;
 

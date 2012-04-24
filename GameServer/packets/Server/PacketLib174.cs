@@ -23,7 +23,11 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Reflection;
 using DOL.Database;
+using DOL.GS.Effects;
 using DOL.GS.Keeps;
+using DOL.GS.PlayerTitles;
+using DOL.GS.Spells;
+using DOL.GS.Styles;
 using DOL.Language;
 using log4net;
 

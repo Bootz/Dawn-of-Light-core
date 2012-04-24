@@ -19,6 +19,7 @@
 
 using System;
 using DOL.Database;
+using DOL.GS.PacketHandler;
 using DOL.Language;
 
 namespace DOL.GS.Commands

@@ -1,3 +1,5 @@
+using DOL.Database;
+
 /*
  * DAWN OF LIGHT - The first free open source DAoC server emulator
  *
@@ -17,7 +19,7 @@
  *
  */
 
-using DOL.Database;
+using DOL.GS;
 
 namespace DOL.GS.SkillHandler
 {

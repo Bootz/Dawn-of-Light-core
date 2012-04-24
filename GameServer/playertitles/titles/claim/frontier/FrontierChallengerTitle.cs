@@ -17,8 +17,6 @@
  *
  */
 
-using DOL.Events;
-
 /*
  * Suncheck: [19.06.2007]
  *   - Corrected
@@ -26,6 +24,8 @@ using DOL.Events;
  *   - Added missing (+language support)
  */
 
+using System;
+using DOL.Events;
 using DOL.Language;
 
 namespace DOL.GS.PlayerTitles

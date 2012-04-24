@@ -1,3 +1,5 @@
+using System;
+
 namespace DOL.GS
 {
     public class RegionTestNpc : GameNPC

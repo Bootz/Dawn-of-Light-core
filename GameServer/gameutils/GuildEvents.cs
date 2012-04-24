@@ -18,8 +18,10 @@
  */
 
 using System;
+using System.Collections;
 using System.Threading;
 using DOL.Events;
+using DOL.GS;
 using DOL.GS.PacketHandler;
 using log4net;
 

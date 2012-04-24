@@ -1,4 +1,8 @@
-﻿/*
+﻿using System.Collections;
+using System.Collections.Generic;
+using DOL.GS.Keeps;
+
+/*
 * DAWN OF LIGHT - The first free open source DAoC server emulator
 *
 * This program is free software; you can redistribute it and/or
@@ -17,9 +21,7 @@
 *
 */
 
-using System.Collections;
-using System.Collections.Generic;
-using DOL.GS.Keeps;
+using DOL.GS.PacketHandler;
 using DOL.GS.ServerRules;
 using DOL.Language;
 

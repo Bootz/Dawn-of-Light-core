@@ -29,6 +29,7 @@ using DOL.GS.Effects;
 using DOL.GS.Keeps;
 using DOL.GS.Quests;
 using DOL.GS.Spells;
+using DOL.GS.Styles;
 using DOL.Language;
 using log4net;
 

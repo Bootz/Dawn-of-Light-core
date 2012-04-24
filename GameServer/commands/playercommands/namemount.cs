@@ -1,3 +1,6 @@
+using System;
+using DOL.GS.PacketHandler;
+
 namespace DOL.GS.Commands
 {
     [CmdAttribute("&namemount", ePrivLevel.Player, "Name your hourse", "/namemount")]

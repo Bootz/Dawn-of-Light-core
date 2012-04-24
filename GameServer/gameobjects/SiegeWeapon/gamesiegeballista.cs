@@ -16,6 +16,11 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
  */
+
+using System;
+using System.Collections;
+using DOL.GS.Spells;
+
 /*1,Ballista,1,ammo,0.46,1
 2,Catapult,2,ammo,0.39,1
 3,Trebuchet,2,ammo,1.03,1

@@ -1,3 +1,5 @@
+using DOL.GS.PacketHandler;
+
 namespace DOL.GS.Keeps
 {
     /// <summary>

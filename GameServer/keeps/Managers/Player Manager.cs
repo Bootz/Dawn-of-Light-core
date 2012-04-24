@@ -1,3 +1,5 @@
+using DOL.Database;
+using DOL.GS;
 using DOL.GS.PacketHandler;
 using DOL.Language;
 using log4net;

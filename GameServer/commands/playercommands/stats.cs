@@ -20,6 +20,17 @@
 // Eden - Darwin 06/10/2008 - Complete /stats
 // Tolakram - moved most code to PlayerStatistics to enable custom stats display
 
+using System;
+using System.Collections;
+using System.Collections.Generic;
+using System.Reflection;
+using DOL;
+using DOL.Database;
+using DOL.Events;
+using DOL.GS;
+using DOL.GS.PacketHandler;
+using log4net;
+
 namespace DOL.GS.Commands
 {
     [CmdAttribute(

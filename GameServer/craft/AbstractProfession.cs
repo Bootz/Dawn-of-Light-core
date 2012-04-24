@@ -18,6 +18,8 @@
  */
 
 using System;
+using System.Collections.Generic;
+using System.Text;
 using DOL.Language;
 
 namespace DOL.GS

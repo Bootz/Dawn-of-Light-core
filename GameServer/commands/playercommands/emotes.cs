@@ -17,6 +17,7 @@
  *
  */
 
+using System;
 using DOL.GS.PacketHandler;
 using DOL.Language;
 

@@ -25,8 +25,10 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Collections.Specialized;
 using DOL.AI.Brain;
 using DOL.Database;
+using DOL.GS.Utils;
 
 namespace DOL.GS
 {

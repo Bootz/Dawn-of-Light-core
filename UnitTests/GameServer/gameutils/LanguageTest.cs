@@ -18,6 +18,8 @@
  */
 
 using System;
+using DOL;
+using DOL.GS;
 using DOL.Language;
 using DOL.Tests;
 using NUnit.Framework;

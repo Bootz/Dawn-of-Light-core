@@ -1,7 +1,11 @@
 /* 01/03/2005
    Written by Gavinius */
 
+using System;
 using System.Collections;
+using DOL;
+using DOL.Database;
+using DOL.GS;
 using DOL.GS.Commands;
 using DOL.GS.PacketHandler;
 using DOL.Language;

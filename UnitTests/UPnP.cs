@@ -17,6 +17,7 @@
  *
  */
 
+using DOL.Network;
 using NUnit.Framework;
 
 namespace DOL.Net

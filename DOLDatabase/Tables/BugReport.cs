@@ -18,6 +18,7 @@
  */
 
 using System;
+using System.Text;
 using DOL.Database.Attributes;
 
 namespace DOL.Database

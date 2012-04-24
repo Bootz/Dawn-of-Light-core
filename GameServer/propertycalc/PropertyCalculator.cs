@@ -17,6 +17,7 @@
  *
  */
 
+using System;
 using log4net;
 
 namespace DOL.GS.PropertyCalc

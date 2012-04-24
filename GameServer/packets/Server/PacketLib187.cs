@@ -19,6 +19,7 @@
 #define NOENCRYPTION
 
 using System;
+using System.Collections.Generic;
 using System.Reflection;
 using DOL.Database;
 using DOL.GS.Quests;

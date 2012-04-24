@@ -27,9 +27,12 @@
  */
 
 using System;
+using System.Reflection;
 using DOL.Database;
 using DOL.Events;
+using DOL.GS.PacketHandler;
 using DOL.Language;
+using log4net;
 
 namespace DOL.GS.Quests.Hibernia
 {

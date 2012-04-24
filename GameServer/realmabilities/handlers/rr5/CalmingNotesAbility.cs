@@ -17,9 +17,11 @@
  *
  */
 
+using System;
 using System.Collections.Generic;
 using DOL.AI.Brain;
 using DOL.Database;
+using DOL.GS.Spells;
 
 namespace DOL.GS.RealmAbilities
 {

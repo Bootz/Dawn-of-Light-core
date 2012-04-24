@@ -17,6 +17,8 @@
  *
  */
 
+using DOL.GS.PacketHandler;
+
 namespace DOL.GS.Commands
 {
     [CmdAttribute("&Noqueue", //command to handle

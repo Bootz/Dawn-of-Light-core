@@ -19,7 +19,10 @@
 
 using System;
 using System.Collections;
+using System.Collections.Generic;
+using DOL.AI.Brain;
 using DOL.Database;
+using DOL.Events;
 using DOL.GS.Keeps;
 using DOL.GS.Movement;
 using DOL.GS.PacketHandler;

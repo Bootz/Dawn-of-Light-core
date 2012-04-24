@@ -20,11 +20,16 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Reflection;
+using System.Text;
+using DOL.AI.Brain;
 using DOL.Database;
 using DOL.GS.Housing;
 using DOL.GS.Keeps;
 using DOL.GS.PacketHandler;
 using DOL.GS.Spells;
+using DOL.Language;
+using log4net;
 
 namespace DOL.GS
 {

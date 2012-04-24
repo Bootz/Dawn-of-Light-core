@@ -17,6 +17,7 @@
  *
  */
 
+using System;
 using DOL.AI.Brain;
 
 namespace DOL.GS.PropertyCalc

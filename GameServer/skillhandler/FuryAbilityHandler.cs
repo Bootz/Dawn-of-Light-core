@@ -17,6 +17,10 @@
  *
  */
 
+using System;
+using DOL.GS;
+using DOL.GS.PacketHandler;
+
 namespace DOL.GS.SkillHandler
 {
     /// <summary>

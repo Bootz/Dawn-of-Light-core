@@ -1,6 +1,4 @@
-﻿using DOL.GS.Effects;
-
-/*
+﻿/*
  * DAWN OF LIGHT - The first free open source DAoC server emulator
  *
  * This program is free software; you can redistribute it and/or
@@ -19,6 +17,10 @@
  *
  */
 
+using System;
+using System.Collections;
+using DOL.GS;
+using DOL.GS.Effects;
 using DOL.GS.PacketHandler;
 
 namespace DOL.GS.Spells

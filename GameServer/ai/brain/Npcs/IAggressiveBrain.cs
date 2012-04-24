@@ -1,4 +1,8 @@
-﻿namespace DOL.AI.Brain
+﻿using System;
+using System.Collections.Generic;
+using System.Text;
+
+namespace DOL.AI.Brain
 {
     public interface IAggressiveBrain
     {

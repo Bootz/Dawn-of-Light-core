@@ -1,3 +1,4 @@
+using System.Collections;
 using System.Collections.Generic;
 using DOL.GS.Effects;
 using DOL.GS.PacketHandler;
