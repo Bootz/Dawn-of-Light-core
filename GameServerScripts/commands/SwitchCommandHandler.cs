@@ -1,14 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Collections;
-using System.Reflection;
-using System.Threading;
-using DOL.Events;
-using DOL.GS.PacketHandler;
-using log4net;
-using DOL.Database;
+﻿using DOL.Database;
 
 namespace DOL.GS.Commands
 {
@@ -60,8 +50,8 @@ namespace DOL.GS.Commands
                 DisplaySyntax(client);
                 return;
             }
-
         }
+
         public void SwitchItem(GamePlayer player, eInventorySlot ToSlot, eInventorySlot FromSlot)
         {
             if (player.Inventory.GetItem(FromSlot) != null)

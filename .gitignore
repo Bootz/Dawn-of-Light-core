@@ -19,6 +19,12 @@
 /DOLDatabase/.sonar
 /DOLServer/.sonar
 /GameServer/.sonar
+/DOLBase/obj
+/DOLConfig/obj
+/DOLDatabase/obj
+/DOLServer/obj
+/GameServer/obj
+/GameServerScripts/obj
 /sonar-project.properties
 /sonar-runner.bat
 /sys$command
