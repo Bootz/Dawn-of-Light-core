@@ -18,7 +18,6 @@
  */
 
 using System.Reflection;
-using DOL;
 using DOL.Network;
 using log4net;
 

@@ -19,9 +19,7 @@
 
 using System;
 using System.Collections;
-using System.Reflection;
 using DOL.GS.PacketHandler;
-using log4net;
 
 namespace DOL.GS.Spells
 {

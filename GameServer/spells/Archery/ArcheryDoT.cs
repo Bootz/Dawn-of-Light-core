@@ -17,14 +17,6 @@
  *
  */
 
-using System;
-using System.Collections;
-using DOL.AI.Brain;
-using DOL.GS;
-using DOL.GS.Effects;
-using DOL.GS.PacketHandler;
-using DOL.Language;
-
 namespace DOL.GS.Spells
 {
     [SpellHandler("ArcheryDoT")]

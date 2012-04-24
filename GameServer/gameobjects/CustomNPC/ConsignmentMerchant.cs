@@ -24,7 +24,6 @@ using System.Reflection;
 using DOL.Database;
 using DOL.GS.Housing;
 using DOL.GS.PacketHandler;
-using DOL.GS.PacketHandler.Client.v168;
 using log4net;
 
 namespace DOL.GS

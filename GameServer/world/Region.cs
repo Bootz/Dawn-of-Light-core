@@ -26,7 +26,6 @@ using System.Threading;
 using DOL.Database;
 using DOL.Events;
 using DOL.GS.Keeps;
-using DOL.GS.PacketHandler;
 using DOL.GS.ServerProperties;
 using DOL.GS.Utils;
 using log4net;

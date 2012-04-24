@@ -17,14 +17,6 @@
  *
  */
 
-using System;
-using System.Collections;
-using DOL.Database;
-using DOL.Events;
-using DOL.GS;
-using DOL.GS.Effects;
-using DOL.GS.PacketHandler;
-
 namespace DOL.GS.Spells
 {
     /// <summary>

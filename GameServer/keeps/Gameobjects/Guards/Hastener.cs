@@ -17,11 +17,7 @@
  *
  */
 
-using System;
 using System.Collections;
-using DOL.GS.Effects;
-using DOL.GS.PacketHandler;
-using DOL.GS.Spells;
 
 namespace DOL.GS.Keeps
 {

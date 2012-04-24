@@ -20,13 +20,9 @@
 //#define OUTPUT_DEBUG_INFO
 using System;
 using System.Collections;
-using System.Net;
 using System.Reflection;
 using System.Text;
 using DOL.Database;
-using DOL.Events;
-using DOL.GS;
-using DOL.GS.PacketHandler;
 using DOL.Language;
 using log4net;
 

@@ -17,11 +17,8 @@
  *
  */
 
-using System.Collections;
-using System.Reflection;
 using DOL.GS.PacketHandler;
 using DOL.Language;
-using log4net;
 
 namespace DOL.GS
 {

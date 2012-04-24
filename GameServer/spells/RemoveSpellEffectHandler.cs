@@ -1,7 +1,5 @@
-using System;
 using System.Collections.Generic;
 using DOL.GS.Effects;
-using DOL.GS.PacketHandler;
 
 namespace DOL.GS.Spells
 {

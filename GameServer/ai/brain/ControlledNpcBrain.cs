@@ -26,7 +26,6 @@ using DOL.GS;
 using DOL.GS.Effects;
 using DOL.GS.PacketHandler;
 using DOL.GS.RealmAbilities;
-using DOL.GS.SkillHandler;
 using DOL.GS.Spells;
 using log4net;
 

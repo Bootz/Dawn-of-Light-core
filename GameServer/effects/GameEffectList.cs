@@ -22,7 +22,6 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
-using System.Threading;
 using DOL.AI.Brain;
 using DOL.Database;
 using DOL.GS.Spells;

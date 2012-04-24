@@ -17,19 +17,10 @@
  *
  */
 
-using System;
-using System.Collections;
 using System.Collections.Generic;
-using System.Reflection;
-using System.Text;
-using DOL.AI.Brain;
-using DOL.Database;
-using DOL.Events;
 using DOL.GS.Effects;
 using DOL.GS.PacketHandler;
-using DOL.GS.SkillHandler;
 using DOL.Language;
-using log4net;
 
 namespace DOL.GS.Spells
 {

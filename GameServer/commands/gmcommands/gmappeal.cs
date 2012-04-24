@@ -18,11 +18,9 @@
  */
 
 using System.Collections.Generic;
-using System.Reflection;
 using DOL.GS.Appeal;
 using DOL.GS.PacketHandler;
 using DOL.Language;
-using log4net;
 
 namespace DOL.GS.Commands
 {

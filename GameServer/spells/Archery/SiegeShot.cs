@@ -1,9 +1,5 @@
 //Andraste v2.0 -Vico
 
-using System;
-using DOL.Events;
-using DOL.GS;
-using DOL.GS.Effects;
 using DOL.GS.Keeps;
 using DOL.GS.PacketHandler;
 

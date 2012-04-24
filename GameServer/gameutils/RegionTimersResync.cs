@@ -26,12 +26,9 @@ using System.Reflection;
 using System.Threading;
 using DOL.AI.Brain;
 using DOL.Events;
-using DOL.GS;
 using DOL.GS.Effects;
 using DOL.GS.Movement;
 using DOL.GS.PacketHandler;
-using DOL.GS.Scripts;
-using DOL.GS.Spells;
 using log4net;
 
 namespace DOL.GS.GameEvents

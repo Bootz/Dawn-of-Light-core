@@ -1,9 +1,6 @@
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using DOL.Events;
-using DOL.GS.PacketHandler;
-using DOL.GS.RealmAbilities;
 
 namespace DOL.GS.Effects
 {

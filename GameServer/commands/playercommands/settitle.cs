@@ -17,10 +17,7 @@
  *
  */
 
-using System;
 using System.Collections;
-using DOL.GS;
-using DOL.GS.Commands;
 using DOL.GS.PacketHandler;
 using DOL.GS.PlayerTitles;
 

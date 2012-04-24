@@ -17,11 +17,9 @@
  *
  */
 
-using System.Collections;
 using DOL.Database;
 using DOL.GS.Keeps;
 using DOL.GS.PacketHandler;
-using DOL.GS.Spells;
 
 namespace DOL.GS
 {

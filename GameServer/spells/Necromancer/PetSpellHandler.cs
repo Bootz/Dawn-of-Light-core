@@ -18,12 +18,9 @@
  */
 
 using System;
-using System.Collections.Generic;
-using System.Text;
 using DOL.AI.Brain;
 using DOL.Events;
 using DOL.GS.PacketHandler;
-using DOL.GS.Spells;
 
 namespace DOL.GS.Spells
 {

@@ -17,14 +17,7 @@
  *
  */
 
-using System;
-using System.Collections;
-using System.Reflection;
-
 using DOL.AI.Brain;
-using DOL.GS.PacketHandler;
-
-using log4net;
 
 namespace DOL.GS
 {

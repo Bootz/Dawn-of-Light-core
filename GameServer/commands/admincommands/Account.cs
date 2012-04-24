@@ -19,7 +19,6 @@
 
 using System;
 using DOL.Database;
-using DOL.GS.PacketHandler;
 using DOL.GS.PacketHandler.Client.v168;
 using DOL.Language;
 

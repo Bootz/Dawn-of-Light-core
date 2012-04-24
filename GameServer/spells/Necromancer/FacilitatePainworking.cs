@@ -17,9 +17,6 @@
  *
  */
 
-using System;
-using System.Collections.Generic;
-using System.Text;
 using DOL.GS.Effects;
 
 namespace DOL.GS.Spells

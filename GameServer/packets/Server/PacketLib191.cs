@@ -18,7 +18,6 @@
 */
 #define NOENCRYPTION
 
-using System;
 using System.Reflection;
 using DOL.GS.Effects;
 using DOL.GS.Spells;

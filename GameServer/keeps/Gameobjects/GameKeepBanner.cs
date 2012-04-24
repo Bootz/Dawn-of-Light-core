@@ -17,9 +17,7 @@
  *
  */
 
-using System;
 using DOL.Database;
-using DOL.GS.PacketHandler;
 
 namespace DOL.GS.Keeps
 {

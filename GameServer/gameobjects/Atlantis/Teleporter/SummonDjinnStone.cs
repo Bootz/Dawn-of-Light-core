@@ -18,8 +18,6 @@
  */
 
 using System;
-using System.Reflection;
-using log4net;
 
 namespace DOL.GS
 {

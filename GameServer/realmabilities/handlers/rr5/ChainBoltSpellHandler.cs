@@ -17,13 +17,6 @@
  *
  */
 
-using System;
-using DOL.AI.Brain;
-using DOL.Database;
-using DOL.GS.Effects;
-using DOL.GS.PacketHandler;
-using DOL.GS.SkillHandler;
-
 namespace DOL.GS.Spells
 {
     /// <summary>

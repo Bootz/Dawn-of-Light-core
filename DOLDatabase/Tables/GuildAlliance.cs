@@ -20,8 +20,6 @@
 // this code has been done by breeze and duff a long time ago
 //
 
-using System;
-using DOL.Database;
 using DOL.Database.Attributes;
 
 //using System.Collections;

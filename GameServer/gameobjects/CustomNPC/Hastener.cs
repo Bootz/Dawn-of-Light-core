@@ -17,12 +17,7 @@
  *
  */
 
-using System;
 using System.Collections;
-using DOL.Database;
-using DOL.Database.Attributes;
-using DOL.Events;
-using DOL.GS;
 using DOL.GS.Keeps;
 
 namespace DOL.GS

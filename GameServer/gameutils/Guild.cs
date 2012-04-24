@@ -19,11 +19,9 @@ using System;
  *
  */
 
-using System.Collections;
 using System.Collections.Generic;
 using System.Reflection;
 using DOL.Database;
-using DOL.GS.Housing;
 using DOL.GS.Keeps;
 using DOL.GS.PacketHandler;
 using DOL.Language;

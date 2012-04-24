@@ -19,7 +19,6 @@ using System;
  *
  */
 
-using DOL.GS.PacketHandler;
 using DOL.GS.Quests;
 
 namespace DOL.GS.Commands

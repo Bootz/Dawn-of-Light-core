@@ -17,9 +17,6 @@
  *
  */
 
-using System;
-using DOL.GS;
-
 namespace DOL.GS.PacketHandler
 {
     /// <summary>

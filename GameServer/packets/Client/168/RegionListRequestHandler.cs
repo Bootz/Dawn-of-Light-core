@@ -17,8 +17,6 @@
  *
  */
 
-using System;
-
 namespace DOL.GS.PacketHandler.Client.v168
 {
     [PacketHandlerAttribute(PacketHandlerType.TCP, 0x35 ^ 168, "Handles sending the region overview")]

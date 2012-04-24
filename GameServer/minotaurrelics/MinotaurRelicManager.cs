@@ -21,12 +21,9 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Reflection;
-using System.Text;
 using System.Threading;
 using DOL.Database;
 using DOL.Events;
-using DOL.GS.Effects;
-using DOL.GS.Spells;
 using log4net;
 
 namespace DOL.GS

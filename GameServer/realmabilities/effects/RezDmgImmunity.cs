@@ -20,7 +20,6 @@
 using System;
 using System.Collections.Generic;
 using DOL.Events;
-using DOL.GS.PacketHandler;
 
 namespace DOL.GS.Effects
 {

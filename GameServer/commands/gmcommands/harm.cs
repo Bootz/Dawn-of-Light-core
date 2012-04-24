@@ -19,7 +19,6 @@
 
 using System;
 using System.Collections.Generic;
-using DOL.GS.PacketHandler;
 using DOL.Language;
 
 namespace DOL.GS.Commands

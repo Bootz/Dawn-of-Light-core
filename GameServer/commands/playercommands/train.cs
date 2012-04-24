@@ -22,7 +22,6 @@
 
 using System.Text;
 using DOL.Database;
-using DOL.GS.Commands;
 using DOL.GS.PacketHandler;
 
 namespace DOL.GS.Commands

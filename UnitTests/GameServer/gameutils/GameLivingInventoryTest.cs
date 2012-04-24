@@ -18,7 +18,6 @@
  */
 
 using System;
-using DOL;
 using DOL.Database;
 using DOL.GS;
 using DOL.Tests;

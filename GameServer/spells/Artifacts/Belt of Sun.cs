@@ -20,10 +20,8 @@
 namespace DOL.GS.Spells
 {
     using System;
-    using System.Collections.Generic;
     using Database;
     using DOL.GS.PacketHandler;
-    using DOL.GS.Utils;
     using Events;
 
     [SpellHandler("BeltOfSun")]

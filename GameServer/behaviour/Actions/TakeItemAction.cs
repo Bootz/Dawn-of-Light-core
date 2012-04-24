@@ -18,12 +18,9 @@
  */
 
 using System;
-using System.Collections;
 using System.Collections.Generic;
-using System.Text;
 using DOL.Database;
 using DOL.Events;
-using DOL.GS.Behaviour;
 using DOL.GS.Behaviour.Attributes;
 using DOL.GS.PacketHandler;
 using DOL.Language;

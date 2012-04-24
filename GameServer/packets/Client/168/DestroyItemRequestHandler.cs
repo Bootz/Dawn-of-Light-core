@@ -18,7 +18,6 @@
  */
 
 using System;
-using System.Collections;
 using DOL.Database;
 
 namespace DOL.GS.PacketHandler.Client.v168

@@ -1,8 +1,4 @@
-using System;
-
 using DOL.Database;
-using DOL.Events;
-using DOL.GS;
 
 namespace DOL.GS.Keeps
 {

@@ -21,12 +21,7 @@ using System;
 using System.Collections;
 using System.Collections.Specialized;
 using System.Reflection;
-using System.Text;
-using DOL.Database;
-using DOL.Events;
-using DOL.GS.Behaviour;
 using DOL.GS.Behaviour.Attributes;
-using DOL.GS.PacketHandler;
 using log4net;
 
 namespace DOL.GS.Behaviour

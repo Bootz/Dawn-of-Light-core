@@ -17,8 +17,6 @@
  *
  */
 
-using System;
-
 namespace DOL.GS.Spells
 {
     [SpellHandler("NightshadeNuke")]

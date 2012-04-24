@@ -17,8 +17,6 @@
  *
  */
 
-using System;
-using DOL.Database;
 using DOL.Database.Attributes;
 
 //using System.Collections;

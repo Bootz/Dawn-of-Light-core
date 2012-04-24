@@ -17,10 +17,7 @@
  *
  */
 
-using System;
 using DOL.Database;
-using DOL.Events;
-using DOL.GS.PacketHandler;
 using DOL.GS.ServerRules;
 
 namespace DOL.GS.GameEvents

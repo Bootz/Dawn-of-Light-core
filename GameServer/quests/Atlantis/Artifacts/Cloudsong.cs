@@ -20,11 +20,9 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.Text;
 using DOL.Database;
 using DOL.Events;
 using DOL.GS.PacketHandler;
-using DOL.GS.Quests;
 
 namespace DOL.GS.Quests.Atlantis.Artifacts
 {

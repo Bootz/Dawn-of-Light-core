@@ -17,9 +17,7 @@
  *
  */
 
-using System;
 using System.Collections;
-using DOL.GS;
 
 namespace DOL.GS.Styles
 {

@@ -19,8 +19,6 @@ using DOL.Database;
  *
  */
 
-using DOL.GS;
-
 namespace DOL.GS.SkillHandler
 {
     //Memories of War: Upon reaching level 41, the Hero, Warrior and Armsman will begin to gain more magic resistance

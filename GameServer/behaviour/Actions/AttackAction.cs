@@ -18,15 +18,10 @@
  */
 
 using System;
-using System.Collections.Generic;
 using System.Reflection;
-using System.Text;
 using DOL.AI.Brain;
-using DOL.Database;
 using DOL.Events;
-using DOL.GS.Behaviour;
 using DOL.GS.Behaviour.Attributes;
-using DOL.GS.PacketHandler;
 using log4net;
 
 namespace DOL.GS.Behaviour.Actions

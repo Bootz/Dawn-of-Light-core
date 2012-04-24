@@ -31,9 +31,6 @@ using DOL.AI.Brain;
 using DOL.Database;
 using DOL.Events;
 using DOL.GS.Behaviour;
-using DOL.GS.Behaviour.Attributes;
-using DOL.GS.PacketHandler;
-using DOL.GS.Quests;
 using DOL.Language;
 using log4net;
 

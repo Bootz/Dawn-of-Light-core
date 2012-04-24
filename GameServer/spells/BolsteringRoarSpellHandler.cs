@@ -1,7 +1,5 @@
-using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.Reflection;
 using DOL.AI.Brain;
 
 /*
@@ -22,9 +20,6 @@ using DOL.AI.Brain;
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  *
  */
-
-using DOL.GS;
-using DOL.GS.PacketHandler;
 
 namespace DOL.GS.Spells
 {

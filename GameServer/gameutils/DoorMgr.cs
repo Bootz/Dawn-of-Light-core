@@ -1,5 +1,3 @@
-using System;
-
 /*
  * DAWN OF LIGHT - The first free open source DAoC server emulator
  *
@@ -19,7 +17,6 @@ using System;
  *
  */
 
-using System.Collections;
 using System.Collections.Generic;
 using System.Reflection;
 using DOL.Database;

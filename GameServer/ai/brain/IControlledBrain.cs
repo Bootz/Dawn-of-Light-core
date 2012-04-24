@@ -17,7 +17,6 @@
  *
  */
 
-using System;
 using DOL.GS;
 
 namespace DOL.AI.Brain

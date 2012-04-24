@@ -17,10 +17,6 @@
  *
  */
 
-using System;
-using System.Collections.Generic;
-using System.Text;
-using DOL.GS.Effects;
 using DOL.GS.Spells;
 
 namespace DOL.GS.Effects

@@ -19,7 +19,6 @@
 
 using System;
 using DOL.AI.Brain;
-using DOL.GS;
 using DOL.GS.Effects;
 using DOL.GS.PacketHandler;
 

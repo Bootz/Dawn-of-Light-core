@@ -1,9 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Data;
-using System.Reflection;
-using System.Text;
-using DOL.Database.Attributes;
 using DOL.Database.Connection;
 using DOL.Database.UniqueID;
 using DataTable = System.Data.DataTable;

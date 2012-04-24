@@ -1,4 +1,3 @@
-using System.Collections;
 using DOL.GS.PacketHandler;
 
 namespace DOL.GS.SkillHandler

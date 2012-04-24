@@ -24,7 +24,6 @@ using DOL.Database;
 using DOL.Database.Attributes;
 using DOL.Database.Connection;
 using DOL.Events;
-using DOL.GS.PacketHandler;
 using log4net;
 
 namespace DOL.GS.Scripts

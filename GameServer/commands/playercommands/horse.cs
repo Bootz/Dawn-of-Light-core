@@ -1,5 +1,3 @@
-using System;
-
 //Create by La Grande Bataille french freeshard
 //Free Scripts for DOL-France and DOLserver
 using DOL.GS.PacketHandler;

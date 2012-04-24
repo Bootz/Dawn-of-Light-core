@@ -1,15 +1,10 @@
 using System;
 using System.Collections.Generic;
 using System.Reflection;
-using System.Text;
 using DOL.AI.Brain;
 using DOL.Events;
-using DOL.GS;
-using DOL.GS.Behaviour;
 using DOL.GS.Behaviour.Actions;
 using DOL.GS.Behaviour.Triggers;
-using DOL.GS.PacketHandler;
-using DOL.GS.Quests;
 using log4net;
 
 namespace DOL.GS.Behaviour.Examples

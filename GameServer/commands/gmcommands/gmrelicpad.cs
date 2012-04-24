@@ -17,11 +17,6 @@
  *
  */
 
-using System;
-using DOL.Database;
-using DOL.GS;
-using DOL.GS.PacketHandler;
-
 namespace DOL.GS.Commands
 {
     [CmdAttribute(

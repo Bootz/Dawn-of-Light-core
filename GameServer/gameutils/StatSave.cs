@@ -21,13 +21,9 @@ using System;
 using System.Collections;
 using System.Diagnostics;
 using System.Reflection;
-using System.Text;
 using System.Threading;
 using DOL.Database;
-using DOL.Database.Attributes;
 using DOL.Events;
-using DOL.GS;
-using DOL.GS.PacketHandler;
 using log4net;
 
 namespace DOL.GS.GameEvents

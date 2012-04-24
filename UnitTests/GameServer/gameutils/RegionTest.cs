@@ -19,8 +19,6 @@
 
 using System;
 using System.Collections;
-using System.Net.Sockets;
-using DOL.Database;
 using DOL.Events;
 using DOL.GS;
 using DOL.Tests;

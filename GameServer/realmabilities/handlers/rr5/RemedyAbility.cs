@@ -19,12 +19,7 @@
  * Updated to be a skillhandler to match 1.108.
  */
 
-using System.Reflection;
 using DOL.GS.Effects;
-using DOL.GS.Keeps;
-using DOL.GS.PacketHandler;
-using DOL.GS.Spells;
-using log4net;
 
 namespace DOL.GS.SkillHandler
 {

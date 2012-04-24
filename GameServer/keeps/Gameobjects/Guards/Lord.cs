@@ -1,9 +1,5 @@
-using System;
 using DOL.AI.Brain;
-using DOL.Events;
-using DOL.GS;
 using DOL.GS.PacketHandler;
-using log4net;
 
 namespace DOL.GS.Keeps
 {

@@ -17,7 +17,6 @@
  *
  */
 
-using System;
 using DOL.Events;
 using DOL.Language;
 

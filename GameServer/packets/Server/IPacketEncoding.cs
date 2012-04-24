@@ -17,8 +17,6 @@
  *
  */
 
-using System;
-
 namespace DOL.GS.PacketHandler
 {
     public interface IPacketEncoding

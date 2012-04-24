@@ -17,10 +17,7 @@
  *
  */
 
-using System;
-using System.Reflection;
 using DOL.Database.Attributes;
-using log4net;
 
 namespace DOL.Database
 {

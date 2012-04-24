@@ -1,4 +1,3 @@
-using System;
 using System.Collections;
 
 /*
@@ -20,15 +19,9 @@ using System.Collections;
  *
  */
 
-using System.Collections.Generic;
-using System.Collections.Specialized;
-using System.Reflection;
 using DOL.AI.Brain;
-using DOL.Events;
-using DOL.GS;
 using DOL.GS.Effects;
 using DOL.GS.PacketHandler;
-using log4net;
 
 namespace DOL.GS.Spells
 {

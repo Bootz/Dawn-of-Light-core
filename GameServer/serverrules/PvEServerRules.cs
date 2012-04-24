@@ -17,10 +17,8 @@
  *
  */
 
-using System;
 using DOL.AI.Brain;
 using DOL.Database;
-using DOL.GS.PacketHandler;
 
 namespace DOL.GS.ServerRules
 {

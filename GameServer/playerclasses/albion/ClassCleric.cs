@@ -17,7 +17,6 @@
  *
  */
 
-using System;
 using DOL.Language;
 
 namespace DOL.GS.PlayerClass

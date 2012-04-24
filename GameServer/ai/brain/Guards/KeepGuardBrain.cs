@@ -1,8 +1,6 @@
-using System;
 using System.Reflection;
 using DOL.GS;
 using DOL.GS.Keeps;
-using DOL.GS.Movement;
 using log4net;
 
 namespace DOL.AI.Brain

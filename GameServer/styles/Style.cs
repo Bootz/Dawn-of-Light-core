@@ -17,11 +17,8 @@
  *
  */
 
-using System;
 using System.Collections.Generic;
 using DOL.Database;
-using DOL.Database.Attributes;
-using DOL.GS;
 
 namespace DOL.GS.Styles
 {

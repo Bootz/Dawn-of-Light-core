@@ -17,13 +17,11 @@
  *
  */
 
-using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using DOL.Database;
-using DOL.GS.PacketHandler;
 using log4net;
 
 namespace DOL.GS.Keeps

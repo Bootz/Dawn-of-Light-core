@@ -17,9 +17,6 @@
  *
  */
 
-using System;
-using System.Text;
-
 namespace DOL.GS
 {
     //Dinberg: Added this for instances as we dont want to have to parse XML every time we create an instance,

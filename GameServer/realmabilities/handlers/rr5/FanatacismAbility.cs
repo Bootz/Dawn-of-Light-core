@@ -20,11 +20,8 @@ using System.Collections.Generic;
  *
  */
 
-using System.Reflection;
 using DOL.Database;
-using DOL.GS;
 using DOL.GS.Effects;
-using DOL.GS.PacketHandler;
 
 namespace DOL.GS.RealmAbilities
 {

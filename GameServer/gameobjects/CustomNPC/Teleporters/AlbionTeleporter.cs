@@ -18,16 +18,8 @@
  */
 
 using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.Reflection;
-using System.Text;
 using DOL.Database;
-using DOL.GS;
-using DOL.GS.Housing;
 using DOL.GS.Quests.Catacombs.Obelisks;
-using DOL.GS.Spells;
-using log4net;
 
 namespace DOL.GS
 {

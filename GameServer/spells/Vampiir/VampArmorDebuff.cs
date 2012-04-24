@@ -1,20 +1,9 @@
 using System;
-using System.Collections;
 using System.Collections.Generic;
-using System.Reflection;
-using System.Threading;
-using DOL.AI;
-using DOL.AI.Brain;
 using DOL.Database;
 using DOL.Events;
 using DOL.GS.Effects;
-using DOL.GS.Movement;
 using DOL.GS.PacketHandler;
-using DOL.GS.RealmAbilities;
-using DOL.GS.Spells;
-using DOL.GS.Utils;
-using DOL.Language;
-using log4net;
 
 namespace DOL.GS.Spells
 {

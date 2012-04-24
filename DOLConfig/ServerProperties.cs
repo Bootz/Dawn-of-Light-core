@@ -24,7 +24,6 @@ using System.Linq;
 using System.Windows.Forms;
 
 using DOL.Database;
-using DOL.Database.Connection;
 
 namespace DOLConfig
 {

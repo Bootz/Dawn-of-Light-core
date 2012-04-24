@@ -19,10 +19,8 @@
 
 using System;
 using System.Collections.Generic;
-using System.Reflection;
 using System.Threading;
 using DOL.Database;
-using log4net;
 
 namespace DOL.GS
 {

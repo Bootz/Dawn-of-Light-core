@@ -21,7 +21,6 @@ using DOL.GS.Keeps;
 *
 */
 
-using DOL.GS.PacketHandler;
 using DOL.GS.ServerRules;
 using DOL.Language;
 

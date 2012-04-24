@@ -18,7 +18,6 @@
  */
 
 using System;
-using System.Reflection;
 using DOL.AI.Brain;
 using DOL.Database;
 using DOL.Events;
@@ -26,7 +25,6 @@ using DOL.GS.Effects;
 using DOL.GS.Keeps;
 using DOL.GS.PacketHandler;
 using DOL.Language;
-using log4net;
 
 namespace DOL.GS.Spells
 {

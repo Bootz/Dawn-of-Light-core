@@ -17,12 +17,9 @@
  *
  */
 
-using System;
-using System.Collections.Generic;
 using System.Reflection;
 using DOL.Database;
 using DOL.Events;
-using DOL.GS;
 using DOL.Language;
 using log4net;
 

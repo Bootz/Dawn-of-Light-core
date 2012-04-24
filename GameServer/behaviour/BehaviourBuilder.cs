@@ -17,10 +17,6 @@
  *
  */
 
-using System;
-using System.Reflection;
-using System.Text;
-using DOL.Database;
 using DOL.GS.Quests;
 
 namespace DOL.GS.Behaviour

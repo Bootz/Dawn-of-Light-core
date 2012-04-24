@@ -17,10 +17,6 @@
  *
  */
 
-using System;
-using System.Collections.Generic;
-using System.Text;
-using DOL.Events;
 using DOL.GS.Spells;
 
 namespace DOL.Events

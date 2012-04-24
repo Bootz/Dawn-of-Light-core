@@ -20,14 +20,8 @@
 // MarketSearch by Tolakram.  Donated from Storm
 // Based on MarketNPC by Etaew, rewritten by Tolakram for new Inventory system
 
-using System;
-using System.Collections;
 using System.Collections.Generic;
 using DOL.Database;
-using DOL.Database.Transaction;
-using DOL.Events;
-using DOL.GS;
-using DOL.GS.PacketHandler;
 using log4net;
 
 namespace DOL.GS

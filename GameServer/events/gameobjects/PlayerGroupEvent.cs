@@ -17,8 +17,6 @@
  *
  */
 
-using System;
-
 namespace DOL.Events
 {
     /// <summary>

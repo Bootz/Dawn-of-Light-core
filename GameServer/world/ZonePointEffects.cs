@@ -19,11 +19,8 @@
 
 using System;
 using System.Collections.Generic;
-using System.Reflection;
-using System.Timers;
 using DOL.Database;
 using DOL.Events;
-using log4net;
 
 namespace DOL.GS.GameEvents
 {

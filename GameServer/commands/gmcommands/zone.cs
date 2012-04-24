@@ -18,16 +18,9 @@
  */
 
 using System;
-using System.Collections;
 using System.Collections.Generic;
-using System.Reflection;
 using DOL.Database;
-using DOL.GS;
 using DOL.GS.PacketHandler;
-using DOL.GS.ServerProperties;
-using DOL.GS.Utils;
-using DOL.Language;
-using log4net;
 
 namespace DOL.GS.Commands
 {

@@ -17,12 +17,7 @@
  *
  */
 
-using System;
-using System.Collections;
-using DOL.GS;
-using DOL.GS.Effects;
 using DOL.GS.PacketHandler;
-using DOL.GS.SkillHandler;
 
 namespace DOL.GS.Spells
 {

@@ -19,11 +19,7 @@
 
 //Instance devised by Dinberg
 //     - there will probably be questions, direct them to dinberg_darktouch@hotmail.co.uk ;)
-using System;
-using System.Reflection;
-using System.Text;
 using DOL.Database;
-using log4net;
 
 namespace DOL.GS
 {

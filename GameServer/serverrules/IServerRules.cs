@@ -17,12 +17,9 @@
  *
  */
 
-using System;
-using System.Collections;
 using System.Collections.Generic;
 using DOL.Database;
 using DOL.GS.Keeps;
-using DOL.GS.Styles;
 
 namespace DOL.GS.ServerRules
 {

@@ -17,7 +17,6 @@
  *
  */
 
-using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.IO;
@@ -26,7 +25,6 @@ using System.Text;
 
 using DOL.Database;
 using DOL.GS;
-using DOL.GS.Quests;
 using log4net;
 
 namespace DOL.Language

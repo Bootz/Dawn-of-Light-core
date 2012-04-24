@@ -22,7 +22,6 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Reflection;
 using System.Threading;
-using DOL.Database;
 using DOL.GS.Utils;
 using DOL.Language;
 using log4net;

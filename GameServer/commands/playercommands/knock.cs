@@ -17,8 +17,6 @@
  *
  */
 
-using System;
-using System.Collections;
 using DOL.GS.Housing;
 using DOL.GS.PacketHandler;
 

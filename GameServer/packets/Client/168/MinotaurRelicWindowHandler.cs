@@ -17,9 +17,7 @@
  *
  */
 
-using System;
 using System.Reflection;
-using DOL.GS;
 using log4net;
 
 namespace DOL.GS.PacketHandler.Client.v168

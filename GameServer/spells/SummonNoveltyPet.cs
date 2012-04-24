@@ -19,12 +19,8 @@
 
 // Original code by Dinberg
 
-using System;
 using System.Collections.Generic;
-using System.Text;
 using DOL.AI.Brain;
-using DOL.GS;
-using DOL.GS.Spells;
 
 namespace DOL.GS.Spells
 {

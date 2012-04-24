@@ -17,7 +17,6 @@
  *
  */
 
-using System;
 using DOL.Database;
 using log4net;
 

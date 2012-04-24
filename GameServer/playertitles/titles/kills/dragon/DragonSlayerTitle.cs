@@ -24,7 +24,6 @@
  *   - Added missing (+language support)
  */
 
-using System;
 using DOL.Events;
 using DOL.Language;
 

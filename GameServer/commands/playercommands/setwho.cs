@@ -1,6 +1,3 @@
-using System;
-using DOL.GS.PacketHandler;
-
 namespace DOL.GS.Commands
 {
     [CmdAttribute(

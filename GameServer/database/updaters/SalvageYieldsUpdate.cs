@@ -17,8 +17,6 @@
  *
  */
 
-using System;
-using System.Collections;
 using DOL.Database;
 using log4net;
 

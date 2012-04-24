@@ -19,13 +19,11 @@ using System;
  *
  */
 
-using System.Reflection;
 using DOL.AI.Brain;
 using DOL.Database;
 using DOL.GS.Effects;
 using DOL.GS.PacketHandler;
 using DOL.GS.PropertyCalc;
-using log4net;
 
 namespace DOL.GS.Spells
 {

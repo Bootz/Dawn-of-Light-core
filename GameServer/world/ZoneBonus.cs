@@ -17,12 +17,7 @@
  *
  */
 
-using System;
-using System.Collections.Generic;
 using System.Reflection;
-using System.Text;
-using DOL.Database;
-using DOL.GS.PacketHandler;
 using DOL.Language;
 using log4net;
 

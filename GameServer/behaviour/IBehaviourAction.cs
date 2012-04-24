@@ -18,7 +18,6 @@
  */
 
 using System;
-using System.Text;
 using DOL.Events;
 
 namespace DOL.GS.Behaviour
